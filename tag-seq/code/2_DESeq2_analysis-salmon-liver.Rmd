@@ -13,35 +13,36 @@ echo $PATH
 ```
 
 ### Load libraries
-```{r load_libraries, inlcude = TRUE}
+```{r load_libraries, include = TRUE}
 
 ## clear
 rm(list=ls())
 
-## Install Rtools directly from (https://cran.r-project.org/bin/windows/Rtools/), then install these on first run:
-# install.packages("BiocManager")
-# BiocManager::install("DESeq2")
-# BiocManager::install("vsn")
-# BiocManager::install("tidybulk")
-# BiocManager::install("goseq")
-# BiocManager::install("affycoretools")
-# BiocManager::install("EnhancedVolcano")
-# BiocManager::install("pcaExplorer")
-# BiocManager::install("apeglm")
-# BiocManager::install("PCAtools")
+## Package versions are pinned in renv.lock at the repository root.
+## On a fresh clone, run renv::restore() once, then render. Do not install
+## packages from inside this notebook: installing at render time means the
+## result depends on whatever CRAN served that day.
 
+## Every package below is called by this notebook. Thirteen that were loaded
+## here and never called have been dropped (edgeR, goseq, GenomicFeatures,
+## data.table, calibrate, affycoretools, vsn, tidybulk, cowplot, gplots,
+## plotly, readxl, sqldf), along with EnhancedVolcano and pcaExplorer, whose
+## functions are never invoked -- the volcano plots are plain ggplot2.
 
-# List of packages we want to install (run every time)
-load.lib<-c("DESeq2","edgeR","goseq","dplyr","GenomicFeatures","data.table","calibrate","affycoretools","data.table","vsn","tidybulk","ggplot2","cowplot","pheatmap","gplots","RColorBrewer","EnhancedVolcano","pcaExplorer","readxl","apeglm","ashr","tibble","plotly","sqldf","PCAtools","ggpubr")
+## library() is used rather than require(): a missing package must stop the
+## render here, not return FALSE and fail later inside an analysis chunk.
 
-# Select only the packages that aren't currently installed (run every time)
-install.lib <- load.lib[!load.lib %in% installed.packages()]
+library(DESeq2)       # DESeqDataSetFromMatrix, DESeq, results, lfcShrink, vst, rlog
+library(apeglm)       # lfcShrink(type = "apeglm")
+library(ashr)         # lfcShrink(type = "ashr")
+library(PCAtools)     # pca, screeplot, biplot, pairsplot, getComponents
+library(pheatmap)     # sample-correlation heatmap
+library(RColorBrewer) # brewer.pal, for the DEG heatmap palette
+library(ggpubr)       # ggexport
+library(ggplot2)
+library(dplyr)
+library(tibble)       # rownames_to_column
 
-# And finally we install the missing packages, including their dependency.
-for(lib in install.lib) install.packages(lib,dependencies=TRUE)
-# After the installation process completes, we load all packages.
-sapply(load.lib,require,character=TRUE)
-                        
 ```
 
 #Set ggplot theme
