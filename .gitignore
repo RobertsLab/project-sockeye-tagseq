@@ -1,0 +1,24 @@
+# ---- R / RStudio session state ----------------------------------------------
+# None of this describes the analysis; it describes one person's editor.
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# ---- Knit / render caches ---------------------------------------------------
+*_cache/
+*_files/
+.quarto/
+_freeze/
+/docs/site_libs/
+
+# ---- renv -------------------------------------------------------------------
+# renv.lock IS tracked; the library it installs is not.
+renv/library/
+renv/staging/
+renv/local/
+renv/python/
+renv/sandbox/
+
+# ---- OS ---------------------------------------------------------------------
+.DS_Store
