@@ -2,21 +2,52 @@
 
 ## Reproducibility
 
-This repository has been rebuilt as a fully reproducible Quarto project (phases 0-4, see 
-`REPRODUCIBILITY-PLAN.md`). To render the analysis:
+This repository has been rebuilt as a reproducible Quarto project (phases 0-4, see
+`REPRODUCIBILITY-PLAN.md`). To reproduce the analysis:
 
 ```bash
-# First-time setup: restore R environment
-renv::restore()
+# First-time setup, from R in the project root:
+#   renv::restore()
 
-# Render the analysis (R and downstream steps only; upstream FASTQ processing requires Raven)
-quarto render
+# Then, from the shell in the project root:
+./render-all.sh
 ```
 
-The upstream steps (alignment and assembly) are documented in `tag-seq/code/01-upstream-alignment.qmd` 
-with `eval: false` — they are meant to run on Raven with access to Gannet storage, not on a laptop.
+`./render-all.sh` is the entry point, **not** `quarto render`.
+`02-differential-expression.qmd` is parameterised by tissue and defaults to
+liver, so a bare `quarto render` regenerates the liver results only and leaves
+the gonad results untouched. The script renders it once per tissue, then the two
+notebooks that consume its output.
 
-For more details, see `REPRODUCIBILITY-PLAN.md`.
+Results land in `tag-seq/DESEQ_output/<tissue>/`, `tag-seq/gene_tables/` and
+`tag-seq/GO_output/<tissue>/`, all of which are tracked in git — so
+`git diff --stat` after a render is the reproduction test. The only expected
+differences are re-rendered image bytes and `apeglm` fold changes in the third
+decimal (its shrinkage is an iterative fit and is sensitive to the package
+version).
+
+The upstream steps (alignment and assembly) are documented in
+`tag-seq/code/01-upstream-alignment.qmd` with `eval: false` — they are meant to
+run on Raven with access to Gannet storage, not on a laptop.
+
+### What each notebook does
+
+| Notebook | Reads | Writes |
+|---|---|---|
+| `01-upstream-alignment.qmd` | FASTQs on Gannet | count matrices (on Raven; `eval: false` here) |
+| `02-differential-expression.qmd` | `tag-seq/data/` | `tag-seq/DESEQ_output/<tissue>/` |
+| `03-gene-tables.qmd` | `*-SIG-DEG-apeglm.csv` | `tag-seq/gene_tables/` |
+| `04-enrichment.qmd` | `*-ALL-DEG-apeglm.csv`, GAF, KEGG | `tag-seq/GO_output/<tissue>/` |
+
+Input integrity is recorded in `CHECKSUMS.sha256` and checked at the start of
+every render (a mismatch warns, it does not stop). Verify by hand with
+`shasum -c CHECKSUMS.sha256`.
+
+`archive/` holds superseded material kept for reference only: the original
+upstream shell transcript and the 2023 DAVID web-tool output. Nothing in it is
+rendered or read by the analysis.
+
+For the full audit and the remaining work, see `REPRODUCIBILITY-PLAN.md`.
 
 ---
 

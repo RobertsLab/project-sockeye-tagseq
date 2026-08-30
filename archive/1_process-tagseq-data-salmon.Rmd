@@ -7,6 +7,15 @@ output: html_notebook
 for the current, cleaned-up version with all absolute paths parameterized, bowtie2 removed, and brain 
 branch clearly marked as unresolved.
 
+It lives in `archive/` and is excluded from the Quarto project's `render:` list, so it is never
+rendered as part of the analysis. The guard below is the second line of defence: every chunk below
+is a shell transcript of one session on one machine — absolute paths under `/home/shared/`, `wget`
+against Gannet, `rsync` between local directories — and none of it should execute anywhere.
+
+```{r deprecated-guard, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
 ---# Get sockeye salmon assembly: https://www.ncbi.nlm.nih.gov/assembly/GCF_006149115.2
 ```{bash}
 

@@ -4,9 +4,9 @@ subtitle: "goseq against the NCBI annotation for GCF_006149115.2"
 date: today
 ---
 
-Replaces the DAVID web-tool step that produced `DESEQ_output/gonad/DAVID_GOterms.txt`
-and `DAVID_KEGG_pathway.txt`, for which no script, input list, background or
-query date was recorded. It also replaces `X_GOterm_Annotation.Rmd` and
+Replaces the DAVID web-tool step that produced `DAVID_GOterms.txt` and
+`DAVID_KEGG_pathway.txt`, for which no script, input list, background or query
+date was recorded (both now in `archive/david-2023/`, see the README there). It also replaces `X_GOterm_Annotation.Rmd` and
 `X_GOSeq_annotation.Rmd`, which belonged to a different experiment entirely
 (finding B3).
 
@@ -67,11 +67,14 @@ print(table(gaf$aspect))
 more reads and are easier to call differentially expressed.
 
 The plan was to take lengths from `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff`,
-but **that file is tracked and zero bytes** — the `sortBed` step in
-`1_process-tagseq-data-salmon.Rmd` that should have written it never produced
-anything that was committed. Lengths come instead from the assembly feature
-table, which is committed and complete: the median mRNA interval length per
-gene, keyed by `GeneID`, which is our `LOC` identifier without the prefix.
+but that file was tracked at **zero bytes** — the `bedtools` step that should
+have written it (documented in `01-upstream-alignment.qmd`, "Generate mRNA
+feature track") never produced anything that was committed. It has since been
+untracked rather than left in place as an empty file asserting that it exists
+(finding E7). Lengths come instead from the assembly feature table, which is
+committed and complete: the median mRNA interval length per gene, keyed by
+`GeneID`, which is our `LOC` identifier without the prefix. Nothing upstream has
+to be re-run to obtain them.
 
 ```{r}
 #| label: lengths

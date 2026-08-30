@@ -155,9 +155,10 @@ load_counts <- function(cfg) {
 ## so this is a strict superset, not a different annotation.
 ##
 ## Length is the median mRNA interval per gene, for goseq's length-bias
-## correction. It comes from here because
-## sequences/GCF_006149115.2_Oner_1.1_mRNA.gff is tracked and zero bytes
-## (finding E7).
+## correction. It comes from here rather than from
+## sequences/GCF_006149115.2_Oner_1.1_mRNA.gff, which was tracked at zero bytes
+## and has since been untracked (finding E7); the feature table is committed and
+## complete, so no upstream step has to be re-run to get lengths.
 load_gene_annotation <- function() {
   ft <- read.delim(file.path(PATHS$genome, "GCF_006149115.2_Oner_1.1_feature_table.txt"),
                    sep = "\t", quote = "", stringsAsFactors = FALSE, check.names = FALSE)
@@ -210,3 +211,70 @@ my_theme <- ggplot2::theme(
 TRT_COLOURS <- c(territorial = "royalblue1", social = "red3")
 
 trt_side_colours <- function(coldata) unname(TRT_COLOURS[as.character(coldata$trt)])
+
+# ---- input integrity ---------------------------------------------------------
+
+## Check the input files against CHECKSUMS.sha256 (finding E12).
+##
+## Finding R1 was a count matrix whose columns had been reordered by a re-run of
+## prepDE.py, silently mislabelling every sample; the loader assertions above
+## catch that case now. This is the same failure mode one layer further out: an
+## input file that changed without anyone noticing, so that the committed
+## results no longer correspond to the committed inputs.
+##
+## A mismatch warns rather than stops. A deliberate data update should not block
+## a render -- it should be loud, and then re-recorded:
+##     shasum -a 256 $(awk '!/^#/ && NF {print $2}' CHECKSUMS.sha256) > CHECKSUMS.sha256
+##
+## Paths in the manifest are relative to the project root, which is where every
+## chunk runs (execute-dir: project). Skipped with a message if the manifest or
+## the digest package is absent, so no notebook gains a hard dependency on it.
+verify_inputs <- function(manifest = "CHECKSUMS.sha256") {
+  if (!file.exists(manifest)) {
+    message("verify_inputs(): ", manifest, " not found; skipping integrity check")
+    return(invisible(NULL))
+  }
+  if (!requireNamespace("digest", quietly = TRUE)) {
+    message("verify_inputs(): package 'digest' not installed; skipping integrity check")
+    return(invisible(NULL))
+  }
+
+  lines <- readLines(manifest, warn = FALSE)
+  lines <- trimws(lines)
+  lines <- lines[nzchar(lines) & !startsWith(lines, "#")]
+
+  expected <- sub("^([0-9a-fA-F]+)[[:space:]]+[*]?(.*)$", "\\1", lines)
+  paths    <- sub("^([0-9a-fA-F]+)[[:space:]]+[*]?(.*)$", "\\2", lines)
+
+  missing  <- character(0)
+  mismatch <- character(0)
+  for (i in seq_along(paths)) {
+    if (!file.exists(paths[i])) {
+      missing <- c(missing, paths[i])
+      next
+    }
+    got <- digest::digest(paths[i], algo = "sha256", file = TRUE)
+    if (!identical(tolower(got), tolower(expected[i]))) {
+      mismatch <- c(mismatch, paths[i])
+    }
+  }
+
+  if (length(missing) > 0) {
+    warning("input file(s) listed in ", manifest, " are missing: ",
+            paste(missing, collapse = ", "), call. = FALSE)
+  }
+  if (length(mismatch) > 0) {
+    warning("input file(s) do not match ", manifest, ": ",
+            paste(mismatch, collapse = ", "),
+            ". The analysis will still run, but the committed results no longer ",
+            "correspond to these inputs.", call. = FALSE)
+  }
+  if (length(missing) == 0 && length(mismatch) == 0) {
+    message("verify_inputs(): ", length(paths), " input files match ", manifest)
+  }
+
+  invisible(list(checked = paths, missing = missing, mismatch = mismatch))
+}
+
+## Runs whenever this file is sourced, i.e. at the top of notebooks 02, 03 and 04.
+verify_inputs()
