@@ -11,8 +11,10 @@
 .quarto/
 _freeze/
 /docs/site_libs/
-# Rendered notebooks land next to their source until phase 5 sets up docs/.
+# Rendered notebooks land beside their source, or at the project root when
+# --output is used, until phase 5 sets up docs/.
 tag-seq/code/*.html
+/*.html
 
 # ---- renv -------------------------------------------------------------------
 # renv.lock IS tracked; the library it installs is not.

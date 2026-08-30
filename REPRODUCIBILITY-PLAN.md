@@ -6,7 +6,7 @@ and render end to end.
 Audit performed 2026-08-29 against commit `94718d8`, tagged `v0-preexisting`.
 Local toolchain at that point: R 4.3.2, Quarto 1.6.40, DESeq2 1.42.1.
 
-**Status:** phases 0, 1 and 2 are complete. Phase 3 is next.
+**Status:** phases 0-3 are complete. Phase 4 is next.
 
 ---
 
@@ -62,10 +62,16 @@ So enrichment becomes one `download.file()` plus `goseq`, with gene lengths
 derived from `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff`, which is already in
 the repository. No BLAST, no web tool, no manual step.
 
-**KEGG is a separate matter.** There is no KEGG organism for *Oncorhynchus
-nerka* (confirmed against the KEGG REST organism list). Pathway-level analysis
-would require transferring orthologs to an annotated relative. Phase 3 reports
-GO enrichment only; KEGG stays out of scope unless you want the ortholog step.
+**KEGG — correction.** An earlier draft of this plan said there was no KEGG
+organism for *Oncorhynchus nerka*. That was wrong. The check queried the KEGG
+REST organism list, got an empty response, and misread "no data" as "no match".
+KEGG carries sockeye as organism **`one`** (genome T07952, 37,942 proteins — the
+same gene count as our matrix), and its gene identifiers are NCBI GeneIDs, which
+join to our `LOC` ids directly. The giveaway was in the repository all along:
+`DAVID_KEGG_pathway.txt` contains strings like `one04110:Cell cycle`.
+
+Both KEGG REST responses are vendored next to the GAF, with their retrieval date
+recorded in `tag-seq/genome/kegg_one_SOURCE.txt`. No ortholog transfer needed.
 
 ---
 
@@ -141,6 +147,11 @@ GO enrichment only; KEGG stays out of scope unless you want the ortholog step.
 - **E5 — The two DESeq2 notebooks are a copy-paste pair.** Normalised for tissue
   name, 571 and 582 lines differ in five places.
 - **E6 — The README documents logistics, not the analysis.**
+- **E7 — `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff` is tracked and zero
+  bytes.** *(new, found during phase 3)* The `sortBed` step in the upstream
+  notebook that should have written it produced nothing that was committed. Gene
+  lengths for `goseq` come from the assembly feature table instead. Phase 4
+  should either regenerate the file or stop tracking it.
 
 ---
 
@@ -290,7 +301,7 @@ Two intended differences:
 renv flags it for any document with a `params:` header, but params are always
 passed on the command line, never prompted for interactively.
 
-### Phase 3 — Rebuild the gene tables, and script the enrichment
+### Phase 3 — Rebuild the gene tables, and script the enrichment &nbsp;`DONE`
 
 - Rewrite `03-gene-tables.qmd` against the two tissues that exist. The
   characterized / uncharacterized / `LOCNA` split is about fifteen lines of
@@ -307,8 +318,54 @@ passed on the command line, never prompted for interactively.
 - Drop the rewritten gene-table notebook from `.renvignore` so its dependencies
   get pinned; add `goseq` to the lockfile.
 
-**Done when** `gene_tables/` and the enrichment results regenerate from a render,
-and every notebook in the repository either runs or is gone.
+**Gene tables.** `03-gene-tables.qmd` replaces the 165-line oyster notebook.
+Whatever produced the committed `gene_tables/` was never in the repository, so
+the rule was reconstructed from the outputs and verified: drop genes with no
+description (the old code's `LOCNA` class), then split the rest on whether the
+description begins with `uncharacterized`. Reproduces exactly —
+liver 28 / 0 / 28, gonad 1280 / 41 / 1321 — and `uncharacterized_stats.txt` is
+byte-identical.
+
+One deliberate format change: the committed tables were written with
+`quote = FALSE, sep = ","` while descriptions contain commas
+(`uncharacterized LOC115129809, transcript variant X3`). In
+`gonad_characterized.txt` only 754 of 1,280 rows had the expected 8 fields; 526
+had 9-11 and could not be read back. They are now properly quoted CSV. Rows and
+values are unchanged. `gonad_all_LOCID.txt` also reorders 71 of 1,321 lines —
+adjacent pairs with near-tied fold changes, swapped by apeglm's third-decimal
+shift from phase 2. Same gene set.
+
+**Enrichment.** `04-enrichment.qmd` runs `goseq` — with its length-bias
+correction — for GO and KEGG, both tissues. Universe is every gene with an
+adjusted p-value; DE is `padj < 0.05`, the same rule the results tables use.
+
+Gene lengths could not come from `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff`
+as planned: **that file is tracked and zero bytes** (new finding E7). They come
+from the assembly feature table instead — median mRNA interval length per gene,
+keyed by `GeneID`, which is our `LOC` id without the prefix. 37,929 of 37,942
+genes get a length.
+
+Results, written to `tag-seq/GO_output/<tissue>/`:
+
+| tissue | categories tested | FDR < 0.05 |
+|---|---|---|
+| liver GO | 3275 | 0 |
+| liver KEGG | 187 | 0 |
+| gonad GO | 5209 | 1 |
+| gonad KEGG | 194 | 0 |
+
+The single hit is `GO:0051131` *chaperone-mediated protein complex assembly*
+(BP, 6 of 6 genes DE, FDR 0.028). Liver has only 31 significant genes, so no
+enrichment there is the expected result rather than a failure.
+
+**On the DAVID files.** They are not enrichment results and never were.
+`DAVID_GOterms.txt` is a 53-row gene report (symbol, name, species) with no GO
+terms in it at all, and `DAVID_KEGG_pathway.txt` is a 13-row gene report listing
+each gene's pathways. There was no committed enrichment analysis to reproduce,
+so these numbers are the project's first.
+
+**Done:** `gene_tables/` and the enrichment results regenerate from a render, and
+every notebook in the repository either runs or is gone.
 
 ### Phase 4 — Make the upstream steps honest
 

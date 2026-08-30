@@ -1,0 +1,195 @@
+"category","name","over_represented_pvalue","FDR","numDEInCat","numInCat"
+"one00190","Oxidative phosphorylation",0.000574211947237267,0.11139711776403,50,164
+"one03060","Protein export",0.00172461182781223,0.167287347297786,13,44
+"one04010","MAPK signaling pathway",0.0348133688354752,1,33,349
+"one04142","Lysosome biogenesis",0.0436059789754175,1,29,252
+"one04060","Cytokine-cytokine receptor interaction",0.0505122659649672,1,18,140
+"one03250","Viral life cycle - HIV-1",0.060294692525234,1,10,80
+"one00790","Folate biosynthesis",0.0810218273812346,1,5,22
+"one04744","Phototransduction",0.0985880808674566,1,4,16
+"one03013","Nucleocytoplasmic transport",0.0987825681818735,1,17,136
+"one04260","Cardiac muscle contraction",0.109562131258543,1,21,95
+"one04144","Endocytosis",0.111432986383104,1,33,368
+"one04623","Cytosolic DNA-sensing pathway",0.113411342555663,1,10,55
+"one03420","Nucleotide excision repair",0.115448898176188,1,9,40
+"one00980","Metabolism of xenobiotics by cytochrome P450",0.125073972562969,1,6,25
+"one04540","Gap junction",0.125629796944161,1,10,97
+"one00740","Riboflavin metabolism",0.137865727363302,1,2,8
+"one03040","Spliceosome",0.145592482963906,1,30,220
+"one03020","RNA polymerase",0.149439452316455,1,6,26
+"one03272","Virion - Hepatitis viruses",0.162762993377181,1,8,62
+"one04514","Cell adhesion molecule (CAM) interaction",0.164922216874513,1,13,133
+"one00250","Alanine, aspartate and glutamate metabolism",0.168225358486512,1,4,33
+"one05100","Bacterial invasion of epithelial cells",0.174006626902993,1,13,129
+"one00640","Propanoate metabolism",0.176847967173177,1,4,28
+"one00510","N-Glycan biosynthesis",0.180041000875214,1,8,65
+"one04517","IgSF CAM signaling",0.183489862036378,1,31,382
+"one03440","Homologous recombination",0.191727981765073,1,4,19
+"one04082","Neuroactive ligand signaling",0.197867829235935,1,10,104
+"one00061","Fatty acid biosynthesis",0.219183799422501,1,2,14
+"one00071","Fatty acid degradation",0.21979281010032,1,3,26
+"one04145","Phagocytosis",0.224006262612634,1,29,268
+"one03260","Virion - Human immunodeficiency virus",0.23278369200561,1,1,3
+"one04156","Integrated stress response (ISR) signaling pathway",0.251230984265844,1,8,68
+"one04814","Motor proteins",0.257644504420705,1,17,163
+"one00330","Arginine and proline metabolism",0.278279423431599,1,6,44
+"one05132","Salmonella infection",0.29370442886195,1,36,350
+"one00561","Glycerolipid metabolism",0.304331923580232,1,6,67
+"one00511","Other glycan degradation",0.305194478570196,1,1,5
+"one03460","Fanconi anemia pathway",0.311043143078326,1,3,20
+"one04340","Hedgehog signaling pathway",0.328043779217674,1,5,67
+"one00565","Ether lipid metabolism",0.354877020182017,1,6,52
+"one01230","Biosynthesis of amino acids",0.360245975940434,1,8,78
+"one04141","Protein processing in endoplasmic reticulum",0.365774628666076,1,24,254
+"one04261","Adrenergic signaling in cardiomyocytes",0.366616902565998,1,14,172
+"one04020","Calcium signaling pathway",0.377098651961591,1,15,203
+"one04081","Hormone signaling",0.385481888262029,1,13,161
+"one00982","Drug metabolism - cytochrome P450",0.386546390802465,1,4,22
+"one04371","Apelin signaling pathway",0.388776479315712,1,14,170
+"one00410","beta-Alanine metabolism",0.408393321966785,1,2,22
+"one01212","Fatty acid metabolism",0.408982533654965,1,4,42
+"one00450","Selenocompound metabolism",0.412522330547336,1,1,8
+"one01100","Metabolic pathways",0.41425837225389,1,124,1270
+"one00600","Sphingolipid metabolism",0.417464004521405,1,4,50
+"one00040","Pentose and glucuronate interconversions",0.420824930743875,1,2,16
+"one00590","Arachidonic acid metabolism",0.422863164748094,1,6,39
+"one04916","Melanogenesis",0.423654530008324,1,8,101
+"one00480","Glutathione metabolism",0.429538466938704,1,6,41
+"one04150","mTOR signaling pathway",0.433612541512077,1,15,188
+"one00052","Galactose metabolism",0.44589890576728,1,2,20
+"one04672","Intestinal immune network for IgA production",0.456397439201539,1,3,25
+"one00650","Butanoate metabolism",0.472286832392496,1,1,9
+"one00260","Glycine, serine and threonine metabolism",0.474625065444258,1,3,28
+"one00220","Arginine biosynthesis",0.482922376745068,1,2,21
+"one00630","Glyoxylate and dicarboxylate metabolism",0.49009123214329,1,3,30
+"one00531","Glycosaminoglycan degradation",0.491840432030491,1,1,10
+"one04625","C-type lectin receptor signaling pathway",0.494169929934993,1,12,151
+"one03265","Virion - Ebolavirus, Lyssavirus and Morbillivirus",0.494654831063888,1,1,12
+"one00340","Histidine metabolism",0.498133720075329,1,1,10
+"one04620","Toll-like receptor signaling pathway",0.507643293109679,1,8,107
+"one04080","Neuroactive ligand-receptor interaction",0.513196282966536,1,10,130
+"one00513","Various types of N-glycan biosynthesis",0.533432925303196,1,5,56
+"one04920","Adipocytokine signaling pathway",0.534855038303123,1,6,88
+"one00770","Pantothenate and CoA biosynthesis",0.538070278522,1,1,12
+"one04914","Progesterone-mediated oocyte maturation",0.563430485214784,1,7,100
+"one03008","Ribosome biogenesis in eukaryotes",0.563727909678188,1,7,64
+"one00062","Fatty acid elongation",0.570072771804755,1,2,23
+"one04120","Ubiquitin mediated proteolysis",0.57021565390397,1,18,187
+"one04270","Vascular smooth muscle contraction",0.5942078422549,1,12,157
+"one00280","Valine, leucine and isoleucine degradation",0.599231998650279,1,2,26
+"one00670","One carbon pool by folate",0.607042525472135,1,2,27
+"one03010","Ribosome",0.609339274709376,1,50,206
+"one05168","Herpes simplex virus 1 infection",0.610101636574354,1,18,218
+"one00512","Mucin type O-glycan biosynthesis",0.612935769670338,1,2,31
+"one04210","Apoptosis",0.614687811872539,1,15,187
+"one00563","Glycosylphosphatidylinositol (GPI)-anchor biosynthesis",0.62150279066624,1,1,10
+"one04350","TGF-beta signaling pathway",0.622391782491624,1,11,145
+"one04977","Vitamin digestion and absorption",0.625862762254216,1,2,22
+"one04621","NOD-like receptor signaling pathway",0.628048775201478,1,15,182
+"one00532","Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate",0.628292430704129,1,1,16
+"one04622","RIG-I-like receptor signaling pathway",0.628485949966469,1,4,56
+"one04519","Cadherin signaling",0.628703222037759,1,24,370
+"one00360","Phenylalanine metabolism",0.643683022488663,1,1,12
+"one04912","GnRH signaling pathway",0.646532518553976,1,8,124
+"one01210","2-Oxocarboxylic acid metabolism",0.661847218561442,1,2,30
+"one00130","Ubiquinone and other terpenoid-quinone biosynthesis",0.664839243725391,1,1,14
+"one04981","Folate transport and metabolism",0.668139325505853,1,1,15
+"one00350","Tyrosine metabolism",0.67443233425129,1,1,12
+"one04518","Integrin signaling",0.679072298695151,1,9,172
+"one03022","Basal transcription factors",0.683497487535585,1,2,24
+"one00020","Citrate cycle (TCA cycle)",0.684422119530578,1,3,40
+"one03273","Virion - Lassa virus and SFTS virus",0.686018958351241,1,1,21
+"one03083","Polycomb repressive complex",0.689361554608667,1,9,133
+"one04115","p53 signaling pathway",0.689529872452106,1,7,85
+"one00910","Nitrogen metabolism",0.702267134986053,1,1,15
+"one00591","Linoleic acid metabolism",0.702614044835721,1,2,13
+"one03082","ATP-dependent chromatin remodeling",0.702700631688963,1,10,142
+"one00983","Drug metabolism - other enzymes",0.718067493268513,1,5,46
+"one04130","SNARE interactions in vesicular transport",0.725203608625285,1,3,37
+"one04217","Necroptosis",0.734876620310374,1,19,201
+"one03050","Proteasome",0.7506743619671,1,12,91
+"one00785","Lipoic acid metabolism",0.752022707159052,1,1,16
+"one03266","Virion - Herpesvirus",0.756017094933694,1,1,17
+"one00592","alpha-Linolenic acid metabolism",0.759476526630787,1,2,16
+"one00601","Glycosphingolipid biosynthesis - lacto and neolacto series",0.761779481598094,1,1,21
+"one04530","Tight junction",0.763586944583362,1,17,253
+"one04980","Cobalamin transport and metabolism",0.779756352896135,1,1,16
+"one03430","Mismatch repair",0.782808074192816,1,1,11
+"one00564","Glycerophospholipid metabolism",0.785149169124327,1,7,112
+"one00380","Tryptophan metabolism",0.791151330953924,1,1,22
+"one00534","Glycosaminoglycan biosynthesis - heparan sulfate / heparin",0.792079399263919,1,1,26
+"one00514","Other types of O-glycan biosynthesis",0.79296687807128,1,2,46
+"one04070","Phosphatidylinositol signaling system",0.795550921931401,1,6,119
+"one00030","Pentose phosphate pathway",0.795631079405963,1,1,19
+"one04370","VEGF signaling pathway",0.798096296485414,1,4,80
+"one00760","Nicotinate and nicotinamide metabolism",0.798208695396484,1,1,21
+"one00053","Ascorbate and aldarate metabolism",0.800244512403148,1,1,17
+"one04330","Notch signaling pathway",0.808356803010396,1,3,68
+"one02010","ABC transporters",0.815952055719381,1,1,31
+"one01200","Carbon metabolism",0.822992092619991,1,8,116
+"one04910","Insulin signaling pathway",0.830263797007627,1,10,179
+"one03018","RNA degradation",0.835269404167832,1,4,72
+"one04114","Oocyte meiosis",0.835507116771793,1,9,140
+"one00562","Inositol phosphate metabolism",0.837745798112921,1,4,93
+"one00230","Purine metabolism",0.842234822337679,1,7,111
+"one03320","PPAR signaling pathway",0.848330096228237,1,6,77
+"one00140","Steroid hormone biosynthesis",0.852853427718431,1,1,19
+"one00051","Fructose and mannose metabolism",0.859740582376335,1,2,38
+"one04510","Focal adhesion",0.86278061225395,1,14,268
+"one04148","Efferocytosis",0.871190045688325,1,9,188
+"one04110","Cell cycle",0.872970699717129,1,10,168
+"one00270","Cysteine and methionine metabolism",0.89887772385853,1,2,49
+"one00520","Amino sugar and nucleotide sugar metabolism",0.899278291225003,1,1,28
+"one01232","Nucleotide metabolism",0.902916316029253,1,5,80
+"one04068","FoxO signaling pathway",0.920584264012225,1,9,191
+"one03030","DNA replication",0.923252247715741,1,1,18
+"one04218","Cellular senescence",0.932278015506007,1,12,222
+"one04820","Cytoskeleton in muscle cells",0.936989049462684,1,11,233
+"one00830","Retinol metabolism",0.937818292666907,1,1,28
+"one04512","ECM-receptor interaction",0.942089775296658,1,2,77
+"one04810","Regulation of actin cytoskeleton",0.942111309407491,1,17,305
+"one04520","Adherens junction",0.944399405807059,1,7,154
+"one04216","Ferroptosis",0.950223347827145,1,6,75
+"one04012","ErbB signaling pathway",0.954148406869826,1,4,122
+"one00860","Porphyrin metabolism",0.956141996887238,1,4,55
+"one01240","Biosynthesis of cofactors",0.960691405054298,1,6,123
+"one00620","Pyruvate metabolism",0.962952867247548,1,1,35
+"one04136","Autophagy - other",0.970399783679255,1,1,36
+"one04310","Wnt signaling pathway",0.972948881112021,1,8,207
+"one04382","Cornified envelope formation",0.974229763934344,1,8,143
+"one03015","mRNA surveillance pathway",0.974777774224106,1,5,118
+"one00010","Glycolysis / Gluconeogenesis",0.977193246881644,1,2,59
+"one00310","Lysine degradation",0.983812792894271,1,1,69
+"one04137","Mitophagy - animal",0.991507791352788,1,8,181
+"one04140","Autophagy - animal",0.999882172004418,1,8,263
+"one00290","Valine, leucine and isoleucine biosynthesis",0.999999999991854,1,0,1
+"one04122","Sulfur relay system",0.999999999992604,1,0,5
+"one00780","Biotin metabolism",0.999999999994851,1,0,1
+"one01320","Sulfur cycle",0.999999999996981,1,0,2
+"one00750","Vitamin B6 metabolism",0.999999999997846,1,0,3
+"one00604","Glycosphingolipid biosynthesis - ganglio series",0.999999999999811,1,0,8
+"one00100","Steroid biosynthesis",1,1,0,14
+"one00120","Primary bile acid biosynthesis",1,1,0,13
+"one00240","Pyrimidine metabolism",1,1,0,49
+"one00440","Phosphonate and phosphinate metabolism",1,1,0,10
+"one00500","Starch and sucrose metabolism",1,1,0,24
+"one00515","Mannose type O-glycan biosynthesis",1,1,0,17
+"one00533","Glycosaminoglycan biosynthesis - keratan sulfate",1,1,0,18
+"one00541","Biosynthesis of various nucleotide sugars",1,1,0,20
+"one00603","Glycosphingolipid biosynthesis - globo and isoglobo series",1,1,0,12
+"one00900","Terpenoid backbone biosynthesis",1,1,0,11
+"one00970","Aminoacyl-tRNA biosynthesis",1,1,0,24
+"one01040","Biosynthesis of unsaturated fatty acids",1,1,0,23
+"one01250","Biosynthesis of nucleotide sugars",1,1,0,27
+"one03410","Base excision repair",1,1,0,19
+"one04146","Peroxisome",1,1,0,59
+"one00400","Phenylalanine, tyrosine and tryptophan biosynthesis",1.00000000000017,1,0,8
+"one03267","Virion - Adenovirus",1.00000000000274,1,0,4
+"one00430","Taurine and hypotaurine metabolism",1.00000000000302,1,0,8
+"one00730","Thiamine metabolism",1.00000000000305,1,0,7
+"one00524","Neomycin, kanamycin and gentamicin biosynthesis",1.00000000000347,1,0,4
+"one00470","D-Amino acid metabolism",1.00000000000401,1,0,3
+"one03450","Non-homologous end-joining",1.00000000000454,1,0,2
+"one03264","Virion - Flavivirus and Alphavirus",1.0000000000049,1,0,7
+"one00920","Sulfur metabolism",1.00000000000792,1,0,7
+"one03271","Virion - Rotavirus",1.00000000001292,1,0,4
