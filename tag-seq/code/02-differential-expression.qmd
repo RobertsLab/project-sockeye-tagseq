@@ -144,7 +144,7 @@ screeplot(p, axisLabSize = 18, titleLabSize = 22)
 
 bp1 <- biplot(p, x = "PC1", y = "PC2",
               colby    = "trt",
-              colkey   = c(territorial = "royalblue1", social = "orangered1"),
+              colkey   = c(territorial = "royalblue1", social = "red3"),
               shape    = "trt",
               shapekey = c(territorial = 19, social = 17),
               pointSize = 4,
@@ -296,10 +296,10 @@ counts_normal   <- single_gene_counts(sig_genes_normal)
 counts_apeglm   <- single_gene_counts(sig_genes_apeglm)
 counts_ashr     <- single_gene_counts(sig_genes_ashr)
 
-write.table(counts_unshrunk, out_path(cfg, cfg$prefix, "-unshrunk-single-gene-counts.csv"), row.names = FALSE)
-write.table(counts_normal,   out_path(cfg, cfg$prefix, "-normal-single-gene-counts.csv"),   row.names = FALSE)
-write.table(counts_apeglm,   out_path(cfg, cfg$prefix, "-apeglm-single-gene-counts.csv"),   row.names = FALSE)
-write.table(counts_ashr,     out_path(cfg, cfg$prefix, "-ashr-single-gene-counts.csv"),     row.names = FALSE)
+write.table(counts_unshrunk, out_path(cfg, cfg$prefix, "-unshrunk-single-gene-counts.csv"), row.names = FALSE, sep = ",")
+write.table(counts_normal,   out_path(cfg, cfg$prefix, "-normal-single-gene-counts.csv"),   row.names = FALSE, sep = ",")
+write.table(counts_apeglm,   out_path(cfg, cfg$prefix, "-apeglm-single-gene-counts.csv"),   row.names = FALSE, sep = ",")
+write.table(counts_ashr,     out_path(cfg, cfg$prefix, "-ashr-single-gene-counts.csv"),     row.names = FALSE, sep = ",")
 ```
 
 ```{r}
@@ -323,7 +323,7 @@ write.table(sig_genes,        out_path(cfg, cfg$prefix, "-SIG-DEG-unshrunken.csv
 write.table(sig_genes_normal, out_path(cfg, cfg$prefix, "-SIG-DEG-normal.csv"),     row.names = FALSE, sep = ",")
 write.table(sig_genes_apeglm, out_path(cfg, cfg$prefix, "-SIG-DEG-apeglm.csv"),     row.names = FALSE, sep = ",")
 write.table(sig_genes_ashr,   out_path(cfg, cfg$prefix, "-SIG-DEG-ashr.csv"),       row.names = FALSE, sep = ",")
-write.table(gene_counts,      out_path(cfg, cfg$prefix, "-gene-counts.csv"),        row.names = TRUE)
+write.table(gene_counts,      out_path(cfg, cfg$prefix, "-gene-counts.csv"),        row.names = TRUE, sep = ",")
 ```
 
 ## Volcano plots
