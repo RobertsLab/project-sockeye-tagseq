@@ -117,14 +117,24 @@ recorded in `tag-seq/genome/kegg_one_SOURCE.txt`. No ortholog transfer needed.
 - **R4 — Heatmap group colours are hardcoded counts.**
   `ColSideColors = c(rep("royalblue1", 15), rep("red3", 15))` in liver, `14`/`14`
   in gonad, both assuming column order rather than deriving it from `coldata`.
-- **R8 — Reducing row names to `LOC` ids collapses 4,731 features onto one
-  name.** *(new, found during phase 2)* `gene-LOC115144855|LOC115144855` becomes
-  `LOC115144855`, but rows with no `LOC` id become the literal string `LOCNA` —
-  4,731 of 37,942 genes, 12.5%. They enter the `DESeqDataSet` with duplicate row
-  names and are later dropped by `na.omit()`, so none reaches an output file and
-  the committed results are unaffected. It is still a lossy identifier step, and
-  it is where the `LOCNA` class the gene tables filter on comes from. Worth
-  replacing when phase 3 rebuilds those tables.
+- **R8 — The gene-identifier step destroyed the identity of 4,731 genes.**
+  *(found during phase 2, fully characterised and **fixed** afterwards)* Row names
+  are `gene-<id>|<id>`, where the identifier is a `LOC` number for genes with no
+  assigned symbol and a real symbol for the rest. The `.Rmd` split each name on
+  the literal string `LOC` and kept the third piece, which works for
+  `LOC115144855` and turns `gene-arhgap8|arhgap8` into the string `LOCNA` — for
+  4,731 genes, 12.5% of the annotation, and disproportionately the
+  well-characterised ones.
+
+  My first assessment — that these were dropped before reaching any output — was
+  wrong. `data.frame()` de-duplicates row names, so they reached the published
+  tables as `LOCNA.1`, `LOCNA.2292` and so on: identifiers corresponding to
+  nothing, joining to nothing. In the committed results that was 936 rows in
+  `liver-ALL-DEG-apeglm.csv` and 3,141 in the gonad equivalent, including
+  **3 of 31 significant liver genes and 309 of 1,630 significant gonad genes**,
+  all of which the gene tables then discarded as "no description".
+
+  See *Identifier repair* below.
 - **R5 — Sample exclusion is a comment toggle with no recorded criterion.** Gonad
   drops `C05` and `C17`; liver has the same two lines commented out. The only
   justification in the repo is "MultiQC report: Pheatmap: C05, C17", with no
@@ -367,25 +377,44 @@ so these numbers are the project's first.
 **Done:** `gene_tables/` and the enrichment results regenerate from a render, and
 every notebook in the repository either runs or is gone.
 
+
 ### Phase 4 — Make the upstream steps honest &nbsp;`DONE`
 
-The goal is not to make FASTQ processing run on a laptop; it is to make it
-legible and re-runnable on Raven.
+### Identifier repair &nbsp;`DONE`
 
-- Hoist every absolute path into variables set once at the top. Delete the
-  abandoned bowtie2 branch. *(B4)*
-- Per decision 4, **keep the brain branch** but mark it clearly as unresolved:
-  the FASTQs are presumed missing and nothing downstream consumes them. Revisit
-  if the data is located.
-- Replace the two "I moved files" comments with the commands that do the move.
-- `eval: false` on the heavy chunks, stated in the prose: this is the record of
-  how the count matrices were produced, runnable on Raven, not part of the
-  default render.
-- Commit the MultiQC reports and alignment-rate summaries. The notebook reports
-  88.7% +/- 2.21 (gonad) and 86.5% +/- 0.82 (liver) in a comment with nothing
-  behind it. These also settle R5.
-- Record exact tool versions — HISAT2 2.2.1, StringTie 2.2.1, samtools 1.12,
-  cutadapt, FastQC — since they are not in `renv`.
+Fixes R8. Identifiers are now taken from after the pipe, which is unique across
+all 37,942 genes. Descriptions and lengths come from the assembly feature table
+instead of `Onerka_LOCID_gene_table.txt`, which is keyed entirely by `LOC`
+identifiers and so could never annotate a symbol-named gene. The feature table
+covers 37,929 genes and **agrees with the old table on all 33,210 they share** —
+verified, so this is a strict superset, not a different annotation. KEGG's
+GeneID keys are mapped through the same table rather than by pasting a `LOC`
+prefix, which would have been right for LOC-numbered genes and wrong for the
+rest.
+
+**No published statistic changed.** Row names never entered the model, so
+`baseMean`, `log2FoldChange` and `padj` are bit-identical to the previous render
+in both tissues — maximum difference 0.00e+00. What changed is which genes can
+be identified:
+
+| | before | after |
+|---|---|---|
+| fabricated `LOCNA.*` ids, liver / gonad ALL-DEG | 936 / 3141 | 0 / 0 |
+| rows with no description, liver / gonad | 936 / 3142 | 11 / 12 |
+| gene tables, liver (char / unchar / total) | 28 / 0 / 28 | **31 / 0 / 31** |
+| gene tables, gonad | 1280 / 41 / 1321 | **1587 / 41 / 1628** |
+| GO-annotated universe, liver / gonad | ~4710 / ~15794 | **5259 / 17086** |
+| GO categories tested, liver / gonad | 3275 / 5209 | 3749 / 6066 |
+| significant GO terms, gonad | 1 | **2** |
+| significant KEGG pathways, gonad | 0 | **1** |
+
+The recovered biology is not marginal. Gonad KEGG now returns **`one00190`
+Oxidative phosphorylation, 59 of 188 pathway genes differentially expressed,
+p = 2.3e-05, FDR = 0.0044** — invisible before precisely because oxidative
+phosphorylation genes are well characterised, carry real symbols, and were
+therefore the ones being discarded. GO adds *negative regulation of
+non-canonical Wnt signaling pathway* alongside the existing
+*chaperone-mediated protein complex assembly*.
 
 **Completed:** `01-upstream-alignment.qmd` replaces the 640-line shell-transcript 
 `.Rmd` with:
