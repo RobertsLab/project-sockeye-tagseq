@@ -74,16 +74,11 @@ gene, keyed by `GeneID`, which is our `LOC` identifier without the prefix.
 
 ```{r}
 #| label: lengths
-ft <- read.delim(file.path(PATHS$genome, "GCF_006149115.2_Oner_1.1_feature_table.txt"),
-                 sep = "\t", quote = "", stringsAsFactors = FALSE, check.names = FALSE)
-names(ft)[1] <- "feature"
+annotation   <- load_gene_annotation()
+gene_lengths <- setNames(annotation$length, annotation$gene)
+geneid2gene  <- setNames(annotation$gene, as.character(annotation$GeneID))
 
-mrna <- ft %>% filter(feature == "mRNA", !is.na(feature_interval_length))
-gene_lengths <- tapply(mrna$feature_interval_length,
-                       paste0("LOC", mrna$GeneID),
-                       median)
-
-cat("genes with a length:", length(gene_lengths), "\n")
+cat("genes with a length:", sum(!is.na(gene_lengths)), "\n")
 ```
 
 ## KEGG pathway mapping
@@ -97,10 +92,13 @@ kegg_names <- read.delim(file.path(PATHS$genome, "kegg_one_pathways.tsv"),
                          header = FALSE, stringsAsFactors = FALSE,
                          col.names = c("pathway", "name"))
 
-## "one:115101128" -> "LOC115101128" ; "path:one00010" -> "one00010"
+## KEGG keys genes by NCBI GeneID ("one:115101128"). Map through the feature
+## table rather than pasting a "LOC" prefix on: that would be right for
+## LOC-numbered genes and wrong for every symbol-named one.
 kegg2cat <- kegg_links %>%
-  transmute(gene    = sub("^one:", "LOC", gene),
+  transmute(gene    = unname(geneid2gene[sub("^one:", "", gene)]),
             pathway = sub("^path:", "", pathway)) %>%
+  filter(!is.na(gene)) %>%
   distinct()
 
 kegg_names$name <- sub(" - Oncorhynchus nerka \\(sockeye salmon\\)$", "", kegg_names$name)

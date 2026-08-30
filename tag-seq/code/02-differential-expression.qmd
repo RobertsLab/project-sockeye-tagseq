@@ -67,7 +67,8 @@ caught a reordered re-run.
 
 ```{r}
 #| label: load_data
-feature_table <- load_feature_table()
+annotation    <- load_gene_annotation()
+feature_table <- annotation[, c("gene", "description")]
 
 dat     <- load_counts(cfg)
 cts     <- dat$cts
@@ -78,13 +79,25 @@ cat("samples:", ncol(cts), " genes:", nrow(cts), "\n")
 cat("reference level:", levels(coldata$trt)[1], "\n")
 ```
 
-::: {.callout-note}
-Reducing StringTie row names to their `LOC` identifier collapses 4,731 features
-that carry no `LOC` id (tRNAs and similar) onto the single name `LOCNA`. They
-survive into the `DESeqDataSet` with duplicate row names and are then removed by
-`na.omit()` on the results tables, so no `LOCNA` row reaches any output file.
-The behaviour is preserved here because the committed results depend on it, but
-it is a lossy step worth replacing when the gene tables are rebuilt.
+::: {.callout-important}
+## Gene identifiers were repaired
+
+StringTie row names are `gene-<id>|<id>`, and the identifier after the pipe is a
+`LOC` number for genes with no assigned symbol and a real symbol for the rest.
+The `.Rmd` split each name on the literal string `LOC` and kept the third piece,
+which works for `LOC115144855` and turns `gene-arhgap8|arhgap8` into the string
+`LOCNA` — for **4,731 genes, 12.5% of the annotation**, and disproportionately
+the well-characterised ones.
+
+Because `data.frame()` de-duplicates row names, those genes did not disappear:
+they reached the published tables as `LOCNA.1`, `LOCNA.2292` and so on —
+identifiers that correspond to nothing, join to nothing, and were therefore
+dropped from the gene tables as "no description". In the committed results that
+was 3 of 31 significant liver genes and **309 of 1,630 significant gonad genes**.
+
+Identifiers are now taken from after the pipe, which is unique across all 37,942
+genes, and descriptions come from the assembly feature table, which covers 37,929
+of them and agrees with the old LOCID table on all 33,210 they share.
 :::
 
 ## Fit the model

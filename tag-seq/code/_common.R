@@ -70,16 +70,28 @@ sample_ids_from_columns <- function(cols) {
   sub("^([0-9]+)([A-Za-z])$", "\\2\\1", tag)
 }
 
-## Reduce StringTie row names to the LOC identifier used everywhere downstream.
+## Take the gene identifier from a StringTie row name.
 ##
-## "gene-LOC115144855|LOC115144855" -> "LOC115144855". Rows with no LOC id
-## become "LOCNA", which is the origin of the LOCNA class the gene tables
-## filter on. This reproduces the .Rmd loop exactly, vectorised.
-loc_ids_from_rownames <- function(rn) {
-  parts <- strsplit(rn, split = "LOC", fixed = TRUE)
-  paste0("LOC", vapply(parts,
-                       function(x) if (length(x) >= 3L) x[[3L]] else NA_character_,
-                       character(1)))
+## Row names are "gene-<id>|<id>": the identifier is a LOC number for genes
+## with no assigned symbol ("gene-LOC115144855|LOC115144855") and a real symbol
+## for the rest ("gene-arhgap8|arhgap8"). The part after the pipe is that
+## identifier in both cases, and it is unique across all 37,942 genes.
+##
+## The .Rmd instead split each name on the literal "LOC" and kept the third
+## piece, which works for LOC-numbered genes and produces the string "LOCNA"
+## for every symbol-named one -- 4,731 genes, 12.5% of the annotation. Because
+## data.frame() then de-duplicates row names, those genes reached the published
+## tables as LOCNA.1, LOCNA.2292 and so on: identifiers that correspond to
+## nothing and join to nothing, and that the gene tables consequently dropped.
+## In the committed results that was 3 of 31 significant liver genes and 309 of
+## 1,630 significant gonad genes (finding R8).
+gene_ids_from_rownames <- function(rn) {
+  ids <- sub("^.*\\|", "", rn)
+  if (anyDuplicated(ids)) {
+    stop("gene identifiers are not unique: ",
+         paste(unique(ids[duplicated(ids)])[1:5], collapse = ", "))
+  }
+  ids
 }
 
 # ---- data loading -----------------------------------------------------------
@@ -114,7 +126,7 @@ load_counts <- function(cfg) {
   cts <- cts[, rownames(coldata), drop = FALSE]   # align by name, not by luck
   stopifnot(identical(colnames(cts), rownames(coldata)))
 
-  rownames(cts) <- loc_ids_from_rownames(rownames(cts))
+  rownames(cts) <- gene_ids_from_rownames(rownames(cts))
 
   ## Excluded samples are dropped from both objects together.
   if (length(cfg$exclude)) {
@@ -134,11 +146,43 @@ load_counts <- function(cfg) {
   list(cts = cts, coldata = coldata)
 }
 
-## Gene ID -> description, used to annotate every results table.
+## Per-gene annotation: description, NCBI GeneID and transcript length.
+##
+## Built from the assembly feature table rather than Onerka_LOCID_gene_table.txt,
+## which is keyed entirely by LOC identifiers (33,210 of our 37,942 genes) and so
+## could never annotate a symbol-named gene. The feature table covers 37,929 and
+## agrees with the old table on every one of the 33,210 they share -- verified,
+## so this is a strict superset, not a different annotation.
+##
+## Length is the median mRNA interval per gene, for goseq's length-bias
+## correction. It comes from here because
+## sequences/GCF_006149115.2_Oner_1.1_mRNA.gff is tracked and zero bytes
+## (finding E7).
+load_gene_annotation <- function() {
+  ft <- read.delim(file.path(PATHS$genome, "GCF_006149115.2_Oner_1.1_feature_table.txt"),
+                   sep = "\t", quote = "", stringsAsFactors = FALSE, check.names = FALSE)
+  names(ft)[1] <- "feature"
+
+  m <- ft[ft$feature == "mRNA" & nzchar(ft$symbol), ]
+
+  first_name <- tapply(m$name, m$symbol, function(x) {
+    x <- x[nzchar(x)]
+    if (length(x)) x[[1]] else NA_character_
+  })
+  gene_id <- tapply(m$GeneID, m$symbol, function(x) x[[1]])
+  len     <- tapply(m$feature_interval_length, m$symbol,
+                    function(x) stats::median(x, na.rm = TRUE))
+
+  data.frame(gene        = names(first_name),
+             GeneID      = as.integer(gene_id[names(first_name)]),
+             description = unname(first_name),
+             length      = as.numeric(len[names(first_name)]),
+             stringsAsFactors = FALSE)
+}
+
+## Kept for the notebooks that only need gene -> description.
 load_feature_table <- function() {
-  ft <- read.delim(file.path(PATHS$genome, "Onerka_LOCID_gene_table.txt"), header = TRUE)
-  colnames(ft) <- c("gene", "description")
-  dplyr::distinct(ft, gene, .keep_all = TRUE)
+  load_gene_annotation()[, c("gene", "description")]
 }
 
 # ---- plotting ---------------------------------------------------------------
