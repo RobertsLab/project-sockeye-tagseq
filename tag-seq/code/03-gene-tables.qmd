@@ -89,9 +89,9 @@ uncharacterized_stats$percent_unknown <-
 
 uncharacterized_stats
 
-write.table(uncharacterized_stats,
-            file.path(GENE_TABLE_DIR, "uncharacterized_stats.txt"),
-            sep = ",", quote = FALSE, row.names = TRUE)
+write.csv(uncharacterized_stats,
+          file.path(GENE_TABLE_DIR, "uncharacterized_stats.txt"),
+          row.names = TRUE)
 ```
 
 ```{r}

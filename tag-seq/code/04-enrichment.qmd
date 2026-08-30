@@ -32,6 +32,7 @@ date. No ortholog transfer is needed.
 #| label: setup
 library(goseq)
 library(GO.db)
+library(AnnotationDbi)
 library(dplyr)
 source("tag-seq/code/_common.R")
 
