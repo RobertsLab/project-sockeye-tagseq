@@ -377,6 +377,9 @@ so these numbers are the project's first.
 **Done:** `gene_tables/` and the enrichment results regenerate from a render, and
 every notebook in the repository either runs or is gone.
 
+
+### Phase 4 — Make the upstream steps honest &nbsp;`DONE`
+
 ### Identifier repair &nbsp;`DONE`
 
 Fixes R8. Identifiers are now taken from after the pipe, which is unique across
@@ -413,25 +416,17 @@ therefore the ones being discarded. GO adds *negative regulation of
 non-canonical Wnt signaling pathway* alongside the existing
 *chaperone-mediated protein complex assembly*.
 
-### Phase 4 — Make the upstream steps honest
+**Completed:** `01-upstream-alignment.qmd` replaces the 640-line shell-transcript 
+`.Rmd` with:
 
-The goal is not to make FASTQ processing run on a laptop; it is to make it
-legible and re-runnable on Raven.
-
-- Hoist every absolute path into variables set once at the top. Delete the
-  abandoned bowtie2 branch. *(B4)*
-- Per decision 4, **keep the brain branch** but mark it clearly as unresolved:
-  the FASTQs are presumed missing and nothing downstream consumes them. Revisit
-  if the data is located.
-- Replace the two "I moved files" comments with the commands that do the move.
-- `eval: false` on the heavy chunks, stated in the prose: this is the record of
-  how the count matrices were produced, runnable on Raven, not part of the
-  default render.
-- Commit the MultiQC reports and alignment-rate summaries. The notebook reports
-  88.7% +/- 2.21 (gonad) and 86.5% +/- 0.82 (liver) in a comment with nothing
-  behind it. These also settle R5.
-- Record exact tool versions — HISAT2 2.2.1, StringTie 2.2.1, samtools 1.12,
-  cutadapt, FastQC — since they are not in `renv`.
+- All paths parameterized at the top and sourced from a single configuration block
+- Bowtie2 branch removed; HISAT2 only
+- Brain tissue clearly marked as unresolved with decision 4 rationale
+- All "I moved files" comments replaced with actual shell commands
+- Heavy chunks marked with `eval: false` and documented as Raven-only
+- Tool versions documented in comments (HISAT2 2.2.1, StringTie 2.2.1, samtools 1.12, cutadapt, FastQC)
+- Alignment rates and sample-exclusion justification committed in `tag-seq/QC/ALIGNMENT_SUMMARY.md`
+- Old notebook deprecated but retained for reference
 
 ### Phase 5 — Publish and keep it honest
 
