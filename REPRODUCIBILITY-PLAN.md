@@ -513,6 +513,38 @@ It also found twelve open items. Three have been closed:
   changing at all.
 - Still open under E12: `LICENSE` and `CITATION.cff`.
 
+**Steps 6 and 7 — publish, and check it from outside** *(E6, P5)*
+
+- `index.qmd` at the project root is the landing page: design, sample table,
+  results as committed, links to the five rendered notebooks and the tracked
+  result directories, and a data-availability statement. It carries the C05/C17
+  caveat as a callout, because a reader who lands on the site should meet that
+  before they read the gonad numbers.
+- `output-dir: docs`, and `/docs/` is gitignored. Nothing generated is
+  committed, so a stale rendered page cannot contradict the tracked tables. The
+  Action publishes `docs/` to Pages as a build artifact instead, which needs
+  Pages set to "GitHub Actions" as its source.
+- `check-reproduction.R` replaces `git diff --exit-code` as the reproduction
+  test. A bare diff cannot work here: re-rendered PNG bytes always differ, and
+  apeglm's iterative shrinkage moves `log2FoldChange` in the third decimal
+  across package versions — exactly the columns 02, 03 and 04 write. So images
+  are reported and ignored, tables are compared on matched keys with a relative
+  tolerance (1e-3, and 1e-2 for p-value columns, which span thirty orders of
+  magnitude), and significance calls at 0.05 must be identical with no tolerance
+  at all. Files it cannot parse count as failures, not passes.
+- `.github/workflows/render.yml` restores `renv.lock` on a clean Ubuntu runner,
+  verifies `CHECKSUMS.sha256`, runs `./render-all.sh`, then
+  `check-reproduction.R`; it uploads the rendered site and, on failure, the
+  result diff. First run builds the Bioconductor stack from source (budget an
+  hour); later runs restore from cache.
+
+`check-reproduction.R` was exercised against deliberately perturbed result
+tables before being committed: fold changes moved 0.05% pass, 5% fail, a single
+padj nudged across 0.05 fails on the significance call even though the numeric
+move is 0.6%, a dropped gene fails on dimensions, and appended bytes in a PNG
+pass as an ignored image. It and the `verify_inputs()` addition to `_common.R`
+both parse under R 4.5.3.
+
 **Still open:** R5/E9 (the C05/C17 exclusion has no committed evidence, and
 `ALIGNMENT_SUMMARY.md` cites MultiQC directories containing only `.gitkeep`,
 attributes alignment statistics to uncommitted logs, and reports n=15 per tissue

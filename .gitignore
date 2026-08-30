@@ -10,9 +10,13 @@
 *_files/
 .quarto/
 _freeze/
-/docs/site_libs/
-# Rendered notebooks land beside their source, or at the project root when
-# --output is used, until phase 5 sets up docs/.
+
+# Rendered output. _quarto.yml sets output-dir: docs, and the render workflow
+# publishes docs/ to GitHub Pages as a build artifact -- nothing generated is
+# committed, so a stale HTML page can never contradict the tracked result
+# tables. The two patterns below catch HTML from before output-dir was set, and
+# from rendering a single notebook outside the project.
+/docs/
 tag-seq/code/*.html
 /*.html
 

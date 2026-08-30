@@ -7,6 +7,11 @@ project:
   # every chunk boundary (finding R7).
   execute-dir: project
 
+  # Rendered HTML goes here, and the GitHub Action publishes it to Pages. docs/
+  # is gitignored: nothing generated is committed, so a stale rendered page can
+  # never contradict the tracked result tables.
+  output-dir: docs
+
   # Without this list, Quarto renders every .qmd and .Rmd under the project
   # directory. That pulled in the deprecated shell transcript
   # (archive/1_process-tagseq-data-salmon.Rmd), whose ~40 bash chunks carried no
@@ -19,6 +24,7 @@ project:
   # ./render-all.sh, which renders it once per tissue. That script is the
   # documented entry point for the whole analysis.
   render:
+    - index.qmd
     - tag-seq/code/01-upstream-alignment.qmd
     - tag-seq/code/02-differential-expression.qmd
     - tag-seq/code/03-gene-tables.qmd

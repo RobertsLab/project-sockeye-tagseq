@@ -38,6 +38,17 @@ quarto render tag-seq/code/03-gene-tables.qmd
 echo "=== 04 enrichment ==="
 quarto render tag-seq/code/04-enrichment.qmd
 
+# Landing page. Rendered last so its links point at pages that now exist.
+echo "=== index (landing page) ==="
+quarto render index.qmd
+
 echo
-echo "Done. Reproduction check:"
+echo "Done. Rendered site in docs/ (docs/index.html)."
+echo
+echo "Reproduction check:"
+echo "  Rscript check-reproduction.R"
+echo
+echo "That compares every tracked result file against HEAD, ignoring re-rendered"
+echo "image bytes and numeric drift within 1e-3, and fails on any changed row,"
+echo "column or significance call. For the raw view:"
 echo "  git diff --stat -- tag-seq/DESEQ_output tag-seq/gene_tables tag-seq/GO_output"

@@ -20,11 +20,25 @@ the gonad results untouched. The script renders it once per tissue, then the two
 notebooks that consume its output.
 
 Results land in `tag-seq/DESEQ_output/<tissue>/`, `tag-seq/gene_tables/` and
-`tag-seq/GO_output/<tissue>/`, all of which are tracked in git — so
-`git diff --stat` after a render is the reproduction test. The only expected
-differences are re-rendered image bytes and `apeglm` fold changes in the third
-decimal (its shrinkage is an iterative fit and is sensitive to the package
-version).
+`tag-seq/GO_output/<tissue>/`, all of which are tracked in git — so a render
+followed by
+
+```bash
+Rscript check-reproduction.R
+```
+
+is the reproduction test. That script compares every tracked result file against
+its committed version, ignoring the two differences a re-render is expected to
+produce — image bytes, and `apeglm` fold changes in the third decimal, since its
+shrinkage is an iterative fit sensitive to the package version — and failing on
+any changed row, column, or significance call at 0.05. `git diff --stat` gives
+the raw view.
+
+Rendered HTML goes to `docs/`, which is gitignored; the `render` GitHub Action
+publishes it to Pages on every push to `main`. That Action is the real
+reproducibility test: it restores `renv.lock` on a machine that has never seen
+the project, renders, and runs the check above. A green run means the analysis
+still reproduces from a clean checkout.
 
 The upstream steps (alignment and assembly) are documented in
 `tag-seq/code/01-upstream-alignment.qmd` with `eval: false` — they are meant to
