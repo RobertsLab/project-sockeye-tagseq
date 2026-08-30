@@ -1,0 +1,25 @@
+project:
+  title: "Sockeye TagSeq"
+  # Every chunk runs with the working directory at the project root, so a path
+  # written in one notebook means the same thing in all of them. This replaces
+  # the three different working-directory assumptions the .Rmd notebooks made
+  # (finding B1) and the setwd() calls inside chunks, which knitr resets at
+  # every chunk boundary (finding R7).
+  execute-dir: project
+
+execute:
+  # Replaces knitr's cache = TRUE. Quarto's freeze invalidates on source
+  # change; the old cache invalidated on nothing, and was combined with
+  # rm(list = ls()) at the top of the library chunk (finding R6).
+  freeze: auto
+  warning: true
+  message: false
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    df-print: paged
+    embed-resources: true

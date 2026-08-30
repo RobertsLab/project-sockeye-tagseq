@@ -6,7 +6,7 @@ and render end to end.
 Audit performed 2026-08-29 against commit `94718d8`, tagged `v0-preexisting`.
 Local toolchain at that point: R 4.3.2, Quarto 1.6.40, DESeq2 1.42.1.
 
-**Status:** phases 0 and 1 are complete. Phase 2 is next.
+**Status:** phases 0, 1 and 2 are complete. Phase 3 is next.
 
 ---
 
@@ -111,6 +111,14 @@ GO enrichment only; KEGG stays out of scope unless you want the ortholog step.
 - **R4 — Heatmap group colours are hardcoded counts.**
   `ColSideColors = c(rep("royalblue1", 15), rep("red3", 15))` in liver, `14`/`14`
   in gonad, both assuming column order rather than deriving it from `coldata`.
+- **R8 — Reducing row names to `LOC` ids collapses 4,731 features onto one
+  name.** *(new, found during phase 2)* `gene-LOC115144855|LOC115144855` becomes
+  `LOC115144855`, but rows with no `LOC` id become the literal string `LOCNA` —
+  4,731 of 37,942 genes, 12.5%. They enter the `DESeqDataSet` with duplicate row
+  names and are later dropped by `na.omit()`, so none reaches an output file and
+  the committed results are unaffected. It is still a lossy identifier step, and
+  it is where the `LOCNA` class the gene tables filter on comes from. Worth
+  replacing when phase 3 rebuilds those tables.
 - **R5 — Sample exclusion is a comment toggle with no recorded criterion.** Gonad
   drops `C05` and `C17`; liver has the same two lines commented out. The only
   justification in the repo is "MultiQC report: Pheatmap: C05, C17", with no
@@ -220,7 +228,7 @@ exclusion for the rewritten file.
 packages load from the project library, and the rewritten `load_libraries` chunk
 executes without error.
 
-### Phase 2 — Port the DESeq2 analysis to one parameterised Quarto document
+### Phase 2 — Port the DESeq2 analysis to one parameterised Quarto document &nbsp;`DONE`
 
 Two 570-line near-duplicates become one document rendered twice.
 
@@ -242,9 +250,45 @@ Two 570-line near-duplicates become one document rendered twice.
   change. Remove `rm(list=ls())`. *(R6)*
 - Shared theme and loader into `code/_common.R`.
 
-**Done when** a fresh `quarto render` reproduces every file in `DESEQ_output/`
-from `v0-preexisting`, or every difference is enumerated and explained. Because
-those outputs stay tracked (decision 2), `git diff` after a render is the test.
+`_quarto.yml` at the project root sets `execute-dir: project` and
+`freeze: auto`. `tag-seq/code/_common.R` holds the paths, the per-tissue
+configuration, the loader and the theme; `tag-seq/code/02-differential-expression.qmd`
+is 386 lines and replaces the two notebooks' 1,153. Render both with
+`tag-seq/code/render-differential-expression.sh`.
+
+**Verification.** Both tissues were rendered and the results diffed against the
+committed baseline. Every table reproduces:
+
+| table | rows old / new | same gene set | max abs d(log2FC) | max abs d(padj) |
+|---|---|---|---|---|
+| liver ALL-DEG (unshrunken) | 4076 / 4076 | yes | 4.4e-09 | 1.3e-07 |
+| liver ALL-DEG normal | 5646 / 5646 | yes | 2.9e-08 | 1.4e-07 |
+| liver ALL-DEG apeglm | 5646 / 5646 | yes | **3.0e-02** | 1.4e-07 |
+| liver ALL-DEG ashr | 5646 / 5646 | yes | 5.9e-08 | 1.4e-07 |
+| liver SIG-DEG unshrunken | 66 / 66 | yes | 1.9e-14 | 6.6e-13 |
+| liver SIG-DEG apeglm | 31 / 31 | yes | **1.1e-03** | 5.6e-13 |
+| gonad ALL-DEG apeglm | 18935 / 18935 | yes | **4.2e-02** | 1.7e-07 |
+| gonad SIG-DEG unshrunken | 1653 / 1653 | yes | 3.8e-10 | 2.1e-11 |
+| gonad SIG-DEG apeglm | 1630 / 1630 | yes | **5.3e-03** | 2.1e-11 |
+
+Gene sets, row counts, descriptions and sort order are identical throughout, and
+`baseMean` agrees to 1e-15 relative — the counts, normalisation and filtering are
+reproduced exactly. `apeglm` is the only estimator whose fold changes move at
+all, in the third decimal; its shrinkage is an iterative optimisation and is
+sensitive to the package version. No gene changes significance status.
+
+Two intended differences:
+
+- `liver-gene-counts.csv` row labels change per decision 1
+  (`DEG_apeglm-s0.005_lfc1.5` -> `DEG_apeglm-p0.05`). **Every count is
+  unchanged** (66 / 31 / 31 / 31). `GONAD-gene-counts.csv` is byte-identical,
+  since its labels were already honest.
+- Image files differ byte-wise. They are re-rendered by a different ggplot2 and
+  R graphics stack; the content is equivalent.
+
+`renv::status()` remains clean. `shiny` is marked ignored in `renv/settings.json`:
+renv flags it for any document with a `params:` header, but params are always
+passed on the command line, never prompted for interactively.
 
 ### Phase 3 — Rebuild the gene tables, and script the enrichment
 

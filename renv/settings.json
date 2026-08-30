@@ -1,7 +1,9 @@
 {
   "bioconductor.version": "3.18",
   "external.libraries": [],
-  "ignored.packages": [],
+  "ignored.packages": [
+    "shiny"
+  ],
   "package.dependency.fields": [
     "Imports",
     "Depends",
