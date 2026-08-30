@@ -1,5 +1,25 @@
 # Berdahl-sockeye-salmon
 
+## Reproducibility
+
+This repository has been rebuilt as a fully reproducible Quarto project (phases 0-4, see 
+`REPRODUCIBILITY-PLAN.md`). To render the analysis:
+
+```bash
+# First-time setup: restore R environment
+renv::restore()
+
+# Render the analysis (R and downstream steps only; upstream FASTQ processing requires Raven)
+quarto render
+```
+
+The upstream steps (alignment and assembly) are documented in `tag-seq/code/01-upstream-alignment.qmd` 
+with `eval: false` — they are meant to run on Raven with access to Gannet storage, not on a laptop.
+
+For more details, see `REPRODUCIBILITY-PLAN.md`.
+
+---
+
 ### Locations
 1. [Gannet folder](https://gannet.fish.washington.edu/panopea/berdahl-sockeye-salmon/)
 2. [Manuscript](https://docs.google.com/document/d/19xcEKJfSdz6b7KGZAEr76w9NrCF5RPQ99FFtRt-G-wI/edit?usp=sharing)

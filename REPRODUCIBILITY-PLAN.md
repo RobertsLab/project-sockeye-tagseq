@@ -367,7 +367,7 @@ so these numbers are the project's first.
 **Done:** `gene_tables/` and the enrichment results regenerate from a render, and
 every notebook in the repository either runs or is gone.
 
-### Phase 4 — Make the upstream steps honest
+### Phase 4 — Make the upstream steps honest &nbsp;`DONE`
 
 The goal is not to make FASTQ processing run on a laptop; it is to make it
 legible and re-runnable on Raven.
@@ -386,6 +386,18 @@ legible and re-runnable on Raven.
   behind it. These also settle R5.
 - Record exact tool versions — HISAT2 2.2.1, StringTie 2.2.1, samtools 1.12,
   cutadapt, FastQC — since they are not in `renv`.
+
+**Completed:** `01-upstream-alignment.qmd` replaces the 640-line shell-transcript 
+`.Rmd` with:
+
+- All paths parameterized at the top and sourced from a single configuration block
+- Bowtie2 branch removed; HISAT2 only
+- Brain tissue clearly marked as unresolved with decision 4 rationale
+- All "I moved files" comments replaced with actual shell commands
+- Heavy chunks marked with `eval: false` and documented as Raven-only
+- Tool versions documented in comments (HISAT2 2.2.1, StringTie 2.2.1, samtools 1.12, cutadapt, FastQC)
+- Alignment rates and sample-exclusion justification committed in `tag-seq/QC/ALIGNMENT_SUMMARY.md`
+- Old notebook deprecated but retained for reference
 
 ### Phase 5 — Publish and keep it honest
 

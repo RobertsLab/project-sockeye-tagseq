@@ -1,14 +1,13 @@
 ---
-title: "Process tagseq data - Berdahl salmon samples"
+title: "Process tagseq data - Berdahl salmon samples [DEPRECATED - see tag-seq/code/01-upstream-alignment.qmd]"
 output: html_notebook
 ---
 
+**DEPRECATED:** This file is retained for historical reference only. Use `tag-seq/code/01-upstream-alignment.qmd` 
+for the current, cleaned-up version with all absolute paths parameterized, bowtie2 removed, and brain 
+branch clearly marked as unresolved.
 
-```{bash, engine.opts='-l'}
-echo $PATH
-```
-
-# Get sockeye salmon assembly: https://www.ncbi.nlm.nih.gov/assembly/GCF_006149115.2
+---# Get sockeye salmon assembly: https://www.ncbi.nlm.nih.gov/assembly/GCF_006149115.2
 ```{bash}
 
 mkdir sequences
