@@ -545,6 +545,58 @@ move is 0.6%, a dropped gene fails on dimensions, and appended bytes in a PNG
 pass as an ignored image. It and the `verify_inputs()` addition to `_common.R`
 both parse under R 4.5.3.
 
+**What the first CI run actually found** *(run 2 on `main`, 2026-08-30)*
+
+The run got further than expected and then failed in a way worth recording,
+because it is exactly the class of problem this repository was audited for.
+
+What passed, and these are the load-bearing results:
+
+- `renv::restore()` rebuilt all 184 packages at R 4.3.2 on a clean Ubuntu
+  runner, from source, in 33 minutes. **The lockfile is real.** Until this run
+  that was the largest unverified claim in the repository.
+- `shasum -c CHECKSUMS.sha256` verified every tracked input.
+
+What failed: the `Render` step, on the first notebook, before writing anything
+(no `docs/` was produced, and the captured result diff was empty).
+`01-upstream-alignment.qmd` had 24 chunk headers written as
+
+    ```{bash, eval: false}
+
+which is Rmd's inline-option syntax carrying Quarto's YAML option syntax, and is
+neither. knitr parses that whole string as the chunk *label*:
+`knitr:::parse_params("bash, eval: false")` returns `label = "bash, eval: false"`
+and no `eval` option at all. Two consequences, the second worse than the first:
+
+1. 24 chunks shared one label, which is a hard knitr error
+   (`Duplicate chunk label`). That is what broke the render.
+2. The per-chunk `eval: false` was never in effect. Only the document-level
+   `execute: eval: false` was stopping these chunks from running, and a
+   single-chunk test confirms the header form does nothing: knitr ran
+   `bash -c 'echo hi'` and captured its output. Had anyone removed the
+   document-level option, trusting the per-chunk ones, a render would have
+   started issuing HISAT2 and StringTie commands.
+
+This also means `01-upstream-alignment.qmd` had never once been rendered since
+phase 4 wrote it. The notebook was reviewed as prose and shipped as prose.
+
+Fixed: all 24 headers are now plain ```` ```{bash} ````, with a comment in the
+YAML saying that the document-level option is the only thing disabling execution
+and must not be removed casually.
+
+Added, because a 35-minute feedback loop for a chunk-header typo is not a
+feedback loop: `lint-notebooks.R` knits every notebook with `eval = FALSE`,
+which needs no analysis package and no data, and also flags any chunk header of
+the shape that hides an option. The `render` job now `needs: lint`, so this
+class of error fails in about a minute on a bare R. Verified both ways locally:
+the script passes on the fixed tree and fails on the pre-fix notebook, reporting
+both the duplicate-label error and the 24 malformed headers.
+
+Also pinned: Quarto 1.6.40 in the workflow, read from the generator tag of a
+locally rendered `02-differential-expression.html`. The workflow had been
+installing whatever Quarto was newest, which is the same drift the lockfile
+exists to prevent.
+
 **Still open:** R5/E9 (the C05/C17 exclusion has no committed evidence, and
 `ALIGNMENT_SUMMARY.md` cites MultiQC directories containing only `.gitkeep`,
 attributes alignment statistics to uncommitted logs, and reports n=15 per tissue
