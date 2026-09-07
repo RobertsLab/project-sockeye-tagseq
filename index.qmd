@@ -49,8 +49,8 @@ notebook 02.
 | | Reads | Writes |
 |---|---|---|
 | [01 — Upstream alignment](tag-seq/code/01-upstream-alignment.html) | FASTQs on Gannet | count matrices |
-| [02 — Differential expression (liver)](02-differential-expression-liver.html) | `tag-seq/data/` | `tag-seq/DESEQ_output/liver/` |
-| [02 — Differential expression (gonad)](02-differential-expression-gonad.html) | `tag-seq/data/` | `tag-seq/DESEQ_output/gonad/` |
+| [02 — Differential expression (liver)](tag-seq/code/02-differential-expression-liver.html) | `tag-seq/data/` | `tag-seq/DESEQ_output/liver/` |
+| [02 — Differential expression (gonad)](tag-seq/code/02-differential-expression-gonad.html) | `tag-seq/data/` | `tag-seq/DESEQ_output/gonad/` |
 | [03 — Gene tables](tag-seq/code/03-gene-tables.html) | significant DEGs | `tag-seq/gene_tables/` |
 | [04 — GO and KEGG enrichment](tag-seq/code/04-enrichment.html) | all DEGs, GAF, KEGG | `tag-seq/GO_output/` |
 

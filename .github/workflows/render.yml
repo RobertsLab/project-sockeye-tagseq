@@ -61,7 +61,14 @@ jobs:
           r-version: '4.3.2'
           use-public-rspm: true
 
+      # Pinned to the version the analysis was developed and verified with
+      # (REPRODUCIBILITY-PLAN.md records Quarto 1.6.40). Unpinned, the action
+      # installed 1.10.18, whose post-processing of the parameterised 02 render
+      # failed on a resource path that 1.6.40 resolves. Part of the toolchain
+      # is R and packages in renv.lock; the other part is this.
       - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.6.40
 
       - name: Cache renv library
         uses: actions/cache@v4
