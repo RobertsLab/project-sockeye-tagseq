@@ -61,10 +61,34 @@ cat("annotations:", nrow(gene2cat), " genes:", dplyr::n_distinct(gene2cat$gene),
 print(table(gaf$aspect))
 ```
 
-## Gene lengths
+## Gene lengths, and why they are not used to weight the test
 
-`goseq` corrects for the length bias in RNA-seq power: longer genes accumulate
-more reads and are easier to call differentially expressed.
+`goseq` was written for whole-transcript RNA-seq, where longer genes accumulate
+more reads and are easier to call differentially expressed, and its default
+Wallenius test re-weights every gene by a spline fitted to that relationship.
+This analysis uses the plain **hypergeometric** test instead, for three reasons
+that came out of the first clean-machine render (PR #4, 2026-09-06):
+
+1. **TagSeq does not have that bias.** It sequences one fragment from the 3′ end
+   of each transcript, so read count does not scale with transcript length, and
+   the premise of the correction does not hold for this assay.
+2. **The length association here is strong and in the opposite direction.**
+   In gonad, 27% of the shortest-decile genes are differentially expressed
+   against about 5% in every other decile (Wilcoxon p ≈ 1e-119). The Wallenius
+   weighting therefore down-weighted short genes heavily, and the pathways it
+   suppressed were the ones made of short genes, oxidative phosphorylation
+   first among them (59 of 188 genes DE: Wallenius p 2e-5, hypergeometric
+   p 1e-18).
+3. **It was not reproducible.** The spline fitted by `nullp()` is numerically
+   platform-sensitive, and the Wallenius results sat at the threshold: the same
+   inputs gave FDR 0.004 / 0.039 / 0.045 for the three enriched terms on macOS
+   and 0.060 / 0.057 / 0.081 on Linux, so `check-reproduction.R` failed on the
+   gonad enrichment tables and nothing else. The hypergeometric test is exact
+   and deterministic.
+
+`nullp()` is still run, because `goseq()` takes its gene universe from the
+object it returns and because its length-bias plot is the evidence for point 2.
+Under `method = "Hypergeometric"` the fitted weights are not used.
 
 The plan was to take lengths from `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff`,
 but that file was tracked at **zero bytes** — the `bedtools` step that should
@@ -73,8 +97,7 @@ feature track") never produced anything that was committed. It has since been
 untracked rather than left in place as an empty file asserting that it exists
 (finding E7). Lengths come instead from the assembly feature table, which is
 committed and complete: the median mRNA interval length per gene, keyed by
-`GeneID`, which is our `LOC` identifier without the prefix. Nothing upstream has
-to be re-run to obtain them.
+`GeneID`, which is our `LOC` identifier without the prefix.
 
 ```{r}
 #| label: lengths
@@ -116,7 +139,8 @@ cat("gene-pathway links:", nrow(kegg2cat),
 
 The universe is every gene DESeq2 returned an adjusted p-value for, and the
 differentially expressed set is those with `padj < 0.05` — the same rule the
-results tables use.
+results tables use. The test is the hypergeometric over-representation test,
+Benjamini–Hochberg corrected across the categories tested.
 
 ```{r}
 #| label: enrich
@@ -141,9 +165,10 @@ run_goseq <- function(tissue, cat_map, label, term_lookup) {
   }
 
   pwf <- nullp(de, bias.data = gene_lengths[names(de)], plot.fit = TRUE)
-  title(main = paste(tissue, "-", label, "- length bias"))
+  title(main = paste(tissue, "-", label, "- proportion DE by transcript length"))
 
-  res <- goseq(pwf, gene2cat = as.data.frame(cat_map))
+  ## Hypergeometric, not the default Wallenius: see "Gene lengths" above.
+  res <- goseq(pwf, gene2cat = as.data.frame(cat_map), method = "Hypergeometric")
 
   res <- res %>%
     mutate(FDR = p.adjust(over_represented_pvalue, method = "BH")) %>%

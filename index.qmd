@@ -77,13 +77,23 @@ Enrichment, FDR < 0.05:
 | Tissue | GO terms tested | GO enriched | KEGG pathways tested | KEGG enriched |
 |---|---|---|---|---|
 | Liver | 3,749 | 0 | 191 | 0 |
-| Gonad | 6,066 | 2 | 195 | 1 |
+| Gonad | 6,066 | 35 | 195 | 6 |
 
-GO enrichment uses `goseq` with Wallenius length-bias correction against the
-NCBI GO annotation for this assembly (155,362 annotations, 32,629 genes, 6,937
-terms); KEGG uses a hypergeometric test against KEGG organism `one`. The single
-enriched gonad pathway is oxidative phosphorylation (`one00190`, 59 of 188 genes,
-FDR 0.0044).
+Both use `goseq`'s hypergeometric over-representation test, GO against the NCBI
+GO annotation for this assembly (155,362 annotations, 32,629 genes, 6,937 terms)
+and KEGG against organism `one`, Benjamini–Hochberg corrected. The gonad signal
+is ribosomal and mitochondrial: the top KEGG pathways are oxidative
+phosphorylation (`one00190`, 59 of 188 genes, FDR 2e-16) and ribosome
+(`one03010`, 66 of 262, FDR 2e-13), and the top GO terms are structural
+constituent of ribosome, translation and the mitochondrial respiratory chain.
+
+`goseq`'s default Wallenius test, which re-weights genes by transcript length,
+is not used. TagSeq is 3′-end counting, so read count does not scale with
+length; the length association in these data runs the other way, with short
+genes far more likely to be differentially expressed; and the Wallenius result
+turned out to depend on the platform, with the three terms it called at FDR
+0.004–0.045 on macOS falling to 0.057–0.081 on Linux. The reasoning is set out
+in notebook 04.
 
 That the liver comparison yields no enriched terms is a result, not a failure:
 31 significant genes is little power for an over-representation test.
