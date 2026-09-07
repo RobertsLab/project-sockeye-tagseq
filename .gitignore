@@ -21,6 +21,10 @@ _freeze/
 /docs/
 tag-seq/code/*.html
 /*.html
+# The manuscript renders standalone, next to its source.
+manuscript/*.html
+manuscript/*.docx
+manuscript/*_files/
 
 # ---- renv -------------------------------------------------------------------
 # renv.lock IS tracked; the library it installs is not.
