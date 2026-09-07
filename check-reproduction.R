@@ -23,10 +23,26 @@
 # understand is a file nobody is checking.
 
 TOL        <- 1e-3     # relative tolerance on numeric columns
+ABS_TOL    <- 1e-2     # absolute floor under the relative tolerance -- see below
 PVAL_TOL   <- 1e-2     # looser, for p-value and FDR columns -- see below
 PVAL_COLS  <- c("padj", "pvalue", "FDR", "over_represented_pvalue",
                 "under_represented_pvalue")
+CALL_COLS  <- c("padj", "FDR")   # adjusted columns: the 0.05 call is checked exactly
 IMAGE_EXTS <- c("png", "pdf", "svg", "jpg", "jpeg", "html")
+
+# Why there is an absolute floor: the first cross-platform render (Linux, in CI)
+# moved apeglm's log2FoldChange by at most 0.0008 log2 units, and lfcSE by at
+# most 0.0013. A purely relative tolerance failed both files anyway, on genes
+# whose fold change is close to zero -- 0.0006 on an LFC of 0.125 is a 0.5%
+# relative change and no result at all. A value passes if it is within
+# ABS_TOL + TOL * |committed| of the committed value. baseMean and normalised
+# counts are in the tens to thousands, so the relative term governs them; the
+# floor matters only for the small-magnitude fold-change columns.
+#
+# Why only adjusted columns get the significance-call check: a raw p-value
+# crossing 0.05 changes no conclusion -- every table is read at padj or FDR
+# below 0.05. Checking raw p-values at that threshold produced 20 spurious
+# "changed calls" in a GO table whose FDR calls had changed by 2.
 
 # Why p-values get their own tolerance: they span thirty orders of magnitude
 # here, so a relative comparison is brutally strict at the small end -- 1e-30 vs
@@ -74,18 +90,26 @@ compare_tables <- function(old, new, tol = TOL) {
   }
 
   ## Match on a key rather than row order: ties in a padj sort can legitimately
-  ## reorder, but the set of rows must not change.
-  key <- intersect(c("gene", "category"), names(old))
-  if (length(key) > 0) {
-    key <- key[[1]]
-    if (!setequal(old[[key]], new[[key]])) {
-      lost   <- setdiff(old[[key]], new[[key]])
-      gained <- setdiff(new[[key]], old[[key]])
-      return(sprintf("%s set changed: %d lost, %d gained (e.g. %s)",
-                     key, length(lost), length(gained),
-                     paste(utils::head(c(lost, gained), 3), collapse = ", ")))
+  ## reorder, but the set of rows must not change. The single-gene-count tables
+  ## have one row per gene per sample, so there the key is the pair; keying on
+  ## gene alone matched every row to the first row for that gene and reported
+  ## counts changed 635-fold when they had changed in the fourteenth digit.
+  key_cols <- intersect(c("gene", "category"), names(old))
+  if (length(key_cols) > 0) {
+    key_cols <- c(key_cols[[1]], intersect("sample", names(old)))
+    key_of   <- function(d) do.call(paste, c(d[key_cols], sep = "\r"))
+    ko <- key_of(old); kn <- key_of(new)
+    if (anyDuplicated(ko) || anyDuplicated(kn)) {
+      return(sprintf("key (%s) is not unique; cannot match rows", paste(key_cols, collapse = ", ")))
     }
-    old <- old[match(new[[key]], old[[key]]), , drop = FALSE]
+    if (!setequal(ko, kn)) {
+      lost   <- setdiff(ko, kn)
+      gained <- setdiff(kn, ko)
+      return(sprintf("%s set changed: %d lost, %d gained (e.g. %s)",
+                     paste(key_cols, collapse = "+"), length(lost), length(gained),
+                     paste(gsub("\r", "/", utils::head(c(lost, gained), 3)), collapse = ", ")))
+    }
+    old <- old[match(kn, ko), , drop = FALSE]
   }
 
   for (col in names(old)) {
@@ -97,17 +121,26 @@ compare_tables <- function(old, new, tol = TOL) {
         problems <- c(problems, sprintf("%s: NA pattern changed", col))
         next
       }
-      col_tol <- if (col %in% PVAL_COLS) PVAL_TOL else tol
       ok <- !is.na(a)
       if (any(ok)) {
-        rel <- abs(b[ok] - a[ok]) / pmax(abs(a[ok]), 1e-12)
-        if (max(rel) > col_tol) {
-          problems <- c(problems, sprintf("%s: max relative change %.3g exceeds %.3g",
-                                          col, max(rel), col_tol))
+        if (col %in% PVAL_COLS) {
+          rel <- abs(b[ok] - a[ok]) / pmax(abs(a[ok]), 1e-12)
+          if (max(rel) > PVAL_TOL) {
+            problems <- c(problems, sprintf("%s: max relative change %.3g exceeds %.3g",
+                                            col, max(rel), PVAL_TOL))
+          }
+        } else {
+          excess <- abs(b[ok] - a[ok]) - (ABS_TOL + tol * abs(a[ok]))
+          if (max(excess) > 0) {
+            i <- which.max(excess)
+            problems <- c(problems, sprintf(
+              "%s: change of %.3g at committed value %.3g exceeds %.3g + %.3g * |value|",
+              col, abs(b[ok] - a[ok])[i], a[ok][i], ABS_TOL, tol))
+          }
         }
       }
       ## A gene crossing 0.05 is a changed result however small the numeric move.
-      if (col %in% PVAL_COLS) {
+      if (col %in% CALL_COLS) {
         call_a <- !is.na(a) & a < 0.05
         call_b <- !is.na(b) & b < 0.05
         if (!identical(call_a, call_b)) {
@@ -187,7 +220,7 @@ if (length(failures) > 0) {
 }
 
 cat("Reproduction check: PASS\n")
-cat(sprintf(paste0("Differences are confined to re-rendered images and numeric drift within %g\n",
-                   "relative tolerance (%g for p-value columns). No row, no column and no\n",
-                   "significance call at 0.05 changed.\n"), TOL, PVAL_TOL))
+cat(sprintf(paste0("Differences are confined to re-rendered images and numeric drift within\n",
+                   "%g + %g * |value| (relative %g for p-value columns). No row, no column\n",
+                   "and no padj or FDR call at 0.05 changed.\n"), ABS_TOL, TOL, PVAL_TOL))
 quit(status = 0)

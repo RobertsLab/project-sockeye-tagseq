@@ -154,8 +154,9 @@ load_counts <- function(cfg) {
 ## agrees with the old table on every one of the 33,210 they share -- verified,
 ## so this is a strict superset, not a different annotation.
 ##
-## Length is the median mRNA interval per gene, for goseq's length-bias
-## correction. It comes from here rather than from
+## Length is the median mRNA interval per gene. goseq's nullp() takes it as
+## bias data; the test itself is hypergeometric (see 04), so the length enters
+## the diagnostic plot but not the p-values. It comes from here rather than from
 ## sequences/GCF_006149115.2_Oner_1.1_mRNA.gff, which was tracked at zero bytes
 ## and has since been untracked (finding E7); the feature table is committed and
 ## complete, so no upstream step has to be re-run to get lengths.

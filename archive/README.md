@@ -37,7 +37,7 @@ Two reasons they are archived rather than maintained:
    annotated terms or pathways, one row each — with no over-representation
    statistic and no FDR anywhere in either file.
 
-The reproducible replacements are `tag-seq/GO_output/<tissue>/`: goseq with
-Wallenius length-bias correction for GO, and a hypergeometric test against the
-KEGG organism `one` map, both reported at FDR < 0.05 with the gene list, the
+The reproducible replacements are `tag-seq/GO_output/<tissue>/`: goseq's
+hypergeometric test against the NCBI GO annotation for this assembly and
+against the KEGG organism `one` map, both reported at FDR < 0.05 with the gene list, the
 background and the package versions recorded in the render.

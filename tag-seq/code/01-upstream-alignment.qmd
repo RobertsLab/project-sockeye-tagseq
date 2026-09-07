@@ -1,7 +1,12 @@
 ---
 title: "Upstream: FASTQ to count matrix"
 subtitle: "Alignment and assembly on Raven"
-eval: false
+# Every chunk here is bash. Without this line Quarto infers the Jupyter engine
+# from the chunk languages and needs a Python kernel with nbformat -- which the
+# CI runner does not have, so the first step of render-all.sh failed there and
+# nothing downstream was ever rendered. knitr handles bash chunks natively, and
+# with eval: false it executes nothing anyway.
+engine: knitr
 execute:
   eval: false
 ---
@@ -32,7 +37,7 @@ Documented here because these tools are not in `renv.lock`:
 Define all paths once at the top so they can be modified for different environments (Raven vs. 
 laptop, different disk mount points, etc.).
 
-```{bash, eval: false}
+```{bash}
 # ---- CONFIGURATION: edit these paths for your environment ----
 
 # Root directory for all work and data storage
@@ -74,7 +79,7 @@ cd "$PROJECT_ROOT"
 
 Get sockeye salmon assembly GCF_006149115.2 from NCBI.
 
-```{bash, eval: false}
+```{bash}
 # Download genome sequence and annotation
 mkdir -p "$SEQUENCES_DIR"
 cd "$SEQUENCES_DIR"
@@ -98,7 +103,7 @@ head "$SEQUENCES_DIR/GCF_006149115.2_Oner_1.1_genomic.fna"
 
 ### Calculate chromosome lengths
 
-```{bash, eval: false}
+```{bash}
 awk '$0 ~ ">" {print c; c=0;printf substr($0,2,14) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' \
   "$SEQUENCES_DIR/GCF_006149115.2_Oner_1.1_genomic.fna" \
 | sed 's/Cr//g' \
@@ -111,7 +116,7 @@ head "$SEQUENCES_DIR/GCF_006149115.2_Oner_1.1_genomic-sequence-lengths.txt"
 
 ### Generate mRNA feature track
 
-```{bash, eval: false}
+```{bash}
 head "$SEQUENCES_DIR/GCF_006149115.2_Oner_1.1_genomic.gff"
 
 grep -e "Gnomon	mRNA" -e "RefSeq	mRNA" -e "cmsearch	mRNA" -e "tRNAscan-SE	mRNA" \
@@ -127,7 +132,7 @@ head "$SEQUENCES_DIR/GCF_006149115.2_Oner_1.1_mRNA.gff"
 
 ### Gonad
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$RAW_GONAD"
 cd "$RAW_GONAD"
 
@@ -142,7 +147,7 @@ gunzip *.fastq.gz
 
 ### Liver
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$RAW_LIVER"
 cd "$RAW_LIVER"
 
@@ -162,7 +167,7 @@ Gannet. The steps below are documented for completeness, but nothing downstream 
 data and no count matrix was generated. If the raw FASTQs are located, these steps can be 
 uncommented and processed like gonad and liver.
 
-```{bash, eval: false}
+```{bash}
 # mkdir -p "$RAW_BRAIN"
 # cd "$RAW_BRAIN"
 #
@@ -179,7 +184,7 @@ uncommented and processed like gonad and liver.
 
 ### Gonad untrimmed reads
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$FASTQC_GONAD/untrimmed"
 
 "$FASTQC" \
@@ -190,7 +195,7 @@ mkdir -p "$FASTQC_GONAD/untrimmed"
 
 ### Liver untrimmed reads
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$FASTQC_LIVER/untrimmed"
 
 "$FASTQC" \
@@ -201,7 +206,7 @@ mkdir -p "$FASTQC_LIVER/untrimmed"
 
 ### Brain untrimmed reads (unresolved)
 
-```{bash, eval: false}
+```{bash}
 # mkdir -p "$FASTQC_BRAIN/untrimmed"
 #
 # "$FASTQC" \
@@ -214,7 +219,7 @@ mkdir -p "$FASTQC_LIVER/untrimmed"
 
 ### Gonad
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$TRIM_GONAD"
 cd "$RAW_GONAD"
 
@@ -230,7 +235,7 @@ done
 
 ### Liver
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$TRIM_LIVER"
 cd "$RAW_LIVER"
 
@@ -243,7 +248,7 @@ done
 
 ### Brain (unresolved)
 
-```{bash, eval: false}
+```{bash}
 # mkdir -p "$TRIM_BRAIN"
 # cd "$RAW_BRAIN"
 #
@@ -258,7 +263,7 @@ done
 
 ### Gonad trimmed reads
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$FASTQC_GONAD/trimmed"
 
 "$FASTQC" \
@@ -269,7 +274,7 @@ mkdir -p "$FASTQC_GONAD/trimmed"
 
 ### Liver trimmed reads
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$FASTQC_LIVER/trimmed"
 
 "$FASTQC" \
@@ -280,7 +285,7 @@ mkdir -p "$FASTQC_LIVER/trimmed"
 
 ### Brain trimmed reads (unresolved)
 
-```{bash, eval: false}
+```{bash}
 # mkdir -p "$FASTQC_BRAIN/trimmed"
 #
 # "$FASTQC" \
@@ -293,7 +298,7 @@ mkdir -p "$FASTQC_LIVER/trimmed"
 
 ### Build HISAT2 index
 
-```{bash, eval: false}
+```{bash}
 # Create HISAT2 index from reference genome (took ~31 min on Raven)
 "$HISAT2_BUILD" \
   -f "$SEQUENCES_DIR/GCF_006149115.2_Oner_1.1_genomic.fna" \
@@ -302,7 +307,7 @@ mkdir -p "$FASTQC_LIVER/trimmed"
 
 ### Gonad: align and convert to BAM
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$HISAT2_SAM_GONAD" "$HISAT2_BAM_GONAD"
 
 cd "$TRIM_GONAD"
@@ -325,7 +330,7 @@ grep "overall alignment rate" "$PROJECT_ROOT/hisat2_alignment_gonad.txt"
 
 ### Liver: align and convert to BAM
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$HISAT2_SAM_LIVER" "$HISAT2_BAM_LIVER"
 
 cd "$TRIM_LIVER"
@@ -348,7 +353,7 @@ grep "overall alignment rate" "$PROJECT_ROOT/hisat2_alignment_liver.txt"
 
 ### Brain: align and convert to BAM (unresolved)
 
-```{bash, eval: false}
+```{bash}
 # mkdir -p "$HISAT2_SAM_BRAIN" "$HISAT2_BAM_BRAIN"
 #
 # cd "$TRIM_BRAIN"
@@ -372,7 +377,7 @@ grep "overall alignment rate" "$PROJECT_ROOT/hisat2_alignment_liver.txt"
 
 ### Gonad
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$PROJECT_ROOT/stringtie_gtf-gonad"
 
 cd "$HISAT2_BAM_GONAD"
@@ -390,7 +395,7 @@ ls "$PROJECT_ROOT/stringtie_gtf-gonad/" | head
 
 ### Liver
 
-```{bash, eval: false}
+```{bash}
 mkdir -p "$PROJECT_ROOT/stringtie_gtf-liver"
 
 cd "$HISAT2_BAM_LIVER"
@@ -408,7 +413,7 @@ ls "$PROJECT_ROOT/stringtie_gtf-liver/" | head
 
 ### Brain (unresolved)
 
-```{bash, eval: false}
+```{bash}
 # mkdir -p "$PROJECT_ROOT/stringtie_gtf-brain"
 #
 # cd "$HISAT2_BAM_BRAIN"
@@ -426,7 +431,7 @@ ls "$PROJECT_ROOT/stringtie_gtf-liver/" | head
 
 The Python script `prepDE.py` aggregates StringTie GTF files into a count matrix.
 
-```{bash, eval: false}
+```{bash}
 # prepDE.py is from StringTie; make it executable if needed
 PREPDEPY="/home/shared/stringtie-2.2.1/prepDE.py"
 

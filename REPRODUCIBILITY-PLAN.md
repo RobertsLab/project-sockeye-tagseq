@@ -6,7 +6,7 @@ and render end to end.
 Audit performed 2026-08-29 against commit `94718d8`, tagged `v0-preexisting`.
 Local toolchain at that point: R 4.3.2, Quarto 1.6.40, DESeq2 1.42.1.
 
-**Status:** phases 0-3 are complete. Phase 4 is next.
+**Status:** phases 0-4 are complete and phase 5 is under way; the analysis has rendered and been checked on a clean machine (see the 2026-09-06 entry at the end).
 
 ---
 
@@ -551,6 +551,45 @@ attributes alignment statistics to uncommitted logs, and reports n=15 per tissue
 where both matrices have 30 columns), step 3 (no independent re-render has been
 performed), E10 (no SRA accession), E14 (upstream toolchain pinned only in
 prose), and all of phase 5 below.
+
+---
+
+## First clean-machine render (2026-09-06, PR #4)
+
+Neither run of the render workflow on 2026-08-30 had got past its first step:
+notebook 01 has only bash chunks, Quarto inferred the Jupyter engine, and the
+runner had no `nbformat`. With `engine: knitr` declared, and the parameterised
+02 renders named through `output-file` rather than `--output` (which Quarto
+1.10 mishandled; CI now pins 1.6.40), the analysis rendered end to end on
+Ubuntu for the first time.
+
+**What reproduced.** Every DESeq2 table: same rows, same `padj < 0.05` calls in
+both tissues. baseMean and normalised counts agree to 1e-14 relative; apeglm
+`log2FoldChange` to 0.0008 and `lfcSE` to 0.0013 log2 units. Step 3 of the
+post-phase-4 audit, "no independent re-render has been performed", is closed.
+
+**What did not.** The gonad enrichment. Gene-to-category counts were identical,
+but goseq's Wallenius p-values moved because the length-bias spline fitted by
+`nullp()` is platform-sensitive, and the three enriched terms sat at the
+threshold: FDR 0.004 / 0.039 / 0.045 on macOS, 0.060 / 0.057 / 0.081 on Linux.
+Investigating why the weighting mattered so much showed that it should not have
+been applied at all. TagSeq is 3′-end counting, so the length bias goseq
+corrects for is not present by design, and the length association in these
+data is strong and negative (gonad: 27% of the shortest-decile genes DE against
+about 5% in every other decile). The test is now hypergeometric, exact and
+deterministic. Gonad returns 35 GO terms and 6 KEGG pathways at FDR < 0.05,
+ribosomal and mitochondrial; liver still none. The Wallenius tables are in the
+history at `bf5bf06` and before.
+
+**Checker.** Ten of the fourteen failures the run reported were the checker's:
+a non-unique key on the single-gene-count tables, no absolute floor under the
+relative tolerance, and 0.05 call checks on raw p-values. All three fixed and
+verified against the Linux outputs and against perturbation probes.
+
+Also closed from the earlier list: E12's `LICENSE` and `CITATION.cff` remain
+open; the eleven count tables changed to comma-separated by `8ea8f80` but never
+regenerated are now regenerated and committed; GitHub Pages is enabled with the
+Actions source.
 
 ---
 
