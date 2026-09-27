@@ -87,6 +87,14 @@ one composite figure and four tables. The manuscript is *not* rendered by CI.
       Commit per-sample alignment rates and library sizes as a supplementary
       table.
 
+Evidence found 2026-09-27 while building Table S1: C05 and C17 are the two
+smallest gonad libraries, 1.97 and 2.14 million gene-assigned counts against
+3.39–5.77 million for the other 28. That is a computable criterion the
+exclusion could be stated in, and the manuscript now reports it as an
+observation. It does not replace the MultiQC evidence the original decision
+cited; either commit that, or adopt a library-size rule in notebook 02 and say
+so.
+
 ### A6. Sequencing details
 
 - [ ] Instrument, read length and run type (single-end assumed) from the GSAF
@@ -229,11 +237,22 @@ should move to the supplement.
 
 ### C3. Tables
 
-- [ ] Main text: at most two tables (KEGG pathways; top gonad genes). The
+- [x] Main text: at most two tables (KEGG pathways; top gonad genes). The
       35-row GO table and the 31-row liver table go to the supplement.
-- [ ] Supplementary tables: sample metadata and QC (A2, A5, B3); full DE
+- [x] Supplementary tables: sample metadata and QC (A2, A5, B3); full DE
       tables per tissue (all shrinkage estimators); full GO and KEGG results;
       gene tables from `tag-seq/gene_tables/`.
+
+Done 2026-09-27 in `tag-seq/code/06-supplementary-tables.qmd`, written to
+`manuscript/supplementary/` as CSV (no Excel writer is in `renv.lock`, and
+archives prefer CSV). S1 samples and QC; S2 and S3 liver and gonad DE for
+every tested gene with all four estimators; S4 and S5 every tested GO term and
+KEGG pathway, both tissues; S6 the 19 shared genes. Legends are in the
+manuscript, column definitions in `manuscript/supplementary/README.md`. The
+characterized/uncharacterized gene tables are not a separate table: the
+`description` column of S2 and S3 carries the same information. S1 still
+lacks sex, maturity, body size and alignment rate, which wait on A1, A2, A5.
+The main text now has Table 1 (top gonad genes) and Table 2 (KEGG).
 
 ### C4. Mechanics
 
