@@ -1,0 +1,195 @@
+---
+title: "Supplementary tables"
+subtitle: "Tables S1–S6, assembled from the committed result tables"
+date: today
+execute:
+  warning: true
+  message: false
+---
+
+This notebook writes the manuscript's supporting-information tables to
+`manuscript/supplementary/`, one CSV per table. It computes no new statistics:
+every value comes from the count matrices or from the tables notebooks 02 and
+04 have already written, and the joins below assert that those tables agree
+with one another before anything is written.
+
+The tables are CSV rather than Excel: CSV is the format data archives prefer,
+and writing Excel would add a package to `renv.lock` for no gain in content.
+Column definitions are in `manuscript/supplementary/README.md`, and the table
+legends are in the manuscript's Supporting information section.
+
+| Table | Contents |
+|---|---|
+| S1 | Samples: tissue, phenotype, inclusion, library size and genes detected |
+| S2 | Liver differential expression, every tested gene, all shrinkage estimators |
+| S3 | Gonad differential expression, same layout |
+| S4 | GO over-representation, every tested term, both tissues |
+| S5 | KEGG over-representation, every tested pathway, both tissues |
+| S6 | Genes differentially expressed in both tissues |
+
+```{r}
+#| label: setup
+library(dplyr)
+source("tag-seq/code/_common.R")
+
+SUPP_DIR <- "manuscript/supplementary"
+dir.create(SUPP_DIR, recursive = TRUE, showWarnings = FALSE)
+
+write_supp <- function(x, name) {
+  path <- file.path(SUPP_DIR, paste0(name, ".csv"))
+  write.csv(x, path, row.names = FALSE, na = "")
+  cat(sprintf("%-40s %6d rows x %2d columns\n", path, nrow(x), ncol(x)))
+  invisible(path)
+}
+```
+
+## Table S1 — samples
+
+Library size is the total of gene-assigned counts in the count matrix, and
+genes detected counts genes with at least one read, and with at least ten.
+The two excluded gonad libraries are listed with their values, because the
+reader should be able to see what was removed.
+
+Sex, maturity stage, body size and per-sample alignment rate are not included
+here yet: they are not in the repository (submission checklist A1, A2 and A5).
+
+```{r}
+#| label: s1
+sample_table <- function(tissue) {
+  cfg <- tissue_config(tissue)
+  excluded <- cfg$exclude
+  cfg$exclude <- character(0)            # load every library, then flag
+  dat <- load_counts(cfg)
+  data.frame(
+    sample             = colnames(dat$cts),
+    tissue             = tissue,
+    phenotype          = as.character(dat$coldata$trt),
+    included           = !colnames(dat$cts) %in% excluded,
+    exclusion_reason   = ifelse(colnames(dat$cts) %in% excluded,
+                                "outlier in sample-correlation clustering", ""),
+    library_size       = colSums(dat$cts),
+    genes_detected     = colSums(dat$cts >= 1),
+    genes_detected_10  = colSums(dat$cts >= 10),
+    row.names = NULL
+  )
+}
+s1 <- bind_rows(sample_table("liver"), sample_table("gonad"))
+stopifnot(sum(!s1$included) == 2,
+          all(table(s1$tissue, s1$phenotype) == 15))
+write_supp(s1, "Table_S1_samples")
+
+## How the excluded libraries compare with the rest of their tissue.
+s1 %>% group_by(tissue, included) %>%
+  summarise(n = n(), median_library = median(library_size),
+            min_library = min(library_size), .groups = "drop")
+s1 %>% filter(!included)
+```
+
+## Tables S2 and S3 — differential expression
+
+One row per tested gene. The unshrunken Wald test supplies the p-values and
+adjusted p-values; each shrinkage estimator supplies its own fold change and
+standard error. Since the shrinkage calls reuse the unshrunken results
+(notebook 02), the adjusted p-values must be identical across all four source
+tables, and that is asserted here.
+
+```{r}
+#| label: s2-s3
+de_table <- function(tissue) {
+  cfg <- tissue_config(tissue)
+  rd  <- function(suffix) read.csv(out_path(cfg, cfg$prefix, "-ALL-DEG", suffix, ".csv"),
+                                   stringsAsFactors = FALSE)
+  un <- rd(""); ap <- rd("-apeglm"); as <- rd("-ashr"); no <- rd("-normal")
+
+  for (x in list(ap, as, no)) {
+    stopifnot(setequal(x$gene, un$gene))
+    x <- x[match(un$gene, x$gene), ]
+    stopifnot(identical(x$padj, un$padj), identical(x$pvalue, un$pvalue))
+  }
+  pick <- function(x, tag) {
+    x <- x[match(un$gene, x$gene), c("log2FoldChange", "lfcSE")]
+    setNames(x, paste0(c("log2FC_", "lfcSE_"), tag))
+  }
+
+  bind_cols(
+    un %>% transmute(gene, description, baseMean,
+                     log2FC_unshrunken = log2FoldChange, lfcSE_unshrunken = lfcSE,
+                     wald_stat = stat, pvalue, padj),
+    pick(ap, "apeglm"), pick(as, "ashr"), pick(no, "normal")
+  ) %>%
+    mutate(significant = padj < 0.05) %>%
+    arrange(padj, pvalue)
+}
+
+s2 <- de_table("liver")
+s3 <- de_table("gonad")
+
+## Must agree with the significant-gene tables every other notebook reads.
+for (x in list(list(t = s2, cfg = tissue_config("liver")),
+               list(t = s3, cfg = tissue_config("gonad")))) {
+  sig <- read.csv(out_path(x$cfg, x$cfg$prefix, "-SIG-DEG-apeglm.csv"))
+  stopifnot(setequal(x$t$gene[x$t$significant], sig$gene))
+}
+write_supp(s2, "Table_S2_liver_differential_expression")
+write_supp(s3, "Table_S3_gonad_differential_expression")
+```
+
+## Tables S4 and S5 — enrichment
+
+Every tested category for both tissues, not only the enriched ones, so the
+reader can see what was tested and how close the liver came. The hypergeometric
+test is one-sided, for over-representation.
+
+```{r}
+#| label: s4-s5
+enrich_table <- function(kind) {
+  bind_rows(lapply(c("liver", "gonad"), function(tissue) {
+    x <- read.csv(file.path("tag-seq/GO_output", tissue, sprintf("%s-%s-all.csv", tissue, kind)),
+                  stringsAsFactors = FALSE)
+    if (kind == "KEGG") x <- rename(x, term = name) %>% mutate(ontology = "KEGG")
+    x %>% transmute(tissue, category, term, ontology,
+                    de_genes = numDEInCat, category_genes = numInCat,
+                    pvalue = over_represented_pvalue, FDR,
+                    enriched = FDR < 0.05) %>%
+      arrange(pvalue)
+  }))
+}
+s4 <- enrich_table("GO")
+s5 <- enrich_table("KEGG") %>% select(-ontology)
+
+enriched <- function(x, t) sum(x$enriched[x$tissue == t])
+c(GO_liver = enriched(s4, "liver"), GO_gonad = enriched(s4, "gonad"),
+  KEGG_liver = enriched(s5, "liver"), KEGG_gonad = enriched(s5, "gonad"))
+
+write_supp(s4, "Table_S4_GO_enrichment")
+write_supp(s5, "Table_S5_KEGG_enrichment")
+```
+
+## Table S6 — genes differentially expressed in both tissues
+
+```{r}
+#| label: s6
+s6 <- inner_join(
+  s2 %>% filter(significant) %>% select(gene, description, liver_log2FC = log2FC_apeglm, liver_padj = padj),
+  s3 %>% filter(significant) %>% select(gene, gonad_log2FC = log2FC_apeglm, gonad_padj = padj),
+  by = "gene"
+) %>%
+  mutate(same_direction = sign(liver_log2FC) == sign(gonad_log2FC)) %>%
+  arrange(desc(gonad_log2FC))
+stopifnot(identical(sort(s6$gene),
+                    sort(read.csv("figures/source-data/shared-genes.csv")$gene)))
+write_supp(s6, "Table_S6_shared_genes")
+s6 %>% select(gene, liver_log2FC, gonad_log2FC, same_direction)
+```
+
+## Not included
+
+The split of significant genes into characterized and uncharacterized
+(`tag-seq/gene_tables/`) is not a separate table: the `description` column of
+Tables S2 and S3 carries the same information, and "uncharacterized" genes are
+those whose description begins with that word.
+
+```{r}
+#| label: session
+sessionInfo()
+```
