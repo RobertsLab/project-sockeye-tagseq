@@ -1,0 +1,84 @@
+---
+title: "Cover letter"
+format:
+  docx:
+    reference-doc: reference-manuscript.docx
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: numbers
+## The few numbers the letter quotes, read from the same tables the manuscript
+## reads, so the letter cannot drift from the paper.
+root <- normalizePath(getwd())
+while (!file.exists(file.path(root, "_quarto.yml")) && dirname(root) != root) root <- dirname(root)
+rd <- function(p) read.csv(file.path(root, p), stringsAsFactors = FALSE)
+g_sig  <- rd("tag-seq/DESEQ_output/gonad/GONAD-SIG-DEG-apeglm.csv")
+g_all  <- rd("tag-seq/DESEQ_output/gonad/GONAD-ALL-DEG-apeglm.csv")
+l_sig  <- rd("tag-seq/DESEQ_output/liver/liver-SIG-DEG-apeglm.csv")
+l_all  <- rd("tag-seq/DESEQ_output/liver/liver-ALL-DEG-apeglm.csv")
+fmt <- function(x) format(x, big.mark = ",", trim = TRUE)
+up_pct <- round(100 * mean(g_sig$log2FoldChange > 0))
+```
+
+[[Date]]
+
+[[Editor name]]\
+Editor, *Molecular Ecology*
+
+Dear [[Editor name]],
+
+We submit our manuscript, "Gonadal but not hepatic transcriptomes distinguish
+territorial from social sockeye salmon (*Oncorhynchus nerka*)", for
+consideration as an Original Article in *Molecular Ecology*.
+
+Adult salmon on the spawning grounds either defend territories or remain in
+social aggregations, and the choice carries real energetic and reproductive
+costs. Transcriptomic work on behavioural phenotype in fish has focused almost
+entirely on the brain, so how that choice is expressed in peripheral tissues of
+wild adults is largely unknown. We used 3′-tag RNA sequencing of gonad and
+liver from territorial and social sockeye to ask which tissue carries the
+phenotype.
+
+The answer is clear-cut. The gonad differed markedly between phenotypes, with
+`r fmt(nrow(g_sig))` of `r fmt(nrow(g_all))` tested genes differentially
+expressed, `r up_pct`% of them higher in territorial fish. These genes form a
+coherent programme of elevated translation and oxidative phosphorylation,
+alongside strong induction of acute-phase genes. The liver, by contrast,
+differed at only `r fmt(nrow(l_sig))` of `r fmt(nrow(l_all))` genes, with no
+enriched pathway. The results point to reproductive investment, rather than
+hepatic energy metabolism, as the physiological axis along which behavioural
+type varies in spawning sockeye, and they identify candidate genes for testing
+whether gonadal state drives behaviour or follows it.
+
+We think the work suits *Molecular Ecology* because it uses a
+transcriptomic approach to address a question in behavioural and reproductive
+ecology in a wild population, and because it adds a peripheral-tissue
+perspective to a literature dominated by neural gene expression. It also
+includes a methodological point of general use for 3′-tag data: the
+transcript-length correction commonly applied in enrichment testing is
+inappropriate for this assay, and in our data it either removed the result or
+failed without warning.
+
+Every number, table and figure in the manuscript is produced by a scripted,
+version-pinned analysis that is re-executed from a clean environment on each
+change to the repository. Raw reads are deposited in the NCBI Sequence Read
+Archive ([[BioProject accession]]), and the code and processed data are
+archived at Zenodo ([[DOI]]).
+
+This manuscript is not under consideration elsewhere, and all authors have
+approved its submission. [[State any preprint, or delete this sentence.]]
+[[Competing interests statement.]]
+
+Suggested reviewers: [[three to five names, affiliations and email
+addresses]].
+
+Sincerely,
+
+[[Corresponding author name]]\
+[[Affiliation]]\
+[[Email]]\
+on behalf of [[all authors]]

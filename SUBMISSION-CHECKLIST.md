@@ -256,18 +256,51 @@ The main text now has Table 1 (top gonad genes) and Table 2 (KEGG).
 
 ### C4. Mechanics
 
-- [ ] Add `manuscript/manuscript.qmd` to the render workflow so the docx is
+- [x] Add `manuscript/manuscript.qmd` to the render workflow so the docx is
       built and proven on every push.
-- [ ] Add a *Molecular Ecology* CSL file and set `csl:` in the YAML header.
-- [ ] Add a docx reference document with double spacing and continuous line
+- [x] Add a *Molecular Ecology* CSL file and set `csl:` in the YAML header.
+- [x] Add a docx reference document with double spacing and continuous line
       numbers for review.
-- [ ] Check the reference list for coverage: sockeye-specific spawning
+- [x] Check the reference list for coverage: sockeye-specific spawning
       behaviour (female nest competition), 3′-tag analysis practice, salmonid
       acute-phase/immune genes, and recent peripheral-tissue social-status
       transcriptomics.
-- [ ] Cover letter.
+- [x] Cover letter.
 - [ ] Remove the `[[...]]` placeholders; grep the rendered docx for `[[`
-      before submitting.
+      before submitting. *(The check exists: `manuscript/check-placeholders.R`,
+      run by `render-all.sh`. It lists every placeholder in the rendered Word
+      file, six at present, all waiting on A-items; run it with
+      `MANUSCRIPT_STRICT=1` for the build you submit and it fails until they
+      are gone.)*
+
+Done 2026-09-27, except placeholder removal:
+
+- `render-all.sh` now renders the manuscript to Word and HTML and the cover
+  letter to Word, after the analysis; CI uploads all three as the `manuscript`
+  artifact on every run.
+- The Citation Style Language repository lists *Molecular Ecology* as a
+  dependent of APA 7th edition, so `manuscript/apa.csl` is vendored and set as
+  `csl:`.
+- `manuscript/reference-manuscript.docx`: Times New Roman 12 pt, double
+  spacing (tables single), continuous line numbers, page numbers, US Letter
+  with 1-inch margins. Validated against the OOXML schema.
+- References: added and cited Foote 1990 and Quinn & Foote 1994 (sockeye
+  female and male spawning territoriality), Ma et al. 2019 (3′ vs
+  whole-transcript RNA-seq; read counts independent of transcript length),
+  Jørgensen et al. 2000 and Bayne & Gerwick 2001 (salmonid serum amyloid A and
+  the fish acute-phase response), and Lea et al. 2018 (rank-associated immune
+  gene expression in blood of wild baboons). Each was checked against Crossref
+  or PubMed, with no correction or retraction notices, and against its abstract
+  for the claim it supports. That check changed one sentence: the Discussion
+  said serum amyloid A transcription rises "by orders of magnitude", a
+  mammalian figure; in salmon hepatocytes the reported induction is about 2- to
+  10-fold, so the sentence now states only what the salmonid evidence shows.
+- Prause et al. 2025 (*amh* expression in dominant vs subordinate tilapia
+  testes) is in `references.bib` but not yet cited; it belongs in the *amh*
+  discussion that C1 adds once A1 settles sex.
+- `manuscript/cover-letter.qmd`: a draft that reads its numbers from the result
+  tables; editor, authors, reviewers, preprint status and competing interests
+  are placeholders.
 
 ---
 

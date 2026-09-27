@@ -31,6 +31,10 @@ abstract: |
   integration check that reproduces every reported number.
 keywords: [sockeye salmon, social behaviour, territoriality, TagSeq, gonad, liver, transcriptomics, oxidative phosphorylation]
 bibliography: references.bib
+# The Citation Style Language repository lists Molecular Ecology as a
+# dependent style whose parent is APA 7th edition, so the parent is vendored
+# here: pandoc needs the independent style file.
+csl: apa.csl
 link-citations: true
 number-sections: true
 execute:
@@ -44,6 +48,9 @@ format:
   docx:
     toc: false
     number-sections: true
+    # Review format: Times New Roman 12 pt, double spacing (tables single),
+    # continuous line numbers, page numbers, US Letter with 1-inch margins.
+    reference-doc: reference-manuscript.docx
 ---
 
 ```{r}
@@ -148,7 +155,7 @@ adults, the same species migrate and move in aggregations whose collective
 properties can improve navigation and passage past obstacles [@Berdahl2014;
 @Okasaki2020], and then, on the spawning grounds, revert to intense intra-sexual
 competition in which males contest access to females and females contest and defend
-nest sites [@Quinn1999; @Fleming1998]. The energetic cost of these behaviours is
+nest sites [@Foote1990; @QuinnFoote1994; @Quinn1999; @Fleming1998]. The energetic cost of these behaviours is
 substantial: aggressive display and nest defence are the most expensive activities in
 the daily budget of spawning Pacific salmon after simple holding [@McVeigh2007].
 Whether an individual behaves territorially or remains within a social aggregation is
@@ -165,7 +172,7 @@ coupled to gonadotropin signalling, sex-steroid levels and testis transcription
 [@Thonnes2022; @HollanderCohen2022]; in juvenile rainbow trout, four days of
 subordination reorganise hepatic lipid metabolism [@Kostyniuk2018]; and in mammals,
 social status remodels immune gene regulation in blood, liver and spleen
-[@SnyderMackler2016; @Lee2022]. The gonad and the liver are natural targets in
+[@SnyderMackler2016; @Lea2018; @Lee2022]. The gonad and the liver are natural targets in
 salmon: the gonad because behaviour on the spawning grounds is inseparable from
 reproductive state, and the liver because it integrates energy allocation and
 synthesises the plasma proteins, including vitellogenin and acute-phase reactants,
@@ -210,7 +217,7 @@ Facility, University of Texas at Austin, using the QuantSeq 3′ mRNA-Seq FWD pr
 (Lexogen, Vienna, Austria), a commercial implementation of TagSeq [@Moll2014;
 @Lohman2016]. The method generates a single cDNA fragment from the 3′ end of each
 polyadenylated transcript, so tag counts are direct proxies for transcript abundance
-and are independent of transcript length [@Meyer2011]. Single-end reads were
+and are independent of transcript length [@Meyer2011; @Ma2019]. Single-end reads were
 sequenced **[[platform and read length to be confirmed]]** in two submissions
 (gonad, GSAF job JA22192; liver, JA22330).
 
@@ -266,7 +273,7 @@ implemented in goseq [@Young2010] and corrected across tested categories by
 Benjamini–Hochberg. We did not use goseq's default Wallenius test, which re-weights
 genes by transcript length, for two reasons. First, TagSeq counts one fragment per
 transcript, so the length-dependent power that the weighting is designed to remove is
-absent by construction. Second, the relationship between length and differential
+absent by construction [@Ma2019]. Second, the relationship between length and differential
 expression in these data runs the other way: in the gonad, `r formatC(dec1, format = "f", digits = 0)`%
 of genes in the shortest length decile were differentially expressed against
 `r formatC(dec_rest[1], format = "f", digits = 0)`–`r formatC(dec_rest[2], format = "f", digits = 0)`% in every
@@ -457,15 +464,19 @@ phenotype.
 The largest fold changes in the data set were induction, in territorial gonads, of two
 serum amyloid A paralogues, an equistatin-like cysteine protease inhibitor, a
 ladderlectin, a saxiphilin-like transferrin-family protein and the small heat shock
-protein *hspb11*. Serum amyloid A is a canonical acute-phase reactant whose
-transcription rises by orders of magnitude in response to inflammatory cytokines,
-and lectins, protease inhibitors and heat shock proteins are the effectors of the
-innate response to tissue damage and infection. Their appearance in ovary rather
+protein *hspb11*. Serum amyloid A is a canonical acute-phase reactant, and in
+salmonids, as in mammals, its transcription is induced by pro-inflammatory cytokines
+and bacterial lipopolysaccharide [@Jorgensen2000; @Bayne2001]; lectins, protease
+inhibitors and heat shock proteins are the effectors of the innate response to
+tissue damage and infection. In fish, as in mammals, the liver is thought to be the
+main source of acute-phase proteins [@Bayne2001], so their elevation in ovary rather
 than liver suggests a local response within the gonad. Two non-exclusive
 explanations fit. Territorial behaviour, especially nest defence, is aggressive and
 energetically costly [@Quinn1999; @McVeigh2007] and may carry a systemic
 inflammatory and glucocorticoid load that peripheral tissues register [@Gilmour2005;
-@SnyderMackler2016]. Alternatively, an ovary approaching ovulation undergoes
+@SnyderMackler2016]. In wild male baboons, whose hierarchies rest on physical
+competition, high rank is associated with elevated innate-immune and
+pro-inflammatory gene expression in blood [@Lea2018]. Alternatively, an ovary approaching ovulation undergoes
 follicular remodelling that recruits many of the same innate-immune and
 chaperone pathways. Distinguishing these requires the maturity staging and plasma
 measurements that the present design lacks.
@@ -509,7 +520,7 @@ We report enrichment from the hypergeometric test rather than the length-weighte
 Wallenius test that is goseq's default. The default is appropriate for
 whole-transcript RNA-seq, where longer transcripts accrue more reads and are called
 differentially expressed more readily [@Young2010]. TagSeq removes that dependence
-by design [@Meyer2011; @Lohman2016]. In our gonad data the length association was
+by design [@Meyer2011; @Lohman2016; @Ma2019]. In our gonad data the length association was
 strong but inverted: short genes were five times more likely to be differentially
 expressed than long ones, because ribosomal and respiratory-chain genes are short
 and were the genes that changed. Where the Wallenius weighting fitted, it therefore
