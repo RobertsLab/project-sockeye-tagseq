@@ -97,3 +97,6 @@ yet have an archival accession (see `SUBMISSION-CHECKLIST.md`, A3).
   *Molecular Ecology* submission.
 - `NOTES.md` — lab logistics: sample shipping, the sequencing quote and
   manifests, related lab-notebook issues and working documents.
+- `LICENSE` — MIT for code and documentation, CC0 for data and results, no
+  licence for the manuscript, and the terms of each third-party file.
+- `CITATION.cff` — how to cite this repository.
