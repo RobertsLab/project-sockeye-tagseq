@@ -34,14 +34,16 @@ Counts are gene-level, quantified against NCBI assembly
 ::: {.callout-warning}
 ## The two excluded gonad samples are not yet reproducibly justified
 
-`C05` and `C17` are dropped by a hardcoded `exclude` in `tag-seq/code/_common.R`,
-on the basis of a MultiQC sample-correlation inspection whose output is **not in
-this repository** — `tag-seq/QC/multiqc_gonad/` contains only a placeholder.
-This is the one analytical choice with a discretionary effect on the gonad
-results, and it currently rests on a statement rather than on evidence (audit
-findings R5 and E9). Treat the gonad counts as provisional until either the
-MultiQC output is committed or the exclusion criterion is computed inside
-notebook 02.
+`C05` and `C17` are dropped by a hardcoded `exclude` in `tag-seq/code/_common.R`.
+The recorded reason is a sample-correlation inspection whose output is **not in
+this repository**; the MultiQC report on Gannet covers FastQC only and has no
+correlation heatmap. What the repository can show is that they are the two
+smallest gonad libraries by gene-assigned counts (1.97 and 2.14 million, against
+3.39–5.77 million for the other 28; Supplementary Table S1). This is the one
+analytical choice with a discretionary effect on the gonad results. Treat the
+gonad counts as provisional until the exclusion is either supported by the
+original evidence or stated as a rule computed in notebook 02 (submission
+checklist A5).
 :::
 
 ## Notebooks
@@ -119,11 +121,10 @@ Raw FASTQ files are on Gannet, at
 <https://gannet.fish.washington.edu/panopea/berdahl-sockeye-salmon/>: gonad in
 `20220714-tagseq-gonad/` (30 libraries, two lanes each), liver in
 `20220917-tagseq-liver/` (30 libraries), with FastQC and MultiQC reports
-alongside. This page previously linked a `seashell/bu-github/` address, which
-no longer resolves.
+alongside.
 
-They have **no archival accession yet** — no BioProject, no SRA (audit finding
-E10). Until they are deposited, the raw data has neither a persistence guarantee
+They have **no archival accession yet**: no BioProject and no SRA deposit
+(submission checklist A3). Until they are deposited, the raw data has neither a persistence guarantee
 nor a citable identifier, and the analysis cannot be re-derived from source by
 anyone outside the lab. The committed count matrices are checksummed in
 `CHECKSUMS.sha256` and verified at the start of every render, which pins what

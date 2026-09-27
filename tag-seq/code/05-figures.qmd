@@ -7,9 +7,8 @@ execute:
   message: false
 ---
 
-This notebook draws the three manuscript figures. It replaces
-`figures/figure_X`, which was assembled by hand in PowerPoint and so could not
-follow the data when the results changed.
+This notebook draws the three manuscript figures, so they follow the data
+whenever the results change.
 
 Every element comes from one of two places:
 
@@ -318,8 +317,8 @@ plot_heatmap <- function(h) {
 row_label <- function(txt) ggdraw() + draw_label(txt, angle = 90, size = BASE_PT + 1, fontface = "bold")
 
 ## Built as a right-hand legend laid out horizontally: cowplot 1.1.3's
-## get_legend() finds ggplot2 3.5's right-hand guide box but returned an empty
-## grob for a top-positioned one, which left the first render without a key.
+## get_legend() finds ggplot2 3.5's right-hand guide box but returns an empty
+## grob for a top-positioned one.
 phenotype_legend <- get_legend(
   plot_pca(PCA$liver) +
     theme(legend.position = "right", legend.direction = "horizontal",

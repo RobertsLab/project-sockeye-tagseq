@@ -771,6 +771,494 @@ Also found: `index.qmd` gave the raw-data location as a Gannet
 
 ---
 
+## Notes moved from the notebooks and READMEs (2026-09-27, checklist D4)
+
+The notebooks, `_common.R` and the directory READMEs now describe the analysis
+as it is. The audit narrative they carried (comparisons with the deleted
+`.Rmd` code, how each finding was found and fixed, and dated history) was
+removed from them and is kept here verbatim, so nothing that was written down
+is lost. Each passage is labelled with the finding or checklist item it
+belongs to and the place it came from; the findings themselves are described
+in the Findings section above.
+
+**E5, D1 (_common.R, tissue_config)**
+
+```text
+## Everything that differed between the two near-identical DESeq2 notebooks
+## (finding E5) is collected here. Every output file is prefixed with the
+## tissue name in lower case (liver-PCA.png, gonad-SIG-DEG-apeglm.csv, ...).
+## Gonad files were "GONAD-*" until 2026-09-27, a historical accident of the two
+## original notebooks; they were renamed so one rule covers both tissues
+## (submission checklist D1).
+```
+
+**R5 (_common.R, gonad exclude). Note: the claim that phase 4 committed the MultiQC output was never true; corrected in the new comment**
+
+```text
+      ## C05 and C17 were dropped on the basis of the MultiQC sample-correlation
+      ## heatmap. In the .Rmd this was an uncommented pair of lines in gonad and
+      ## the same pair commented out in liver, with no recorded criterion
+      ## (finding R5). Phase 4 commits the MultiQC output that justifies it.
+```
+
+**R1 (_common.R, sample_ids_from_columns)**
+
+```text
+## Derive the treatment-table sample ID from a StringTie count-matrix column.
+##
+## prepDE.py names columns after the GTF files: "01B_S43_R1.gtf". The treatment
+## tables use "B01". The mapping is: take the token before the first underscore
+## ("01B") and swap its number and tissue letter ("B01").
+##
+## The .Rmd did this positionally -- colnames(cts) <- row.names(trt_list) -- and
+## then "checked" the result with all(colnames(cts) %in% rownames(coldata)),
+## which is unconditionally TRUE after the rename (finding R1). Any prepDE.py
+## re-run that emitted columns in a different order would have silently
+## mislabelled every sample.
+```
+
+**R8 (_common.R, gene_ids_from_rownames)**
+
+```text
+## Take the gene identifier from a StringTie row name.
+##
+## Row names are "gene-<id>|<id>": the identifier is a LOC number for genes
+## with no assigned symbol ("gene-LOC115144855|LOC115144855") and a real symbol
+## for the rest ("gene-arhgap8|arhgap8"). The part after the pipe is that
+## identifier in both cases, and it is unique across all 37,942 genes.
+##
+## The .Rmd instead split each name on the literal "LOC" and kept the third
+## piece, which works for LOC-numbered genes and produces the string "LOCNA"
+## for every symbol-named one -- 4,731 genes, 12.5% of the annotation. Because
+## data.frame() then de-duplicates row names, those genes reached the published
+## tables as LOCNA.1, LOCNA.2292 and so on: identifiers that correspond to
+## nothing and join to nothing, and that the gene tables consequently dropped.
+## In the committed results that was 3 of 31 significant liver genes and 309 of
+## 1,630 significant gonad genes (finding R8).
+```
+
+**R1 (_common.R, load_counts check.names)**
+
+```text
+  ## check.names = FALSE: the StringTie columns start with a digit
+  ## ("01B_S43_R1.gtf"), and read.csv would otherwise silently rename them to
+  ## "X01B_S43_R1.gtf". The .Rmd never noticed because it overwrote the column
+  ## names positionally before ever reading them.
+```
+
+**R1 (_common.R, load_counts assertions)**
+
+```text
+  ## The three assertions the old tautological check should have been.
+```
+
+**R3, D1 (_common.R, reference level; trt renamed phenotype)**
+
+```text
+  ## Behavioural phenotype, observed at capture: territorial is compared with
+  ## social, the reference. Made explicit so the sign of every log2FoldChange no
+  ## longer depends on "social" happening to sort before "territorial"
+  ## alphabetically (finding R3). The column was called "trt" until 2026-09-27;
+  ## it is not a treatment, since phenotype was observed, not assigned.
+```
+
+**R8, E7 (_common.R, load_gene_annotation; LOC table and zero-byte GFF)**
+
+```text
+## Built from the assembly feature table rather than Onerka_LOCID_gene_table.txt,
+## which is keyed entirely by LOC identifiers (33,210 of our 37,942 genes) and so
+## could never annotate a symbol-named gene. The feature table covers 37,929 and
+## agrees with the old table on every one of the 33,210 they share -- verified,
+## so this is a strict superset, not a different annotation.
+##
+## Length is the median mRNA interval per gene. goseq's nullp() takes it as
+## bias data; the test itself is hypergeometric (see 04), so the length enters
+## the diagnostic plot but not the p-values. It comes from here rather than from
+## sequences/GCF_006149115.2_Oner_1.1_mRNA.gff, which was tracked at zero bytes
+## and has since been untracked (finding E7); the feature table is committed and
+## complete, so no upstream step has to be re-run to get lengths.
+```
+
+**R3 (_common.R, fit_deseq)**
+
+```text
+## social is the reference level (set in load_counts), so coefficient 2 is the
+## territorial-vs-social effect; that is asserted, not assumed (finding R3).
+```
+
+**R4 (_common.R, colours)**
+
+```text
+## Phenotype colours, derived from coldata rather than hardcoded run lengths.
+## The .Rmd wrote rep("royalblue1", 15) / rep("red3", 15) for liver and 14 / 14
+## for gonad, assuming both the group sizes and the column order (finding R4).
+##
+## The hues
+```
+
+**E12, R1 (_common.R, verify_inputs)**
+
+```text
+## Check the input files against CHECKSUMS.sha256 (finding E12).
+##
+## Finding R1 was a count matrix whose columns had been reordered by a re-run of
+## prepDE.py, silently mislabelling every sample; the loader assertions above
+## catch that case now. This is the same failure mode one layer further out: an
+## input file that changed without anyone noticing, so that the committed
+## results no longer correspond to the committed inputs.
+##
+```
+
+**E5 (02, introduction)**
+
+```text
+This notebook runs the DESeq2 analysis for **one tissue**, chosen by the
+`tissue` parameter. It replaces `2_DESeq2_analysis-salmon-liver.Rmd` and
+`2_DESeq2_analysis-salmon-gonad.Rmd`, which were 571 and 582 lines differing in
+five places (finding E5).
+```
+
+**R1 (02, load data)**
+
+```text
+Samples are matched between the count matrix and the treatment table **by name**,
+not by column position. `prepDE.py` names columns after the GTF files
+(`01B_S43_R1.gtf`); the treatment tables use `B01`. `load_counts()` derives one
+from the other and asserts the two sets are identical before aligning them.
+
+The previous code assigned `colnames(cts) <- row.names(trt_list)` positionally
+and then "checked" it with `all(colnames(cts) %in% rownames(coldata))`, which is
+unconditionally `TRUE` after such a rename (finding R1). The assignment happened
+to be correct for the committed matrices — verified — but nothing would have
+caught a reordered re-run.
+```
+
+**R8 (02, callout 'Gene identifiers were repaired')**
+
+```text
+::: {.callout-important}
+## Gene identifiers were repaired
+
+StringTie row names are `gene-<id>|<id>`, and the identifier after the pipe is a
+`LOC` number for genes with no assigned symbol and a real symbol for the rest.
+The `.Rmd` split each name on the literal string `LOC` and kept the third piece,
+which works for `LOC115144855` and turns `gene-arhgap8|arhgap8` into the string
+`LOCNA` — for **4,731 genes, 12.5% of the annotation**, and disproportionately
+the well-characterised ones.
+
+Because `data.frame()` de-duplicates row names, those genes did not disappear:
+they reached the published tables as `LOCNA.1`, `LOCNA.2292` and so on —
+identifiers that correspond to nothing, join to nothing, and were therefore
+dropped from the gene tables as "no description". In the committed results that
+was 3 of 31 significant liver genes and **309 of 1,630 significant gonad genes**.
+
+Identifiers are now taken from after the pipe, which is unique across all 37,942
+genes, and descriptions come from the assembly feature table, which covers 37,929
+of them and agrees with the old LOCID table on all 33,210 they share.
+:::
+```
+
+**R3 (02, fit the model)**
+
+```text
+2. Asserts that coefficient 2 is `phenotype_territorial_vs_social`. `social` is set
+   as the reference level explicitly in `load_counts()`, so this holds by
+   construction rather than by alphabetical accident (finding R3).
+3. Keeps genes with 10 or more counts in at least a third of samples. This
+   filtering happens *after* `DESeq()`, so dispersions were estimated on the
+   full matrix — preserved from the original, which the committed results
+   depend on.
+```
+
+**R7 (02, exports)**
+
+```text
+Exports are written to full paths. The original wrapped these in
+`setwd("DESEQ_output/<tissue>")` followed by two `setwd('..')` calls, which
+knitr resets at every chunk boundary (finding R7).
+```
+
+**B1-checklist (02, contrasts: alpha 0.05 vs 0.1 history)**
+
+```text
+genes and so produces different adjusted p-values. Before this was fixed the
+unshrunken table (alpha 0.05) and the three shrunken tables (alpha 0.1) called
+different numbers of genes significant at the same 0.05 threshold.
+```
+
+**D2 (02, MA plots)**
+
+```text
+## PNG only. This was a PDF of 2-3 MB per tissue holding tens of thousands of
+## vector points; gonad also carried a 2022 MA_plots.png that no code wrote.
+```
+
+**R2 (02, results tables)**
+
+```text
+Significance is `padj < 0.05`, and only that.
+
+The previous code also defined `lfc.cutoff <- 1.5` and `svalue.cutoff <- 0.005`,
+never used them, and then labelled its outputs
+`DEG_apeglm-s0.005_lfc1.5` — describing a filter that never ran (finding R2).
+The unused variables are gone and the labels now say what was actually done. The
+counts themselves are unchanged.
+```
+
+**D2 (02, single-gene counts)**
+
+```text
+The four estimators flag exactly the same genes, because they share one set of
+adjusted p-values. That is asserted here, and it is why one table of normalised
+counts serves all four: the counts depend on the gene, not on the estimator.
+Until 2026-09-27 there were four copies of that table, identical but for row
+order (submission checklist D2).
+```
+
+**D1 (02, summary rows)**
+
+```text
+have `padj < 0.05` (`significant_*`). Until 2026-09-27 the first set was
+labelled `DEGs_all-genes*`, which read as a count of differentially expressed
+genes; it never was (submission checklist D1).
+```
+
+**D2 (02, volcano plots)**
+
+```text
+## Unshrunken and apeglm, shown here; only apeglm, the estimate the manuscript
+## uses, is saved. Eight volcano PNGs per tissue were written until 2026-09-27,
+## one per estimator for all and for significant genes (submission checklist
+## D2); the manuscript's volcano plots are drawn by notebook 05.
+```
+
+**R4 (02, expression heatmap)**
+
+```text
+Column annotation colours are derived from `coldata`. The previous code wrote
+`rep("royalblue1", 15)` / `rep("red3", 15)` for liver and `14` / `14` for gonad,
+hardcoding both the group sizes and the column order (finding R4).
+```
+
+**B2 (03, introduction; rule reconstructed from the committed outputs)**
+
+```text
+Replaces `3_generate_gene_tables-salmon.Rmd`, which loaded `liver` and `gonad`
+and then operated on `control_ploidy`, `heat_ploidy`, `diploid_heat` and five
+other objects that never existed — leftovers from an oyster ploidy ×
+multistressor experiment. It also read the DESeq2 CSVs with `sep=" "` when they
+were written with `sep=","`, and its final chunk did not parse (finding B2).
+
+Whatever produced the committed `gene_tables/` was therefore not in the
+repository. The rule has been reconstructed from those outputs and verified
+against both tissues:
+
+1. Drop genes with **no description** — no match in the LOCID table. These are
+   the rows the old oyster code called `LOCNA`.
+2. Of the rest, **uncharacterized** are those whose description begins with
+   `uncharacterized`; everything else is **characterized**.
+```
+
+**phase 3 (03, callout 'Output format changed deliberately': unquoted CSV in the 2023 gene tables)**
+
+```text
+::: {.callout-important}
+## Output format changed deliberately
+
+The committed tables were written with `quote = FALSE` and `sep = ","`, but
+descriptions contain commas — `uncharacterized LOC115129809, transcript variant X3`.
+In `gonad_characterized.txt` only 754 of 1,280 rows have the expected 8 fields;
+526 have 9, 10 or 11 and cannot be read back correctly. These are now written as
+properly quoted CSV. The rows and values are unchanged; only the quoting is.
+:::
+```
+
+**B3, E13 (04, introduction; DAVID output and the other experiment's notebooks)**
+
+```text
+Replaces the DAVID web-tool step that produced `DAVID_GOterms.txt` and
+`DAVID_KEGG_pathway.txt`, for which no script, input list, background or query
+date was recorded (both now in `archive/david-2023/`, see the README there). It also replaces `X_GOterm_Annotation.Rmd` and
+`X_GOSeq_annotation.Rmd`, which belonged to a different experiment entirely
+(finding B3).
+```
+
+**phase 3 (04, 'KEGG is available after all': the earlier misread organism list)**
+
+```text
+**KEGG is available after all.** An earlier check of the KEGG REST organism
+list came back empty and was misread as "no such organism". KEGG does carry
+*Oncorhynchus nerka* as organism `one` (genome T07952, 37,942 proteins — the
+same gene count as our matrix). Its gene identifiers are NCBI GeneIDs, so they
+join to our `LOC` ids directly. The two REST responses are vendored alongside
+the GAF; see `tag-seq/genome/kegg_one_SOURCE.txt` for the URLs and retrieval
+date. No ortholog transfer is needed.
+```
+
+**PR #4 (04, gene lengths intro)**
+
+```text
+This analysis uses the plain **hypergeometric** test instead, for three reasons
+that came out of the first clean-machine render (PR #4, 2026-09-06):
+```
+
+**PR #4, B1-checklist (04, reasons 2 and 3: the Wallenius numbers on the earlier gene set and platforms)**
+
+```text
+   against 5–13% in every other decile (Wilcoxon p ≈ 3e-119). Where the
+   Wallenius weighting could be fitted it therefore down-weighted short genes
+   heavily, and the pathways it suppressed were the ones made of short genes,
+   oxidative phosphorylation first among them (on the gene set of PR #4,
+   before the independent-filtering fix, on Linux: Wallenius p 3e-4, and no KEGG pathway
+   at FDR < 0.05; hypergeometric, 59 of 186 genes DE, p 1e-17, on the current
+   set).
+3. **It was not reproducible.** The spline fitted by `nullp()` is numerically
+   unstable against a decreasing relationship. On the PR #4 gene set it was
+   platform-sensitive, and the Wallenius results sat at the threshold: the same
+   inputs gave FDR 0.004 / 0.039 / 0.045 for the three enriched terms on macOS
+   and 0.060 / 0.057 / 0.081 on Linux, so `check-reproduction.R` failed on the
+   gonad enrichment tables and nothing else. On the current gene set, which
+   differs from that one by a few hundred low-count genes, the fit fails
+   outright: every fitted probability is the same constant, so a Wallenius
+   test would silently return the hypergeometric result. The hypergeometric
+   test is exact and deterministic.
+```
+
+**E7 (04, gene lengths source: the zero-byte GFF)**
+
+```text
+The plan was to take lengths from `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff`,
+but that file was tracked at **zero bytes** — the `bedtools` step that should
+have written it (documented in `01-upstream-alignment.qmd`, "Generate mRNA
+feature track") never produced anything that was committed. It has since been
+untracked rather than left in place as an empty file asserting that it exists
+(finding E7). Lengths come instead from the assembly feature table, which is
+committed and complete: the median mRNA interval length per gene, keyed by
+`GeneID`, which is our `LOC` identifier without the prefix.
+```
+
+**E11, C2 (05, introduction: figure_X)**
+
+```text
+This notebook draws the three manuscript figures. It replaces
+`figures/figure_X`, which was assembled by hand in PowerPoint and so could not
+follow the data when the results changed.
+```
+
+**E11 (data README, introduction)**
+
+```text
+What each tracked file is, and which notebook reads it. Written to close finding
+E11: 39 MB of this repository was tracked input that no current notebook reads,
+with nothing to say whether it was still needed.
+```
+
+**D3 (data README: 'tracked here until 2026-09-27')**
+
+```text
+## Moved out of the tree: the three provenance-only files
+
+Three files that no notebook reads were tracked here until 2026-09-27
+(submission checklist D3). They are the only record of what the upstream
+pipeline produced besides the gene-level matrices above, so they were not
+deleted: they were removed from the working tree and remain in the
+repository's history, retrievable byte-for-byte from these commit-pinned
+addresses.
+```
+
+**E11, R8, D3 (genome README: section 'Removed: Onerka_LOCID_gene_table.txt')**
+
+```text
+## Removed: Onerka_LOCID_gene_table.txt
+
+The pre-2026 annotation table, removed from the tree on 2026-09-27 (submission
+checklist D3). No notebook read it.
+
+It is keyed entirely by LOC identifiers, so it can never annotate a
+symbol-named gene, which is what produced the fabricated `LOCNA.*` identifiers
+of finding R8. The feature table above replaces it and is a strict superset,
+re-verified before removal: all 33,211 genes in the LOC table are in the
+feature table, and every one of their descriptions matches one of that gene's
+mRNA names there. The only differences are CSV quoting and which transcript
+variant's name was taken (", transcript variant X1" against "X2").
+
+Two copies remain:
+
+| Copy | sha256 |
+|---|---|
+| [commit-pinned, as tracked here](https://raw.githubusercontent.com/RobertsLab/project-sockeye-tagseq/97e1a1eafdef1e241aad325a3f4626cf30bf4f83/tag-seq/genome/Onerka_LOCID_gene_table.txt) | `931450449975391ce6135c0e06ed5d146ed783447769c2e35dae17fe21f5dd32` |
+| [Gannet](https://gannet.fish.washington.edu/panopea/berdahl-sockeye-salmon/genome/Onerka_LOCID_gene_table.txt) | `e60dbd4b9dbc3c0e06bfad3e71fe416ac2020ea9acb44236f39f8458953ffea5` |
+
+The Gannet copy has Windows (CRLF) line endings and is otherwise identical;
+that is the only reason the checksums differ.
+```
+
+**E11 (genome README, introduction)**
+
+```text
+Written to close finding E11.
+```
+
+**E7 (sequences README: section 'Removed: GCF_006149115.2_Oner_1.1_mRNA.gff')**
+
+```text
+## Removed: GCF_006149115.2_Oner_1.1_mRNA.gff
+
+This file was tracked at **zero bytes** (finding E7). It is a derived
+intermediate: `01-upstream-alignment.qmd` ("Generate mRNA feature track") writes
+it by grepping mRNA features out of the genomic GFF and piping them through
+`bedtools`, and StringTie then consumes it as `-G`. An empty tracked file
+asserts that the artefact exists when it does not, so it has been untracked
+rather than left in place.
+
+To regenerate it, run the "Generate mRNA feature track" chunk of
+`01-upstream-alignment.qmd` on Raven. Nothing downstream needs it: goseq's gene
+lengths come from `genome/GCF_006149115.2_Oner_1.1_feature_table.txt`, which is
+committed and complete.
+```
+
+**E11, C2 (figures README: section 'History')**
+
+```text
+## History
+
+This directory used to hold `figure_X.png`, exported from a hand-assembled
+PowerPoint file (`figure_X.pptx`) that no script produced (finding E11). After
+the independent-filtering fix of 2026-09-26 its heatmap panels showed gene sets
+that no longer matched the results. Both files were removed when notebook 05
+replaced them; they remain in the git history.
+```
+
+**R5, E9 (index.qmd exclusion callout, before update)**
+
+```text
+::: {.callout-warning}
+## The two excluded gonad samples are not yet reproducibly justified
+
+`C05` and `C17` are dropped by a hardcoded `exclude` in `tag-seq/code/_common.R`,
+on the basis of a MultiQC sample-correlation inspection whose output is **not in
+this repository** — `tag-seq/QC/multiqc_gonad/` contains only a placeholder.
+This is the one analytical choice with a discretionary effect on the gonad
+results, and it currently rests on a statement rather than on evidence (audit
+findings R5 and E9). Treat the gonad counts as provisional until either the
+MultiQC output is committed or the exclusion criterion is computed inside
+notebook 02.
+:::
+```
+
+**E10, D3 (index.qmd data availability, before update)**
+
+```text
+`20220917-tagseq-liver/` (30 libraries), with FastQC and MultiQC reports
+alongside. This page previously linked a `seashell/bu-github/` address, which
+no longer resolves.
+
+They have **no archival accession yet** — no BioProject, no SRA (audit finding
+E10).
+```
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no

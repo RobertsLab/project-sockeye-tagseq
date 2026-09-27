@@ -14,12 +14,9 @@ PATHS <- list(
 
 # ---- per-tissue configuration -----------------------------------------------
 
-## Everything that differed between the two near-identical DESeq2 notebooks
-## (finding E5) is collected here. Every output file is prefixed with the
-## tissue name in lower case (liver-PCA.png, gonad-SIG-DEG-apeglm.csv, ...).
-## Gonad files were "GONAD-*" until 2026-09-27, a historical accident of the two
-## original notebooks; they were renamed so one rule covers both tissues
-## (submission checklist D1).
+## Everything that differs between the two tissues is set here, so notebook 02
+## is one document rendered once per tissue. Every output file is prefixed with
+## the tissue name (liver-PCA.png, gonad-SIG-DEG-apeglm.csv, ...).
 tissue_config <- function(tissue) {
   cfg <- switch(
     tissue,
@@ -28,10 +25,11 @@ tissue_config <- function(tissue) {
       pca_xlim       = c(-100, 100)
     ),
     gonad = list(
-      ## C05 and C17 were dropped on the basis of the MultiQC sample-correlation
-      ## heatmap. In the .Rmd this was an uncommented pair of lines in gonad and
-      ## the same pair commented out in liver, with no recorded criterion
-      ## (finding R5). Phase 4 commits the MultiQC output that justifies it.
+      ## C05 and C17 are excluded. The recorded reason is that they clustered
+      ## apart from the other gonad libraries by sample correlation; that output
+      ## is not in this repository. They are also the two smallest gonad
+      ## libraries by gene-assigned counts (Table S1). The exclusion is stated
+      ## here rather than computed from a rule (submission checklist A5).
       exclude        = c("C05", "C17"),
       pca_xlim       = c(-150, 150)
     ),
@@ -60,17 +58,13 @@ alt_path <- function(cfg, ...) {
 
 # ---- sample identity --------------------------------------------------------
 
-## Derive the treatment-table sample ID from a StringTie count-matrix column.
+## Derive the sample ID used in the phenotype tables from a count-matrix column.
 ##
-## prepDE.py names columns after the GTF files: "01B_S43_R1.gtf". The treatment
+## prepDE.py names columns after the GTF files: "01B_S43_R1.gtf". The phenotype
 ## tables use "B01". The mapping is: take the token before the first underscore
-## ("01B") and swap its number and tissue letter ("B01").
-##
-## The .Rmd did this positionally -- colnames(cts) <- row.names(trt_list) -- and
-## then "checked" the result with all(colnames(cts) %in% rownames(coldata)),
-## which is unconditionally TRUE after the rename (finding R1). Any prepDE.py
-## re-run that emitted columns in a different order would have silently
-## mislabelled every sample.
+## ("01B") and swap its number and tissue letter ("B01"). Samples are then
+## matched by this ID, never by column position, so a count matrix whose columns
+## come out in a different order cannot mislabel them.
 sample_ids_from_columns <- function(cols) {
   tag <- sub("_.*$", "", sub("\\.gtf$", "", cols))
   bad <- !grepl("^[0-9]+[A-Za-z]$", tag)
@@ -86,16 +80,8 @@ sample_ids_from_columns <- function(cols) {
 ## Row names are "gene-<id>|<id>": the identifier is a LOC number for genes
 ## with no assigned symbol ("gene-LOC115144855|LOC115144855") and a real symbol
 ## for the rest ("gene-arhgap8|arhgap8"). The part after the pipe is that
-## identifier in both cases, and it is unique across all 37,942 genes.
-##
-## The .Rmd instead split each name on the literal "LOC" and kept the third
-## piece, which works for LOC-numbered genes and produces the string "LOCNA"
-## for every symbol-named one -- 4,731 genes, 12.5% of the annotation. Because
-## data.frame() then de-duplicates row names, those genes reached the published
-## tables as LOCNA.1, LOCNA.2292 and so on: identifiers that correspond to
-## nothing and join to nothing, and that the gene tables consequently dropped.
-## In the committed results that was 3 of 31 significant liver genes and 309 of
-## 1,630 significant gonad genes (finding R8).
+## identifier in both cases, and it is unique across all 37,942 genes, which is
+## asserted.
 gene_ids_from_rownames <- function(rn) {
   ids <- sub("^.*\\|", "", rn)
   if (anyDuplicated(ids)) {
@@ -107,7 +93,7 @@ gene_ids_from_rownames <- function(rn) {
 
 # ---- data loading -----------------------------------------------------------
 
-## Load the count matrix and treatment table for one tissue, matched on sample
+## Load the count matrix and phenotype table for one tissue, matched on sample
 ## ID rather than on column position, and return them already aligned.
 load_counts <- function(cfg) {
   coldata <- read.csv(file.path(PATHS$data, paste0("treatments-", cfg$tissue, ".csv")),
@@ -115,15 +101,15 @@ load_counts <- function(cfg) {
 
   ## check.names = FALSE: the StringTie columns start with a digit
   ## ("01B_S43_R1.gtf"), and read.csv would otherwise silently rename them to
-  ## "X01B_S43_R1.gtf". The .Rmd never noticed because it overwrote the column
-  ## names positionally before ever reading them.
+  ## "X01B_S43_R1.gtf".
   cts <- as.matrix(read.csv(
     file.path(PATHS$data, paste0("onerka_gene_count_matrix-", cfg$tissue, ".csv")),
     sep = ",", header = TRUE, row.names = "gene_id", check.names = FALSE))
 
   ids <- sample_ids_from_columns(colnames(cts))
 
-  ## The three assertions the old tautological check should have been.
+  ## Every derived ID is unique, and the matrix and the phenotype table describe
+  ## exactly the same samples.
   if (anyDuplicated(ids)) {
     stop("duplicate sample IDs derived from count matrix columns: ",
          paste(unique(ids[duplicated(ids)]), collapse = ", "))
@@ -149,10 +135,8 @@ load_counts <- function(cfg) {
   }
 
   ## Behavioural phenotype, observed at capture: territorial is compared with
-  ## social, the reference. Made explicit so the sign of every log2FoldChange no
-  ## longer depends on "social" happening to sort before "territorial"
-  ## alphabetically (finding R3). The column was called "trt" until 2026-09-27;
-  ## it is not a treatment, since phenotype was observed, not assigned.
+  ## social, the reference, set explicitly so the sign of every fold change is
+  ## fixed by this line rather than by alphabetical order.
   coldata$phenotype <- relevel(factor(coldata$phenotype), ref = "social")
   coldata$tissue <- factor(coldata$tissue)
 
@@ -161,18 +145,13 @@ load_counts <- function(cfg) {
 
 ## Per-gene annotation: description, NCBI GeneID and transcript length.
 ##
-## Built from the assembly feature table rather than Onerka_LOCID_gene_table.txt,
-## which is keyed entirely by LOC identifiers (33,210 of our 37,942 genes) and so
-## could never annotate a symbol-named gene. The feature table covers 37,929 and
-## agrees with the old table on every one of the 33,210 they share -- verified,
-## so this is a strict superset, not a different annotation.
+## Built from the NCBI feature table for assembly GCF_006149115.2, which covers
+## 37,929 of the 37,942 genes in the count matrices. The description is the name
+## of the gene's first mRNA with a name.
 ##
 ## Length is the median mRNA interval per gene. goseq's nullp() takes it as
 ## bias data; the test itself is hypergeometric (see 04), so the length enters
-## the diagnostic plot but not the p-values. It comes from here rather than from
-## sequences/GCF_006149115.2_Oner_1.1_mRNA.gff, which was tracked at zero bytes
-## and has since been untracked (finding E7); the feature table is committed and
-## complete, so no upstream step has to be re-run to get lengths.
+## the diagnostic plot but not the p-values.
 load_gene_annotation <- function() {
   ft <- read.delim(file.path(PATHS$genome, "GCF_006149115.2_Oner_1.1_feature_table.txt"),
                    sep = "\t", quote = "", stringsAsFactors = FALSE, check.names = FALSE)
@@ -202,7 +181,7 @@ load_gene_annotation <- function() {
 ## model rather than two copies that could drift apart.
 ##
 ## social is the reference level (set in load_counts), so coefficient 2 is the
-## territorial-vs-social effect; that is asserted, not assumed (finding R3).
+## territorial-vs-social effect, which is asserted.
 ## Genes are then kept if at least a third of samples have 10 or more counts.
 ## The filter is applied *after* DESeq(), so dispersions and size factors were
 ## estimated on the full matrix -- the order the committed results depend on.
@@ -242,9 +221,8 @@ my_theme <- ggplot2::theme(
   legend.key       = ggplot2::element_blank()
 )
 
-## Phenotype colours, derived from coldata rather than hardcoded run lengths.
-## The .Rmd wrote rep("royalblue1", 15) / rep("red3", 15) for liver and 14 / 14
-## for gonad, assuming both the group sizes and the column order (finding R4).
+## Phenotype colours, looked up per sample from coldata, so they follow the
+## samples whatever the group sizes or column order.
 ##
 ## The hues are validated for colour-vision deficiency, not chosen by eye:
 ## blue and orange separate by OKLab delta E 24.7 under protanopia and 33.6 for
@@ -264,13 +242,9 @@ phenotype_side_colours <- function(coldata) unname(PHENOTYPE_COLOURS[as.characte
 
 # ---- input integrity ---------------------------------------------------------
 
-## Check the input files against CHECKSUMS.sha256 (finding E12).
-##
-## Finding R1 was a count matrix whose columns had been reordered by a re-run of
-## prepDE.py, silently mislabelling every sample; the loader assertions above
-## catch that case now. This is the same failure mode one layer further out: an
-## input file that changed without anyone noticing, so that the committed
-## results no longer correspond to the committed inputs.
+## Check the input files against CHECKSUMS.sha256, so that an input which
+## changed without anyone noticing is reported: otherwise the committed results
+## would silently stop corresponding to the committed inputs.
 ##
 ## A mismatch warns rather than stops. A deliberate data update should not block
 ## a render -- it should be loud, and then re-recorded:
@@ -326,5 +300,6 @@ verify_inputs <- function(manifest = "CHECKSUMS.sha256") {
   invisible(list(checked = paths, missing = missing, mismatch = mismatch))
 }
 
-## Runs whenever this file is sourced, i.e. at the top of notebooks 02, 03 and 04.
+## Runs whenever this file is sourced: at the top of notebooks 02-06 and of the
+## manuscript.
 verify_inputs()
