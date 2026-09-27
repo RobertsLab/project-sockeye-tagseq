@@ -206,18 +206,26 @@ inventory in places.
 default ggplot styling, does not colour the volcanoes by significance, has no
 heatmap colour legend, and is produced by no script (`figures/README.md`).
 
-- [ ] Add a figure notebook (e.g. `tag-seq/code/05-figures.qmd`, added to the
+- [x] Add a figure notebook (e.g. `tag-seq/code/05-figures.qmd`, added to the
       render list and to `render-all.sh`) that builds the composite from the
       DESeq2 objects with `patchwork` or `cowplot`, so the figure tracks the
       data.
-- [ ] Figure 1: PCA, volcano (coloured by padj < 0.05, headline genes
+- [x] Figure 1: PCA, volcano (coloured by padj < 0.05, headline genes
       labelled), heatmap with legend; both tissues.
-- [ ] Figure 2: enrichment dot plot, KEGG and GO, gonad.
-- [ ] Figure 3: per-group normalised counts for the headline genes (two SAA-5
+- [x] Figure 2: enrichment dot plot, KEGG and GO, gonad.
+- [x] Figure 3: per-group normalised counts for the headline genes (two SAA-5
       paralogues, equistatin-like, *hspb11*, vasotocin-neurophysin VT1, *amh*,
       and the 11 genes shared between tissues).
-- [ ] Export at journal resolution (vector PDF/EPS, or TIFF ≥ 300 dpi) with a
+- [x] Export at journal resolution (vector PDF/EPS, or TIFF ≥ 300 dpi) with a
       colour-blind-safe palette; check the current royalblue/red3 pairing.
+
+Done 2026-09-27 in `tag-seq/code/05-figures.qmd`: vector PDF and 300 dpi PNG
+at 170 mm, colours validated for colour-vision deficiency, treatment shown by
+shape as well. Figure 3 B plots the shared genes as liver vs gonad fold changes
+rather than as count panels, and labels only the genes the text names. The
+manuscript now embeds all three figures and reads its PCA percentages from
+`figures/source-data/`. Figure 2 duplicates the KEGG and GO tables, which C3
+should move to the supplement.
 
 ### C3. Tables
 
@@ -319,7 +327,7 @@ record belongs in `REPRODUCIBILITY-PLAN.md`, which already holds it.
 
 ### D6. Figures and supplement as outputs
 
-- [ ] Replace `figures/figure_X.pptx` and its PNG export with the output of
+- [x] Replace `figures/figure_X.pptx` and its PNG export with the output of
       the figures notebook (C2). Delete the pptx once the scripted figure
       matches.
 - [ ] Have the same notebook write `manuscript/supplementary/` (tables S1–Sn

@@ -693,6 +693,20 @@ packages current in that snapshot require R >= 4.4. A future
 
 ---
 
+## Scripted manuscript figures (2026-09-27, checklist C2)
+
+`tag-seq/code/05-figures.qmd` draws Figures 1–3 and replaces the hand-built
+`figures/figure_X` (finding E11), which is removed. The model fit moved into
+`fit_deseq()` in `_common.R`, called by both 02 and 05, so the figures are
+drawn from the same fitted object that produces the tables. A full
+`render-all.sh` after that refactor passed `check-reproduction.R` with every
+table unchanged. The notebook's PCA reproduces notebook 02's variance
+explained exactly (liver 13.82% and 10.86%, gonad 21.37%), and the
+manuscript now reads those numbers from `figures/source-data/pca-variance.csv`
+instead of typing them.
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no
