@@ -61,14 +61,17 @@ record, not a step this render performs.
 ## Results as committed
 
 Differential expression, territorial vs social, `padj < 0.05`, `apeglm`
-shrinkage:
+shrinkage. Adjusted p-values come from the Wald test with independent filtering
+at `alpha = 0.05`, and the shrunken tables carry those same values, so every
+table makes the same significance calls:
 
 | Tissue | Genes tested | Significant | Characterized | Uncharacterized |
 |---|---|---|---|---|
-| Liver | 5,646 | 31 | 31 | 0 |
-| Gonad | 18,935 | 1,630 | 1,587 | 41 |
+| Liver | 4,076 | 66 | 66 | 0 |
+| Gonad | 18,156 | 1,653 | 1,609 | 42 |
 
-Rows with no annotation available: 11 of 5,646 (liver), 12 of 18,935 (gonad).
+Rows with no annotation available: 11 of 4,076 (liver), 12 of 18,156 (gonad),
+including 2 of the significant gonad genes.
 "Uncharacterized" means NCBI describes the gene as `uncharacterized LOC…`;
 2.5% of the significant gonad genes.
 
@@ -76,27 +79,29 @@ Enrichment, FDR < 0.05:
 
 | Tissue | GO terms tested | GO enriched | KEGG pathways tested | KEGG enriched |
 |---|---|---|---|---|
-| Liver | 3,749 | 0 | 191 | 0 |
-| Gonad | 6,066 | 35 | 195 | 6 |
+| Liver | 3,109 | 0 | 188 | 0 |
+| Gonad | 6,011 | 36 | 195 | 5 |
 
 Both use `goseq`'s hypergeometric over-representation test, GO against the NCBI
 GO annotation for this assembly (155,362 annotations, 32,629 genes, 6,937 terms)
 and KEGG against organism `one`, Benjamini–Hochberg corrected. The gonad signal
 is ribosomal and mitochondrial: the top KEGG pathways are oxidative
-phosphorylation (`one00190`, 59 of 188 genes, FDR 2e-16) and ribosome
-(`one03010`, 66 of 262, FDR 2e-13), and the top GO terms are structural
+phosphorylation (`one00190`, 59 of 186 genes, FDR 2e-15) and ribosome
+(`one03010`, 66 of 261, FDR 3e-12), and the top GO terms are structural
 constituent of ribosome, translation and the mitochondrial respiratory chain.
 
 `goseq`'s default Wallenius test, which re-weights genes by transcript length,
 is not used. TagSeq is 3′-end counting, so read count does not scale with
 length; the length association in these data runs the other way, with short
 genes far more likely to be differentially expressed; and the Wallenius result
-turned out to depend on the platform, with the three terms it called at FDR
-0.004–0.045 on macOS falling to 0.057–0.081 on Linux. The reasoning is set out
-in notebook 04.
+turned out to be numerically unstable: on an earlier gene set the three terms it
+called at FDR 0.004–0.045 on macOS fell to 0.057–0.081 on Linux, and on the
+current gene set its length-bias spline cannot be fitted and collapses to a
+constant. The reasoning is set out in notebook 04.
 
 That the liver comparison yields no enriched terms is a result, not a failure:
-31 significant genes is little power for an over-representation test.
+66 significant genes of small effect is little power for an over-representation
+test. The closest liver pathway is oxidative phosphorylation, at FDR 0.11.
 
 ## Result tables
 

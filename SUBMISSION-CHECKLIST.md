@@ -125,14 +125,19 @@ default `alpha = 0.1` and carry that padj. This is why the draft has a
 Limitations paragraph explaining 66 versus 31 liver genes and 1,653 versus
 1,630 gonad genes.
 
-- [ ] Pass the alpha-0.05 results object into each shrinkage call:
+- [x] Pass the alpha-0.05 results object into each shrinkage call:
       `lfcShrink(dds, coef = 2, res = res_table, type = "apeglm")` (and the
       same for `normal` and `ashr`).
-- [ ] Re-render with `./render-all.sh`, review the diff in significant-gene
+- [x] Re-render with `./render-all.sh`, review the diff in significant-gene
       counts, and commit the new baseline so `check-reproduction.R` passes.
-- [ ] Update every number in `index.qmd` that is typed rather than computed
+- [x] Update every number in `index.qmd` that is typed rather than computed
       (the results tables there are hand-written), and delete the Limitations
       paragraph about the two conventions from `manuscript.qmd`.
+
+Done 2026-09-26: liver 66 and gonad 1,653 significant genes, 5 KEGG and 36
+GO terms enriched in gonad. Before/after detail in `REPRODUCIBILITY-PLAN.md`,
+"One significance convention". `figures/figure_X` still shows the old counts
+(C2).
 
 ### B2. Marker-gene and covariate work from A1
 
@@ -150,6 +155,18 @@ Limitations paragraph explaining 66 versus 31 liver genes and 1,653 versus
       liver and 12 of 18,935 gonad rows lack a description — say so).
 - [ ] Per-sample sequencing depth, alignment rate and genes detected, as a
       supplementary table.
+
+### B4. The pinned CRAN snapshot cannot restore the lockfile
+
+Found while re-rendering for B1. `.Rprofile` pins CRAN to the 2024-04-24
+Posit Package Manager snapshot, but `renv.lock` records many packages from a
+2025-05-18 snapshot, and `nlme` 3.1-166 exists only in the later one. A restore
+from the pinned snapshot alone fails; CI passes only because its runner adds
+"latest" Package Manager as a fallback.
+
+- [ ] Either move the `.Rprofile` pin to 2025-05-18 or re-snapshot the
+      lockfile against 2024-04-24, then confirm `renv::restore()` succeeds
+      with no other repository configured.
 
 ---
 
