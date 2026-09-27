@@ -1259,6 +1259,17 @@ E10).
 
 ---
 
+## Licence and citation metadata (2026-09-27, checklist D7; closes E12)
+
+`LICENSE` and `CITATION.cff` exist, the last items open under E12. The licence
+is MIT for code and documentation and CC0 for data and results; the manuscript
+is not licensed; third-party files keep their own terms. The KEGG REST files
+are explicitly excluded from any licence, because KEGG provides its API for
+academic use only; whether they may stay in the repository is an open
+decision (submission checklist A4).
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no

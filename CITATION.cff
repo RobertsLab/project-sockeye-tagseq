@@ -1,0 +1,41 @@
+# Citation metadata for this repository (https://citation-file-format.github.io).
+#
+# To complete before the Zenodo release (submission checklist A4, A7):
+#   - the author list, to match the manuscript's; only contributors who can
+#     be identified from the repository are listed so far
+#   - version, date-released and doi, once the release is minted
+#   - preferred-citation, once the article is published
+cff-version: 1.2.0
+message: >-
+  If you use this analysis or its results, please cite it using these
+  metadata. A citation for the associated article will be added when it is
+  published.
+type: software
+title: >-
+  Sockeye salmon TagSeq: gonad and liver gene expression in territorial and
+  social Oncorhynchus nerka
+abstract: >-
+  Complete analysis for a comparison of gonad and liver transcriptomes of adult
+  sockeye salmon classified at capture as territorial or social, measured by
+  3' tag RNA sequencing: DESeq2 differential expression, GO and KEGG
+  over-representation, the manuscript's figures and supplementary tables, and
+  a check that re-running the analysis reproduces every committed result.
+authors:
+  - given-names: Steven
+    family-names: Roberts
+    affiliation: School of Aquatic and Fishery Sciences, University of Washington
+    orcid: "https://orcid.org/0000-0001-8302-1138"
+  - alias: mattgeorgephd
+repository-code: "https://github.com/RobertsLab/project-sockeye-tagseq"
+url: "https://robertslab.github.io/project-sockeye-tagseq/"
+license:
+  - MIT
+  - CC0-1.0
+keywords:
+  - sockeye salmon
+  - Oncorhynchus nerka
+  - TagSeq
+  - territoriality
+  - gene expression
+  - DESeq2
+  - reproducibility

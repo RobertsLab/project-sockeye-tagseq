@@ -66,12 +66,22 @@ one composite figure and four tables. The manuscript is *not* rendered by CI.
 
 ### A4. Code archive with a DOI
 
-- [ ] Add `LICENSE` (the repository currently has none; GitHub reports
-      `license: None`).
+- [x] Add `LICENSE` (the repository currently has none; GitHub reports
+      `license: None`). *(Done 2026-09-27, see D7.)*
 - [ ] Add `CITATION.cff` with the author list and, once minted, the Zenodo DOI.
-- [ ] Decide on the 33 MB of provenance-only files listed as an open decision
+      *(File added and schema-valid 2026-09-27; the author list is incomplete
+      and the DOI does not exist yet. Zenodo's GitHub integration reads this
+      file for the release metadata, so complete the authors first.)*
+- [x] Decide on the 33 MB of provenance-only files listed as an open decision
       in `tag-seq/data/README.md`, and on `Onerka_LOCID_gene_table.txt`
-      (`tag-seq/genome/README.md`), before the archive is cut.
+      (`tag-seq/genome/README.md`), before the archive is cut. *(Done in D3.)*
+- [ ] Decide whether the vendored KEGG files
+      (`tag-seq/genome/kegg_one_*.tsv`) may be redistributed. KEGG states it
+      is not a public database, provides its API for academic use by academic
+      users, and requires a licence for other use; the LICENSE therefore
+      excludes them from every open licence. If redistribution is not
+      acceptable, remove them from the repository and the archive and have
+      notebook 04 fetch them at render time, recording the retrieval date.
 - [ ] Tag a release and mint a Zenodo DOI. GitHub alone is not an acceptable
       archive for *Molecular Ecology*.
 
@@ -473,12 +483,26 @@ the PDFs parse under a strict parser.
 
 ### D7. Standard files
 
-- [ ] `LICENSE` (A4).
-- [ ] `CITATION.cff` (A4).
-- [ ] `tag-seq/` is an extra directory level left from when the repository
+- [x] `LICENSE` (A4).
+- [x] `CITATION.cff` (A4).
+- [x] `tag-seq/` is an extra directory level left from when the repository
       held other work. Flattening it touches every path and every committed
       result location; do it only if the results are being regenerated anyway
-      for B1 and D1–D2, and otherwise leave it.
+      for B1 and D1–D2, and otherwise leave it. *(Left as it is: B1 and D1–D2
+      are merged, so flattening now would mean another full rebaseline for
+      no change in content.)*
+
+Done 2026-09-27. `LICENSE` follows the pattern of recent RobertsLab
+repositories (MIT for code, CC0 for data): MIT for code and documentation,
+CC0 1.0 for the data and every result, no licence for the manuscript and cover
+letter (the authors keep all rights pending publication, so nothing here
+complicates a journal copyright agreement), and third-party files under their
+own terms, each named: NCBI, GO (CC BY 4.0), KEGG (academic use, not
+released), the CSL style (CC BY-SA 3.0), pandoc, renv, DAVID and MultiQC. The
+licence choice is the authors' to confirm. `CITATION.cff` validates against
+schema 1.2.0; it lists Steven Roberts (ORCID checked against the public
+registry) and the GitHub user mattgeorgephd, and says what to add before the
+Zenodo release.
 
 ---
 
