@@ -1,7 +1,8 @@
 # sha256 of every file the analysis reads as input.
 #
-# The six data and genome files are what notebooks 02, 03 and 04 depend on; the two
-# kegg_one_* files are vendored KEGG REST responses (see tag-seq/genome/kegg_one_SOURCE.txt).
+# The six data and genome files are what notebooks 02-06 depend on. The KEGG pathway
+# files are not listed: they are downloaded at render time, and their checksums
+# are recorded in tag-seq/genome/kegg_one_SOURCE.txt instead.
 # Nothing derived is listed here -- derived files are tracked in git and diffed after a
 # render instead.
 #
@@ -16,5 +17,3 @@ c8dcb549b1892e4134b4228c81874b545e4086080f43add404cfd2e42e45c07a  tag-seq/data/t
 5fa84f148583babf13a3b41aed7bb813ec185444f8d60f004735fed70335c906  tag-seq/data/treatments-liver.csv
 fd05fe737a9aaa5cb4f737757437b657e5a87a7ff9df7fbde62dd4c62bd259e0  tag-seq/genome/GCF_006149115.2_Oner_1.1_feature_table.txt
 f22a749b60a3811cd073e69a245b4bc0bed7798ca5f54c9a1190c622d021b374  tag-seq/genome/GCF_006149115.2_Oner_1.1_gene_ontology.gaf.gz
-ccfed30c8233f372dee6b2e4080add8bc00e99b0d25fb76829ab051b26722892  tag-seq/genome/kegg_one_gene2pathway.tsv
-cb58038df5143450e71b6b7c7f2683ac9dec758585966d4743991c93888df0d0  tag-seq/genome/kegg_one_pathways.tsv

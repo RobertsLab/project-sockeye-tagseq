@@ -67,7 +67,7 @@ every render (a mismatch warns, it does not stop). Verify by hand with
 | Directory | What it holds | Written by | Read by |
 |---|---|---|---|
 | `tag-seq/data/` | Gene count matrices and phenotype tables, the analysis inputs | counts: upstream pipeline (01, on Raven); phenotypes: by hand | 02, 05, 06, manuscript |
-| `tag-seq/genome/` | NCBI feature table, GO annotation and KEGG maps for assembly GCF_006149115.2 | downloaded; retrieval recorded | 02, 04, 05, manuscript |
+| `tag-seq/genome/` | NCBI feature table and GO annotation for assembly GCF_006149115.2; KEGG pathway data are downloaded here at render time and not tracked | downloaded; retrieval recorded | 02, 04, 05, manuscript |
 | `tag-seq/sequences/` | Genome sequence lengths for the upstream pipeline | 01 | 01 |
 | `tag-seq/code/` | The notebooks 01–06 and their shared helpers, `_common.R` | — | `render-all.sh` |
 | `tag-seq/DESEQ_output/` | Differential-expression tables and diagnostic plots per tissue; `alternatives/` inside each is regenerated and untracked | 02 | 03–06, manuscript, cover letter |
