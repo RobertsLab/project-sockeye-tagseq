@@ -52,8 +52,20 @@ quarto render tag-seq/code/06-supplementary-tables.qmd
 echo "=== index (landing page) ==="
 quarto render index.qmd
 
+# The manuscript reads the result tables, figures/ and manuscript/supplementary/,
+# so it renders last. It is outside the project's render list and renders next
+# to its source (manuscript/manuscript.{docx,html}, both gitignored). The
+# placeholder check only reports unless MANUSCRIPT_STRICT=1 is set.
+echo "=== manuscript (Word and HTML) ==="
+quarto render manuscript/manuscript.qmd --to docx
+quarto render manuscript/manuscript.qmd --to html
+Rscript manuscript/check-placeholders.R
+quarto render manuscript/cover-letter.qmd --to docx
+
 echo
 echo "Done. Rendered site in docs/ (docs/index.html)."
+echo "Manuscript in manuscript/manuscript.docx and manuscript/manuscript.html;"
+echo "cover letter in manuscript/cover-letter.docx."
 echo
 echo "Reproduction check:"
 echo "  Rscript check-reproduction.R"
