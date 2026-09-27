@@ -233,7 +233,9 @@ GCF_006149115.2 (Oner_1.1) [@Christensen2020] with HISAT2 v2.2.1 [@Kim2019] usin
 sorted with samtools v1.12. Transcripts were assembled per sample against the RefSeq
 mRNA annotation with StringTie v2.2.1 [@Pertea2015; @Kovaka2019], merged per tissue,
 and gene-level counts were extracted with prepDE.py. Mean overall alignment rates
-were 88.7% (SD 2.2) for gonad and 86.5% (SD 0.8) for liver libraries. Two gonad
+were 88.7% (SD 2.2) for gonad and 86.5% (SD 0.8) for liver libraries
+**[[unverified: the HISAT2 logs these come from are not in the repository; see
+tag-seq/QC/README.md]]**. Two gonad
 samples (C05 and C17) clustered apart from all others in the sample-correlation
 heatmap and were excluded before modelling, leaving 28 gonad and 30 liver libraries.
 They were also the two smallest gonad libraries, with `r mill(g_exc$library_size[1])` and
