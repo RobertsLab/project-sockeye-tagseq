@@ -109,7 +109,7 @@ test. The closest liver pathway is oxidative phosphorylation, at FDR 0.11.
 
 Tracked in git, so a re-render either reproduces them or shows a diff:
 
-- [`tag-seq/DESEQ_output/`](https://github.com/RobertsLab/project-sockeye-tagseq/tree/main/tag-seq/DESEQ_output) — per-tissue DESeq2 tables (unshrunken plus `normal`, `apeglm` and `ashr` shrinkage), PCA, heatmaps, volcano and MA plots
+- [`tag-seq/DESEQ_output/`](https://github.com/RobertsLab/project-sockeye-tagseq/tree/main/tag-seq/DESEQ_output) — per-tissue DESeq2 tables (unshrunken and `apeglm`), the summary counts, PCA, sample-correlation and expression heatmaps, a volcano plot and MA plots. The `normal` and `ashr` estimates are regenerated on every render but not tracked; their fold changes are in Supplementary Tables S2 and S3.
 - [`tag-seq/gene_tables/`](https://github.com/RobertsLab/project-sockeye-tagseq/tree/main/tag-seq/gene_tables) — significant genes split by annotation status, and the LOC identifier lists
 - [`tag-seq/GO_output/`](https://github.com/RobertsLab/project-sockeye-tagseq/tree/main/tag-seq/GO_output) — full and FDR-filtered GO and KEGG results
 

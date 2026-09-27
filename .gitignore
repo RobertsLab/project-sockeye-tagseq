@@ -28,6 +28,13 @@ manuscript/*.docx
 !manuscript/reference-manuscript.docx
 manuscript/*_files/
 
+# ---- regenerated diagnostics -------------------------------------------------
+# Notebook 02 writes the normal and ashr shrinkage tables, the per-gene
+# normalised counts and the PCA pairs plot here on every render. They are not
+# tracked: the manuscript does not use them directly, and the shrinkage
+# estimates reach it through Tables S2 and S3, which are tracked and checked.
+tag-seq/DESEQ_output/*/alternatives/
+
 # ---- renv -------------------------------------------------------------------
 # renv.lock IS tracked; the library it installs is not.
 renv/library/

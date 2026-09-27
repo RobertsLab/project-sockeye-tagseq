@@ -29,6 +29,7 @@ PVAL_COLS  <- c("padj", "pvalue", "FDR", "over_represented_pvalue",
                 "under_represented_pvalue")
 CALL_COLS  <- c("padj", "FDR")   # adjusted columns: the 0.05 call is checked exactly
 IMAGE_EXTS <- c("png", "pdf", "svg", "jpg", "jpeg", "html")
+DOC_EXTS   <- c("md")   # column dictionaries next to the tables; not results
 
 # Why there is an absolute floor: the first cross-platform render (Linux, in CI)
 # moved apeglm's log2FoldChange by at most 0.0008 log2 units, and lfcSE by at
@@ -49,7 +50,13 @@ IMAGE_EXTS <- c("png", "pdf", "svg", "jpg", "jpeg", "html")
 # 1.1e-30 is a 10% relative change and no result at all. What matters about a
 # p-value is which side of the threshold it falls on, and that is checked
 # exactly, below, with no tolerance at all.
-RESULT_DIRS <- c("tag-seq/DESEQ_output", "tag-seq/gene_tables", "tag-seq/GO_output")
+## manuscript/supplementary holds Tables S1-S6. They are joins of the tables
+## above, but they are also the only tracked record of the normal and ashr
+## shrinkage estimates (whose own tables are regenerated untracked, checklist
+## D2), and they are what readers of the paper download, so they are checked
+## with the same rules.
+RESULT_DIRS <- c("tag-seq/DESEQ_output", "tag-seq/gene_tables", "tag-seq/GO_output",
+                 "manuscript/supplementary")
 
 changed <- system2("git", c("diff", "--name-only", "--", RESULT_DIRS), stdout = TRUE)
 changed <- changed[nzchar(changed)]
@@ -94,9 +101,11 @@ compare_tables <- function(old, new, tol = TOL) {
   ## have one row per gene per sample, so there the key is the pair; keying on
   ## gene alone matched every row to the first row for that gene and reported
   ## counts changed 635-fold when they had changed in the fourteenth digit.
+  ## Tables S4 and S5 list the same category once per tissue, so tissue joins
+  ## the key where present.
   key_cols <- intersect(c("gene", "category"), names(old))
   if (length(key_cols) > 0) {
-    key_cols <- c(key_cols[[1]], intersect("sample", names(old)))
+    key_cols <- c(key_cols[[1]], intersect(c("sample", "tissue"), names(old)))
     key_of   <- function(d) do.call(paste, c(d[key_cols], sep = "\r"))
     ko <- key_of(old); kn <- key_of(new)
     if (anyDuplicated(ko) || anyDuplicated(kn)) {
@@ -167,6 +176,7 @@ for (path in changed) {
     images <- c(images, path)
     next
   }
+  if (ext %in% DOC_EXTS) next
 
   head_lines <- tryCatch(read_head_lines(path), error = function(e) NULL)
   if (is.null(head_lines)) {

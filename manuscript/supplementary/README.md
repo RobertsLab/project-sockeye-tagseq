@@ -77,9 +77,12 @@ One row per gene significant in both tissues, sorted by gonad fold change.
 | `gonad_log2FC`, `gonad_padj` | Same, in gonad |
 | `same_direction` | Whether the fold changes have the same sign |
 
-## What is not checked, and why
+## Checking
 
-`check-reproduction.R` does not compare these files. They are joins of the
-DESeq2 and enrichment tables it already checks, and notebook 06 asserts that
-those source tables agree with one another, and with the significant-gene
-tables, before anything is written.
+`check-reproduction.R` compares these tables against their committed versions
+on every render, with the same tolerances and significance-call rules as the
+DESeq2 tables. They are joins of tables it already checks, but they are also
+the only tracked record of the normal and ashr shrinkage estimates, whose own
+tables are regenerated untracked (submission checklist D2), and they are what
+readers of the paper download. Notebook 06 additionally asserts that its
+source tables agree with one another before writing anything.

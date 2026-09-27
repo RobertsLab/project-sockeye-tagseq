@@ -726,6 +726,29 @@ choose to state the exclusion that way.
 
 ---
 
+## Tracked outputs trimmed (2026-09-27, checklist D2)
+
+`tag-seq/DESEQ_output/` tracked 53 files and 37 MB; it now tracks 20 and
+11 MB. What left git and why:
+
+- normal and ashr tables (all and significant genes): regenerated into the
+  untracked `alternatives/` folder. Their fold changes are published in Tables
+  S2 and S3, which notebook 06 builds from that folder.
+- four per-estimator tables of normalised counts per significant gene: after
+  B1 the four estimators flag the same genes, and the four tables were shown
+  to hold identical rows in different orders. One is regenerated into
+  `alternatives/`.
+- seven of eight volcano plots per tissue, the PCA pairs plot, and the
+  MA plots as PDF (2-3 MB of vector points each); the MA plots are now PNG.
+- `gonad/MA_plots.png`, committed in 2022 and written by no code.
+
+`check-reproduction.R` now also checks `manuscript/supplementary/`, keying
+rows on tissue as well as gene or category, and skips Markdown files, so
+dropping the normal and ashr tables from git does not drop them from
+verification.
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no

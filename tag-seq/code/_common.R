@@ -46,6 +46,18 @@ tissue_config <- function(tissue) {
 ## Build an output path inside this tissue's results directory.
 out_path <- function(cfg, ...) file.path(cfg$dir, paste0(...))
 
+## Build a path in this tissue's alternatives/ subdirectory: outputs that every
+## render regenerates but that are not tracked in git, because the manuscript
+## does not use them directly -- the normal and ashr shrinkage tables, the
+## normalised counts per significant gene, and the PCA pairs plot. Notebook 06
+## reads the shrinkage tables from here into Tables S2 and S3, which are
+## tracked and checked, so those estimates are still recorded and verified.
+alt_path <- function(cfg, ...) {
+  d <- file.path(cfg$dir, "alternatives")
+  dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  file.path(d, paste0(...))
+}
+
 # ---- sample identity --------------------------------------------------------
 
 ## Derive the treatment-table sample ID from a StringTie count-matrix column.

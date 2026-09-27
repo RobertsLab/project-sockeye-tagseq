@@ -339,14 +339,26 @@ changed. `treatments-*.csv` keeps its filename.
 each with all-genes, significant and per-gene-count tables, plus eight volcano
 PNGs and two MA-plot formats per tissue. The manuscript uses apeglm only.
 
-- [ ] Keep the unshrunken and apeglm tables, the gene-count summary, the PCA,
+- [x] Keep the unshrunken and apeglm tables, the gene-count summary, the PCA,
       correlation heatmap and one volcano and heatmap per tissue.
-- [ ] Either stop writing the `normal` and `ashr` tables and the per-estimator
+- [x] Either stop writing the `normal` and `ashr` tables and the per-estimator
       single-gene-count tables, or write them to an untracked `alternatives/`
       subfolder. Say in notebook 02 that the estimators were compared and the
       significant sets were identical.
-- [ ] Drop the duplicate MA-plot format and the per-estimator volcano PNGs.
-- [ ] Rebaseline `check-reproduction.R` on the reduced set.
+- [x] Drop the duplicate MA-plot format and the per-estimator volcano PNGs.
+- [x] Rebaseline `check-reproduction.R` on the reduced set.
+
+Done 2026-09-27. Tracked `tag-seq/DESEQ_output/` fell from 37 MB to 11 MB.
+Each tissue keeps five tables (unshrunken and apeglm, all and significant
+genes, and the summary counts) and five images (PCA, sample-correlation
+heatmap, expression heatmap, apeglm volcano, MA plot as PNG). The normal and
+ashr tables, one table of normalised counts per significant gene (the four
+per-estimator copies were identical apart from row order), and the PCA pairs
+plot are regenerated into `alternatives/`, which git ignores. Notebook 06
+reads the normal and ashr tables from there, so their fold changes are still
+published in Tables S2 and S3, and `check-reproduction.R` now checks
+`manuscript/supplementary/` too, so they are still verified. Also removed:
+a 2022 `gonad/MA_plots.png` that no code wrote.
 
 ### D3. Move the inputs nothing reads
 
