@@ -11,17 +11,29 @@ Written to close finding E11.
 | `kegg_one_gene2pathway.tsv` | 859 KB | **input** — KEGG gene-to-pathway map, organism `one` | `04` |
 | `kegg_one_pathways.tsv` | 14 KB | **input** — KEGG pathway names | `04` |
 | `kegg_one_SOURCE.txt` | 323 B | provenance — REST URLs and retrieval date for the two files above | humans |
-| `Onerka_LOCID_gene_table.txt` | 3.8 MB | **superseded** — the pre-2026 annotation table | nothing |
 
 All four input files are checksummed in `CHECKSUMS.sha256` and verified at the
 start of every render.
 
-## On Onerka_LOCID_gene_table.txt
+## Removed: Onerka_LOCID_gene_table.txt
 
-It is keyed entirely by LOC identifiers, covering 33,210 of our 37,942 genes, so
-it can never annotate a symbol-named gene — which is what produced the fabricated
-`LOCNA.*` identifiers of finding R8. The feature table covers 37,929 genes and
-agrees with this table on every one of the 33,210 they share, so it is a strict
-superset rather than a different annotation. Retained as the record of what the
-2023 analysis was annotated against; not read by any notebook. **Open decision:**
-keep as provenance or drop.
+The pre-2026 annotation table, removed from the tree on 2026-09-27 (submission
+checklist D3). No notebook read it.
+
+It is keyed entirely by LOC identifiers, so it can never annotate a
+symbol-named gene, which is what produced the fabricated `LOCNA.*` identifiers
+of finding R8. The feature table above replaces it and is a strict superset,
+re-verified before removal: all 33,211 genes in the LOC table are in the
+feature table, and every one of their descriptions matches one of that gene's
+mRNA names there. The only differences are CSV quoting and which transcript
+variant's name was taken (", transcript variant X1" against "X2").
+
+Two copies remain:
+
+| Copy | sha256 |
+|---|---|
+| [commit-pinned, as tracked here](https://raw.githubusercontent.com/RobertsLab/project-sockeye-tagseq/97e1a1eafdef1e241aad325a3f4626cf30bf4f83/tag-seq/genome/Onerka_LOCID_gene_table.txt) | `931450449975391ce6135c0e06ed5d146ed783447769c2e35dae17fe21f5dd32` |
+| [Gannet](https://gannet.fish.washington.edu/panopea/berdahl-sockeye-salmon/genome/Onerka_LOCID_gene_table.txt) | `e60dbd4b9dbc3c0e06bfad3e71fe416ac2020ea9acb44236f39f8458953ffea5` |
+
+The Gannet copy has Windows (CRLF) line endings and is otherwise identical;
+that is the only reason the checksums differ.
