@@ -57,6 +57,27 @@ theme_fig <- theme_classic(base_size = BASE_PT) +
 ## PDF with embedded fonts where cairo is available.
 pdf_device <- if (capabilities("cairo")) grDevices::cairo_pdf else grDevices::pdf
 
+## A PDF records the time it was written, so the same figure saved twice gives
+## two different files, and every render would change the tracked PDFs. The
+## timestamp is the only difference (checked by saving one plot twice), so it
+## is replaced with a fixed value of exactly the same length, which leaves every
+## byte offset in the PDF's cross-reference table valid. The fixed value is the
+## Unix epoch, the convention of reproducible-build tools. Cairo 1.16, the
+## version in this environment, does not honour SOURCE_DATE_EPOCH itself.
+fix_pdf_date <- function(path) {
+  bytes <- readBin(path, "raw", file.size(path))
+  n0    <- length(bytes)
+  for (h in grepRaw("/CreationDate (D:", bytes, fixed = TRUE, all = TRUE)) {
+    first <- h + nchar("/CreationDate (D:")      # first digit of the date
+    last  <- first + nchar("20260927162728Z") - 1
+    stopifnot(grepl("^[0-9]{14}Z$", rawToChar(bytes[first:last])))
+    bytes[first:last] <- charToRaw("19700101000000Z")
+  }
+  stopifnot(length(bytes) == n0)
+  writeBin(bytes, path)
+  invisible(path)
+}
+
 save_fig <- function(plot, name, height_mm) {
   for (ext in c("pdf", "png")) {
     ggsave(file.path(FIG_DIR, paste0(name, ".", ext)), plot,
@@ -64,6 +85,7 @@ save_fig <- function(plot, name, height_mm) {
            device = if (ext == "pdf") pdf_device else "png",
            dpi = 300, bg = "white")
   }
+  fix_pdf_date(file.path(FIG_DIR, paste0(name, ".pdf")))
   invisible(file.path(FIG_DIR, paste0(name, c(".pdf", ".png"))))
 }
 
@@ -181,6 +203,11 @@ pca_variance
 
 pca_scores <- do.call(rbind, lapply(names(PCA), function(t)
   cbind(tissue = t, PCA[[t]]$scores)))
+## Rounded to six decimals: the scores vary in the 13th decimal between
+## otherwise identical renders (floating-point summation order), which would
+## change the tracked file every time without changing any value that matters.
+pc_cols <- grep("^PC[0-9]+$", names(pca_scores))
+pca_scores[pc_cols] <- lapply(pca_scores[pc_cols], round, digits = 6)
 write.csv(pca_scores, file.path(SRC_DIR, "pca-scores.csv"), row.names = FALSE)
 
 plot_pca <- function(p) {
