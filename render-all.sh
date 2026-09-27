@@ -38,6 +38,11 @@ quarto render tag-seq/code/03-gene-tables.qmd
 echo "=== 04 enrichment ==="
 quarto render tag-seq/code/04-enrichment.qmd
 
+# Manuscript figures. Reads the tables 02 and 04 have just written, so it must
+# follow both. Writes figures/*.pdf, figures/*.png and figures/source-data/.
+echo "=== 05 figures ==="
+quarto render tag-seq/code/05-figures.qmd
+
 # Landing page. Rendered last so its links point at pages that now exist.
 echo "=== index (landing page) ==="
 quarto render index.qmd
