@@ -73,22 +73,30 @@ that came out of the first clean-machine render (PR #4, 2026-09-06):
    of each transcript, so read count does not scale with transcript length, and
    the premise of the correction does not hold for this assay.
 2. **The length association here is strong and in the opposite direction.**
-   In gonad, 27% of the shortest-decile genes are differentially expressed
-   against about 5% in every other decile (Wilcoxon p ≈ 1e-119). The Wallenius
-   weighting therefore down-weighted short genes heavily, and the pathways it
-   suppressed were the ones made of short genes, oxidative phosphorylation
-   first among them (59 of 188 genes DE: Wallenius p 2e-5, hypergeometric
-   p 1e-18).
+   In gonad, 28% of the shortest-decile genes are differentially expressed
+   against 5–13% in every other decile (Wilcoxon p ≈ 3e-119). Where the
+   Wallenius weighting could be fitted it therefore down-weighted short genes
+   heavily, and the pathways it suppressed were the ones made of short genes,
+   oxidative phosphorylation first among them (on the gene set of PR #4,
+   before the independent-filtering fix, on Linux: Wallenius p 3e-4, and no KEGG pathway
+   at FDR < 0.05; hypergeometric, 59 of 186 genes DE, p 1e-17, on the current
+   set).
 3. **It was not reproducible.** The spline fitted by `nullp()` is numerically
+   unstable against a decreasing relationship. On the PR #4 gene set it was
    platform-sensitive, and the Wallenius results sat at the threshold: the same
    inputs gave FDR 0.004 / 0.039 / 0.045 for the three enriched terms on macOS
    and 0.060 / 0.057 / 0.081 on Linux, so `check-reproduction.R` failed on the
-   gonad enrichment tables and nothing else. The hypergeometric test is exact
-   and deterministic.
+   gonad enrichment tables and nothing else. On the current gene set, which
+   differs from that one by a few hundred low-count genes, the fit fails
+   outright: every fitted probability is the same constant, so a Wallenius
+   test would silently return the hypergeometric result. The hypergeometric
+   test is exact and deterministic.
 
 `nullp()` is still run, because `goseq()` takes its gene universe from the
-object it returns and because its length-bias plot is the evidence for point 2.
-Under `method = "Hypergeometric"` the fitted weights are not used.
+object it returns. Under `method = "Hypergeometric"` the fitted weights are not
+used. Its diagnostic plot below shows the binned proportions of DE genes by
+length, which are the evidence for point 2; for the gonad, the fitted line
+through them is the flat, failed fit described in point 3.
 
 The plan was to take lengths from `sequences/GCF_006149115.2_Oner_1.1_mRNA.gff`,
 but that file was tracked at **zero bytes** — the `bedtools` step that should

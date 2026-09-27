@@ -11,15 +11,15 @@ abstract: |
   the brain. We used 3′-tag RNA sequencing (TagSeq) to compare gonad and liver
   transcriptomes of adult sockeye salmon classified in the field as territorial or
   social (n = 15 per phenotype, two tissues per fish). Gonadal expression differed
-  markedly between phenotypes: 1,630 of 18,935 tested genes were
+  markedly between phenotypes: 1,653 of 18,156 tested genes were
   differentially expressed (adjusted p < 0.05), 79% of them more highly
   expressed in territorial fish. Over-representation analysis of these genes recovered
   a coherent programme of elevated protein synthesis and energy production, led by
-  ribosome and oxidative phosphorylation pathways (6 KEGG pathways and
-  35 GO terms at FDR < 0.05), alongside strong induction of acute-phase
+  ribosome and oxidative phosphorylation pathways (5 KEGG pathways and
+  36 GO terms at FDR < 0.05), alongside strong induction of acute-phase
   and stress-response genes including two serum amyloid A paralogues and a small heat
-  shock protein. By contrast the liver was nearly indistinguishable between
-  phenotypes, with 31 differentially expressed genes of 5,646
+  shock protein. By contrast the liver differed only slightly between
+  phenotypes, with 66 differentially expressed genes of 4,076
   tested and no enriched pathway. Expression of sex-linked marker genes indicated that
   all gonad samples were ovarian. The results point to the gonad, rather than the
   liver, as the peripheral tissue in which the territorial phenotype of adult sockeye
@@ -86,11 +86,17 @@ n_genes <- L$counts["genes_before_filtering", "count"]
 g_lfc1 <- sum(abs(G$sig$log2FoldChange) > 1)
 g_medlfc <- median(abs(G$sig$log2FoldChange)); l_medlfc <- median(abs(L$sig$log2FoldChange))
 shared <- intersect(L$sig$gene, G$sig$gene)
+shared_same_dir <- sum(sign(L$sig$log2FoldChange[match(shared, L$sig$gene)]) ==
+                       sign(G$sig$log2FoldChange[match(shared, G$sig$gene)]))
 
 go_sig  <- sum(G$go$FDR  < 0.05);  k_sig  <- sum(G$kegg$FDR < 0.05)
 lgo_sig <- sum(L$go$FDR  < 0.05);  lk_sig <- sum(L$kegg$FDR < 0.05)
 oxphos <- G$kegg[G$kegg$category == "one00190", ]
 ribo   <- G$kegg[G$kegg$category == "one03010", ]
+## Enriched gonad pathways after the two leading ones, in p-value order.
+k_rest <- tolower(G$kegg$name[G$kegg$FDR < 0.05 & !G$kegg$category %in% c("one00190", "one03010")])
+## Best liver pathway, to report how close the liver came.
+lk_top <- L$kegg[which.min(L$kegg$FDR), ]
 
 ## Library depth from the count matrices themselves.
 depth <- sapply(c("liver", "gonad"), function(t) colSums(load_counts(tissue_config(t))$cts))
@@ -224,9 +230,11 @@ size factors were estimated on the full matrix of `r fmt(n_genes)` annotated gen
 for reporting, genes were retained if they had at least 10 counts in at least a third
 of the samples (`r fmt(l_kept)` liver and `r fmt(g_kept)` gonad genes). The Wald test
 p-values were adjusted for multiple testing with the Benjamini–Hochberg procedure
-[@Benjamini1995] after DESeq2's independent filtering, and log~2~ fold changes were
-shrunk with the apeglm estimator [@Zhu2019]. Genes with an adjusted p below 0.05 were
-considered differentially expressed. Ordination used principal component analysis of
+[@Benjamini1995] after DESeq2's independent filtering, with the filtering target set
+to the same 0.05 used for significance. Log~2~ fold changes were then shrunk with the
+apeglm estimator [@Zhu2019]; shrinkage was applied to that results table, so it
+changes fold-change estimates but not p-values or significance calls. Genes with an
+adjusted p below 0.05 were considered differentially expressed. Ordination used principal component analysis of
 variance-stabilised counts; sample clustering used Pearson correlation of
 regularised-log counts.
 
@@ -248,9 +256,11 @@ absent by construction. Second, the relationship between length and differential
 expression in these data runs the other way: in the gonad, `r formatC(dec1, format = "f", digits = 0)`%
 of genes in the shortest length decile were differentially expressed against
 `r formatC(dec_rest[1], format = "f", digits = 0)`–`r formatC(dec_rest[2], format = "f", digits = 0)`% in every
-other decile, so the Wallenius weighting selectively suppressed the short-gene
-pathways that constitute the biological signal, and its spline fit proved sensitive
-to computing platform. The hypergeometric test is exact and deterministic.
+other decile. The Wallenius weighting is estimated by fitting a monotone spline to
+that relationship, and with an inverted relationship the fit proved numerically
+unstable: across computing platforms and near-identical gene sets it either
+suppressed the short-gene pathways that constitute the biological signal or
+collapsed to a constant. The hypergeometric test is exact and deterministic.
 
 ## Reproducibility
 
@@ -298,14 +308,18 @@ Only `r fmt(l_sig)` of `r fmt(l_tested)` tested liver genes differed between
 phenotypes at an adjusted p below 0.05 (@fig-overview B, C; @tbl-liver), and fold
 changes were modest (median |log~2~ fold change| `r formatC(l_medlfc, format = "f", digits = 2)`;
 one gene beyond two-fold). `r fmt(l_up)` genes were more highly expressed in
-territorial fish and `r fmt(l_down)` in social fish. The territorial-high set
-included a ferritin middle subunit, an NADH dehydrogenase iron–sulfur subunit,
-MARCKS-related protein 1, a mannose-binding protein C-like lectin, WD repeat domain
-45 and components of the proteasome, spliceosome and oligosaccharyltransferase
-complexes; the social-high set included coagulation factor X, low-density lipoprotein
-receptor-related protein 1, unconventional myosin XVI and an alpha-tubulin
-N-acetyltransferase. No GO term or KEGG pathway was enriched (`r lgo_sig` and
-`r lk_sig` at FDR < 0.05).
+territorial fish and `r fmt(l_down)` in social fish. The territorial-high set was
+dominated by subunits of the mitochondrial respiratory chain and ATP synthase
+(NADH dehydrogenase subunits NDUFS5, NDUFA8 and NDUFB5, cytochrome c1, cytochrome
+b-c1 complex subunit 9, ATP synthase F~0~ subunit B1 and ATP5MPL), cytosolic
+ribosomal proteins (L3, L32 and S13), proteasome subunits, ferritin heavy and middle
+subunits, and a mannose-binding protein C-like lectin. The social-high set included
+an alpha-tubulin N-acetyltransferase, a disintegrin and metalloproteinase (ADAM10),
+unconventional myosin XVI, long-chain acyl-CoA synthetase 1 and low-density
+lipoprotein receptor-related protein 1. No GO term or KEGG pathway was enriched
+(`r lgo_sig` and `r lk_sig` at FDR < 0.05); the closest was
+`r tolower(lk_top$name)` (`r lk_top$numDEInCat` of `r lk_top$numInCat` pathway genes,
+FDR `r formatC(lk_top$FDR, format = "f", digits = 2)`).
 
 ```{r}
 #| label: tbl-liver
@@ -315,7 +329,7 @@ kable(gene_tbl(L$sig, by = "lfc"), align = c("l", "l", "r", "r"))
 
 ## Gonad
 
-The gonad responded strongly: 1,630 of 18,935 tested genes were
+The gonad responded strongly: `r fmt(g_sig)` of `r fmt(g_tested)` tested genes were
 differentially expressed (@fig-overview E, F), of which `r fmt(g_up)`
 (`r pct(g_up, g_sig)`) were more highly expressed in territorial fish and
 `r fmt(g_down)` in social fish. The median |log~2~ fold change| was
@@ -343,7 +357,9 @@ Over-representation analysis recovered a coherent programme (@tbl-kegg, @tbl-go)
 phosphorylation (`r oxphos$numDEInCat` of `r oxphos$numInCat` pathway genes
 differentially expressed, FDR `r sci(oxphos$FDR)`) and ribosome
 (`r ribo$numDEInCat` of `r ribo$numInCat`, FDR `r sci(ribo$FDR)`), followed by
-protein export, nucleotide excision repair and RNA polymerase. The direction of
+`r knitr::combine_words(k_rest)`. The cardiac muscle contraction pathway is enriched
+here for the same reason as oxidative phosphorylation: most of its differentially
+expressed members are subunits of respiratory complexes III and IV. The direction of
 these changes was almost entirely one-sided: all `r ox_dir["n"]` differentially
 expressed oxidative phosphorylation genes and `r ribo_dir["up"]` of `r ribo_dir["n"]`
 ribosomal genes were higher in territorial fish. The `r fmt(go_sig)` enriched GO
@@ -375,13 +391,15 @@ G$go %>% filter(FDR < 0.05) %>%
 ## Overlap between tissues
 
 `r length(shared)` genes were differentially expressed in both tissues
-(`r paste(shared, collapse = ", ")`), including the NADH dehydrogenase iron–sulfur
-subunit 5-like gene, the oligosaccharyltransferase subunit OSTC, proteasome subunit
-SEM1 and splicing factor 3B subunit 6, each higher in territorial fish in both
-tissues. This is a small set, but its composition mirrors at the level of individual
-genes the translation and energy-metabolism programme that dominates the gonad.
+(`r paste(shared, collapse = ", ")`), and `r shared_same_dir` of them changed in the
+same direction in both. They include NADH dehydrogenase subunits NDUFS5 and NDUFB5,
+ATP5MPL, a cytochrome b-c1 complex subunit, the oligosaccharyltransferase subunit
+OSTC, proteasome subunit SEM1 and splicing factor 3B subunit 6, each higher in
+territorial fish in both tissues. This is a small set, but its composition mirrors at
+the level of individual genes the translation and energy-metabolism programme that
+dominates the gonad.
 
-![Transcriptome-wide comparison of territorial (blue circles) and social (red triangles) sockeye salmon in liver (A–C) and gonad (D–F). (A, D) Principal component analysis of variance-stabilised counts with 95% confidence ellipses. (B, E) Volcano plots of all tested genes; colour indicates the sign of the shrunken fold change. (C, F) Row-scaled expression of the differentially expressed genes (adjusted p < 0.05) across samples, with hierarchical clustering; n gives the number of genes.](../figures/figure_X.png){#fig-overview}
+![Transcriptome-wide comparison of territorial (blue circles) and social (red triangles) sockeye salmon in liver (A–C) and gonad (D–F). (A, D) Principal component analysis of variance-stabilised counts with 95% confidence ellipses. (B, E) Volcano plots of all tested genes; colour indicates the sign of the shrunken fold change. (C, F) Row-scaled expression of the differentially expressed genes (adjusted p < 0.05) across samples, with hierarchical clustering; n gives the number of genes. **[[Figure to be regenerated: panels C and F still show the gene counts from before the independent-filtering correction (31 and 1,630); the current counts are 66 and 1,653. See figures/README.md.]]**](../figures/figure_X.png){#fig-overview}
 
 # Discussion
 
@@ -467,16 +485,18 @@ group hierarchies in the laboratory and sampled during active feeding, when the
 liver's role in partitioning ingested energy between growth and storage makes it a
 sensitive readout of status. Adult sockeye on the spawning migration do not feed,
 and both phenotypes were drawing on the same finite somatic reserves; the liver's
-transcriptional programme may be dominated by that shared state. The few genes that
-did differ are nonetheless interpretable: higher ferritin and a respiratory-chain
-subunit in territorial fish, and lower coagulation factor X and LRP1, are consistent
-with mild differences in iron handling, oxidative metabolism and plasma-protein
-synthesis rather than a distinct hepatic phenotype. It is also possible that the
-liver responds on a slower timescale than the gonad, or that the field
-classification captured a behavioural state too transient to be recorded in hepatic
-transcription. The 11 genes shared between tissues, which include the same
-respiratory-chain and translation-associated genes that dominate the gonad, hint
-that a weak systemic version of the gonadal programme reaches the liver.
+transcriptional programme may be dominated by that shared state. The genes that did
+differ are nonetheless interpretable: higher respiratory-chain, ATP-synthase,
+ribosomal and ferritin subunits in territorial fish, and lower LRP1 and long-chain
+acyl-CoA synthetase 1, are consistent with mild differences in oxidative metabolism,
+iron handling and lipid uptake rather than a distinct hepatic phenotype. It is also
+possible that the liver responds on a slower timescale than the gonad, or that the
+field classification captured a behavioural state too transient to be recorded in
+hepatic transcription. The `r length(shared)` genes shared between tissues, which
+include the same respiratory-chain and translation-associated genes that dominate
+the gonad and which changed in the same direction in both, together with a
+non-significant tendency toward enrichment of `r tolower(lk_top$name)` in the liver,
+hint that a weak systemic version of the gonadal programme reaches the liver.
 
 ## Methodological note on enrichment testing with TagSeq
 
@@ -487,13 +507,16 @@ differentially expressed more readily [@Young2010]. TagSeq removes that dependen
 by design [@Meyer2011; @Lohman2016]. In our gonad data the length association was
 strong but inverted: short genes were five times more likely to be differentially
 expressed than long ones, because ribosomal and respiratory-chain genes are short
-and were the genes that changed. Applying the Wallenius weighting therefore removed
-the signal rather than a bias, reducing the enriched KEGG pathways from
-`r k_sig` to one and, in an independent re-execution on a different operating
-system, to zero, because the weighting spline is numerically sensitive. We flag this
-because length-bias correction is often applied to 3′-tag data by default, and in
-data sets where the differentially expressed genes are themselves short it will
-systematically hide the result.
+and were the genes that changed. Where the Wallenius weighting fitted, it therefore
+removed the signal rather than a bias: in an earlier version of this analysis that
+differed only in the independent-filtering target, it reduced the enriched KEGG
+pathways from six to one on one operating system and to zero on another. On the
+final gene set the weighting spline could not be fitted at all and collapsed to a
+constant, returning the hypergeometric result. A correction whose output ranges from
+none to all of the enriched pathways across near-identical inputs is not usable. We
+flag this because length-bias correction is often applied to 3′-tag data by default,
+and in data sets where the differentially expressed genes are themselves short it
+will either hide the result or fail without warning.
 
 ## Limitations
 
@@ -507,12 +530,8 @@ dissection records, and the analysis should be repeated with maturity stage as a
 covariate if it was recorded. Two gonad samples were excluded on the basis of a
 correlation heatmap without a pre-registered criterion. The sample size, 15 per
 group, gives good power for the large gonadal effects but limited power in the
-liver, where the true number of affected genes is probably larger than 31. Finally,
-because the reported differentially expressed gene counts come from shrunken result
-tables whose adjusted p-values were computed with DESeq2's default independent
-filtering target of 0.1, the unshrunken tables filtered at 0.05 call more genes (66
-in liver and 1,653 in gonad); the gene sets and all enrichment conclusions are
-unchanged, but the counts should not be compared across the two conventions.
+liver, where the true number of affected genes is probably larger than
+`r fmt(l_sig)`.
 
 # Conclusions
 

@@ -593,6 +593,68 @@ Actions source.
 
 ---
 
+## One significance convention (2026-09-26, submission checklist B1)
+
+**The problem.** Notebook 02 computed the unshrunken results with
+`results(..., alpha = 0.05)` but called `lfcShrink()` without `res =`, so each
+shrinkage estimator computed its own results internally at DESeq2's default
+`alpha = 0.1`. `alpha` is the target independent filtering optimises for, so
+the two conventions filtered different low-count genes and produced different
+adjusted p-values. At the same `padj < 0.05` threshold the unshrunken table
+called 66 liver and 1,653 gonad genes and the shrunken tables 31 and 1,630.
+Every downstream product read the shrunken tables. The draft manuscript carried
+a Limitations paragraph explaining the discrepancy.
+
+**The fix.** The alpha-0.05 results object is passed to all three shrinkage
+calls through `res =`, and the notebook asserts that every shrunken table
+carries exactly the same `padj` as the unshrunken one. Shrinkage now changes
+fold changes and their standard errors only.
+
+**Re-render.** Run on Hyak in `bioconductor/bioconductor_docker:3.18-R-4.3.2`
+with Quarto 1.6.40, restoring `renv.lock` (R 4.3.2, DESeq2 1.42.1, apeglm
+1.24.0, goseq 1.54.0); all eight input checksums matched. The unshrunken tables
+came back unchanged, which confirms the environment reproduces CI. The new
+tables were committed as the baseline for `check-reproduction.R`.
+
+| | Before | After |
+|---|---|---|
+| Liver genes tested / significant | 5,646 / 31 | 4,076 / 66 |
+| Gonad genes tested / significant | 18,935 / 1,630 | 18,156 / 1,653 |
+| Gonad KEGG / GO enriched (FDR < 0.05) | 6 / 35 | 5 / 36 |
+| Liver KEGG / GO enriched | 0 / 0 | 0 / 0 |
+| Genes significant in both tissues | 11 | 19 |
+
+Liver lost 3 genes (they are no longer tested under the stricter filtering;
+two were named in the draft, coagulation factor X and MARCKS-related protein)
+and gained 38, mostly respiratory-chain, ATP-synthase and ribosomal subunits.
+Gonad lost 14 and gained 37, none with |log2FC| above 0.93; the 20 largest
+effects are identical and in the same order. KEGG RNA polymerase (`one03020`)
+fell from FDR 0.019 to 0.075. All 19 shared genes change in the same direction
+in both tissues. Every hand-typed number in `index.qmd` and the manuscript was
+updated or replaced with an inline computation, and the Limitations paragraph
+was removed. `figures/figure_X` is hand-built and still shows the old counts;
+see `figures/README.md`.
+
+**Wallenius, again.** On the new gonad gene set goseq's `nullp()` spline fit
+fails outright: every fitted probability is the same constant, so a Wallenius
+test would silently equal the hypergeometric one. On the old gene set in the
+same environment the fit is sensible and Wallenius returns no KEGG pathway at
+FDR < 0.05. The decision to use the hypergeometric test stands, with more
+evidence behind it; notebook 04 and the manuscript now say this rather than
+quoting the old-gene-set figures as current.
+
+**New finding: the CRAN snapshot does not cover the lockfile.** `.Rprofile`
+pins CRAN to the 2024-04-24 Posit Package Manager snapshot, but `renv.lock`
+records many packages from a 2025-05-18 snapshot, and some (`nlme` 3.1-166)
+exist only in the later one. A restore limited to the pinned snapshot fails on
+`nlme` and `mgcv`. CI succeeds only because its runner also configures "latest"
+Package Manager as a fallback. The re-render above passed both snapshots to
+`renv::restore(repos = ...)`. Open: either move the `.Rprofile` pin to
+2025-05-18, or re-snapshot the lockfile against 2024-04-24, so that the pinned
+snapshot alone restores the environment.
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no
