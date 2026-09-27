@@ -120,6 +120,21 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+      # The manuscript as rendered from this commit's results, for co-authors
+      # who do not render locally. render-all.sh builds it and reports any
+      # [[...]] placeholders still in the text.
+      - name: Upload manuscript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manuscript
+          path: |
+            manuscript/manuscript.docx
+            manuscript/manuscript.html
+            manuscript/cover-letter.docx
+          retention-days: 30
+          if-no-files-found: warn
+
       - name: Capture the result diff on failure
         if: failure()
         continue-on-error: true

@@ -24,6 +24,8 @@ tag-seq/code/*.html
 # The manuscript renders standalone, next to its source.
 manuscript/*.html
 manuscript/*.docx
+# ...except the Word template the manuscript renders with, which is a source file.
+!manuscript/reference-manuscript.docx
 manuscript/*_files/
 
 # ---- renv -------------------------------------------------------------------
