@@ -187,179 +187,178 @@
 "liver","one04916","Melanogenesis",0,23,1,1,FALSE
 "liver","one04981","Folate transport and metabolism",0,4,1,1,FALSE
 "liver","one05100","Bacterial invasion of epithelial cells",0,30,1,1,FALSE
-"gonad","one00190","Oxidative phosphorylation",59,186,1.01423996263316e-17,1.97776792713467e-15,TRUE
-"gonad","one03010","Ribosome",66,261,3.4133198931295e-14,3.32798689580126e-12,TRUE
-"gonad","one03060","Protein export",15,50,3.90819755680048e-05,0.00254032841192031,TRUE
-"gonad","one04260","Cardiac muscle contraction",22,97,8.63696884824853e-05,0.00421052231352116,TRUE
-"gonad","one03420","Nucleotide excision repair",16,64,0.000240702921397894,0.00938741393451785,TRUE
-"gonad","one03020","RNA polymerase",10,38,0.00231239387949217,0.0751528010834955,FALSE
-"gonad","one03040","Spliceosome",35,258,0.0197038443100975,0.548892805781289,FALSE
-"gonad","one04060","Cytokine-cytokine receptor interaction",20,136,0.0324691472606247,0.791435464477726,FALSE
-"gonad","one00980","Metabolism of xenobiotics by cytochrome P450",6,27,0.0381663863565552,0.806335519237381,FALSE
-"gonad","one03050","Proteasome",15,98,0.0435414658053045,0.806335519237381,FALSE
-"gonad","one04623","Cytosolic DNA-sensing pathway",10,58,0.0454855933928779,0.806335519237381,FALSE
-"gonad","one00740","Riboflavin metabolism",3,10,0.0621787995034504,1,FALSE
-"gonad","one04145","Phagocytosis",37,304,0.0698967276852918,1,FALSE
-"gonad","one05132","Salmonella infection",44,374,0.0803995276921055,1,FALSE
-"gonad","one04744","Phototransduction",4,18,0.08519878191469,1,FALSE
-"gonad","one00250","Alanine, aspartate and glutamate metabolism",7,41,0.090051650667841,1,FALSE
-"gonad","one00590","Arachidonic acid metabolism",7,41,0.090051650667841,1,FALSE
-"gonad","one03250","Viral life cycle - HIV-1",12,86,0.114170349623538,1,FALSE
-"gonad","one00062","Fatty acid elongation",5,28,0.121890123483071,1,FALSE
-"gonad","one00790","Folate biosynthesis",5,28,0.121890123483071,1,FALSE
-"gonad","one03013","Nucleocytoplasmic transport",20,161,0.130863132150515,1,FALSE
-"gonad","one00510","N-Glycan biosynthesis",11,81,0.145214923262101,1,FALSE
-"gonad","one04142","Lysosome biogenesis",35,311,0.167714259435686,1,FALSE
-"gonad","one00982","Drug metabolism - cytochrome P450",4,23,0.170374564410086,1,FALSE
-"gonad","one01100","Metabolic pathways",159,1562,0.173439740368238,1,FALSE
-"gonad","one04814","Motor proteins",21,180,0.192104782239127,1,FALSE
-"gonad","one00563","Glycosylphosphatidylinositol (GPI)-anchor biosynthesis",4,25,0.210472421016215,1,FALSE
-"gonad","one03440","Homologous recombination",5,35,0.237009862520609,1,FALSE
-"gonad","one00330","Arginine and proline metabolism",7,54,0.252089454842002,1,FALSE
-"gonad","one00670","One carbon pool by folate",5,36,0.255487144018994,1,FALSE
-"gonad","one03260","Virion - Human immunodeficiency virus",1,3,0.259511546143133,1,FALSE
-"gonad","one03272","Virion - Hepatitis viruses",8,65,0.276467276200172,1,FALSE
-"gonad","one00730","Thiamine metabolism",2,12,0.319258644569869,1,FALSE
-"gonad","one04672","Intestinal immune network for IgA production",3,21,0.323331766119135,1,FALSE
-"gonad","one04156","Integrated stress response (ISR) signaling pathway",9,78,0.324118084817052,1,FALSE
-"gonad","one03008","Ribosome biogenesis in eukaryotes",10,88,0.327375657481575,1,FALSE
-"gonad","one00260","Glycine, serine and threonine metabolism",5,40,0.332148784560114,1,FALSE
-"gonad","one04514","Cell adhesion molecule (CAM) interaction",15,138,0.334603288307304,1,FALSE
-"gonad","one00061","Fatty acid biosynthesis",3,22,0.350473507989292,1,FALSE
-"gonad","one00591","Linoleic acid metabolism",2,13,0.35550424972726,1,FALSE
-"gonad","one04082","Neuroactive ligand signaling",11,102,0.37958976239549,1,FALSE
-"gonad","one00340","Histidine metabolism",2,14,0.391033007316643,1,FALSE
-"gonad","one01212","Fatty acid metabolism",7,64,0.410138407776051,1,FALSE
-"gonad","one00480","Glutathione metabolism",6,54,0.410719154582223,1,FALSE
-"gonad","one04540","Gap junction",11,105,0.417398444105669,1,FALSE
-"gonad","one04010","MAPK signaling pathway",37,373,0.422749525436694,1,FALSE
-"gonad","one04141","Protein processing in endoplasmic reticulum",28,283,0.445984428878614,1,FALSE
-"gonad","one00470","D-Amino acid metabolism",1,6,0.451748152285405,1,FALSE
-"gonad","one00640","Propanoate metabolism",4,36,0.453068378449626,1,FALSE
-"gonad","one01230","Biosynthesis of amino acids",9,88,0.463905631495334,1,FALSE
-"gonad","one00565","Ether lipid metabolism",6,58,0.480404165128396,1,FALSE
-"gonad","one00220","Arginine biosynthesis",3,27,0.48214883103858,1,FALSE
-"gonad","one03022","Basal transcription factors",4,38,0.496073296527172,1,FALSE
-"gonad","one04350","TGF-beta signaling pathway",15,155,0.515315896313129,1,FALSE
-"gonad","one04625","C-type lectin receptor signaling pathway",15,155,0.515315896313129,1,FALSE
-"gonad","one00592","alpha-Linolenic acid metabolism",2,18,0.522739885902241,1,FALSE
-"gonad","one04621","NOD-like receptor signaling pathway",18,188,0.52860949175005,1,FALSE
-"gonad","one05100","Bacterial invasion of epithelial cells",13,136,0.538609079295383,1,FALSE
-"gonad","one00983","Drug metabolism - other enzymes",5,51,0.542806222593841,1,FALSE
-"gonad","one04120","Ubiquitin mediated proteolysis",21,222,0.548739823815978,1,FALSE
-"gonad","one04916","Melanogenesis",10,105,0.54987366789131,1,FALSE
-"gonad","one04122","Sulfur relay system",1,8,0.551333912089294,1,FALSE
-"gonad","one00561","Glycerolipid metabolism",7,74,0.56645211852805,1,FALSE
-"gonad","one03018","RNA degradation",9,96,0.572028058063192,1,FALSE
-"gonad","one00071","Fatty acid degradation",4,42,0.577280656849875,1,FALSE
-"gonad","one00630","Glyoxylate and dicarboxylate metabolism",4,42,0.577280656849875,1,FALSE
-"gonad","one00410","beta-Alanine metabolism",3,31,0.577711196423317,1,FALSE
-"gonad","one04980","Cobalamin transport and metabolism",2,20,0.581054289572129,1,FALSE
-"gonad","one04981","Folate transport and metabolism",2,20,0.581054289572129,1,FALSE
-"gonad","one04080","Neuroactive ligand-receptor interaction",12,130,0.590929550167891,1,FALSE
-"gonad","one04261","Adrenergic signaling in cardiomyocytes",17,184,0.591556034099645,1,FALSE
-"gonad","one00513","Various types of N-glycan biosynthesis",6,65,0.59500176643417,1,FALSE
-"gonad","one00760","Nicotinate and nicotinamide metabolism",3,32,0.599806944793848,1,FALSE
-"gonad","one00040","Pentose and glucuronate interconversions",2,21,0.608182976251392,1,FALSE
-"gonad","one00052","Galactose metabolism",2,21,0.608182976251392,1,FALSE
-"gonad","one00053","Ascorbate and aldarate metabolism",2,21,0.608182976251392,1,FALSE
-"gonad","one00140","Steroid hormone biosynthesis",2,21,0.608182976251392,1,FALSE
-"gonad","one04517","IgSF CAM signaling",37,402,0.616430580044172,1,FALSE
-"gonad","one04217","Necroptosis",19,209,0.621933680655792,1,FALSE
-"gonad","one00860","Porphyrin metabolism",5,56,0.628096585985013,1,FALSE
-"gonad","one03430","Mismatch repair",2,22,0.633953923077602,1,FALSE
-"gonad","one04130","SNARE interactions in vesicular transport",4,46,0.650509836460287,1,FALSE
-"gonad","one04977","Vitamin digestion and absorption",2,23,0.658379215796786,1,FALSE
-"gonad","one04622","RIG-I-like receptor signaling pathway",5,60,0.688925042822761,1,FALSE
-"gonad","one04081","Hormone signaling",15,173,0.689587892193592,1,FALSE
-"gonad","one00450","Selenocompound metabolism",1,12,0.699576363238632,1,FALSE
-"gonad","one00511","Other glycan degradation",1,12,0.699576363238632,1,FALSE
-"gonad","one04620","Toll-like receptor signaling pathway",9,107,0.702432000539455,1,FALSE
-"gonad","one04371","Apelin signaling pathway",16,186,0.705250851684751,1,FALSE
-"gonad","one00360","Phenylalanine metabolism",1,13,0.72824903936458,1,FALSE
-"gonad","one03265","Virion - Ebolavirus, Lyssavirus and Morbillivirus",1,13,0.72824903936458,1,FALSE
-"gonad","one04115","p53 signaling pathway",8,98,0.728541833237494,1,FALSE
-"gonad","one01040","Biosynthesis of unsaturated fatty acids",2,27,0.743175777209389,1,FALSE
-"gonad","one00910","Nitrogen metabolism",1,14,0.754188734137498,1,FALSE
-"gonad","one04216","Ferroptosis",6,77,0.755118593042577,1,FALSE
-"gonad","one04150","mTOR signaling pathway",17,204,0.756507494667446,1,FALSE
-"gonad","one04270","Vascular smooth muscle contraction",13,161,0.775427317144916,1,FALSE
-"gonad","one00051","Fructose and mannose metabolism",3,42,0.777545717646657,1,FALSE
-"gonad","one00130","Ubiquinone and other terpenoid-quinone biosynthesis",1,15,0.777655606359261,1,FALSE
-"gonad","one00531","Glycosaminoglycan degradation",1,15,0.777655606359261,1,FALSE
-"gonad","one04144","Endocytosis",34,399,0.78365226118262,1,FALSE
-"gonad","one00350","Tyrosine metabolism",1,16,0.798885082053768,1,FALSE
-"gonad","one00650","Butanoate metabolism",1,16,0.798885082053768,1,FALSE
-"gonad","one03266","Virion - Herpesvirus",1,16,0.798885082053768,1,FALSE
-"gonad","one00280","Valine, leucine and isoleucine degradation",3,44,0.804021893169613,1,FALSE
-"gonad","one00380","Tryptophan metabolism",2,31,0.809286117657314,1,FALSE
-"gonad","one00512","Mucin type O-glycan biosynthesis",2,31,0.809286117657314,1,FALSE
-"gonad","one03460","Fanconi anemia pathway",3,45,0.816236334579464,1,FALSE
-"gonad","one03030","DNA replication",2,32,0.823251395848212,1,FALSE
-"gonad","one04210","Apoptosis",16,203,0.823404394694169,1,FALSE
-"gonad","one00020","Citrate cycle (TCA cycle)",3,46,0.827798648401732,1,FALSE
-"gonad","one00620","Pyruvate metabolism",3,46,0.827798648401732,1,FALSE
-"gonad","one04136","Autophagy - other",3,46,0.827798648401732,1,FALSE
-"gonad","one03320","PPAR signaling pathway",6,85,0.832768518590914,1,FALSE
-"gonad","one00770","Pantothenate and CoA biosynthesis",1,18,0.83546375073374,1,FALSE
-"gonad","one04370","VEGF signaling pathway",6,86,0.84092066423296,1,FALSE
-"gonad","one05168","Herpes simplex virus 1 infection",18,230,0.843586121251819,1,FALSE
-"gonad","one00900","Terpenoid backbone biosynthesis",1,19,0.851180173663928,1,FALSE
-"gonad","one04914","Progesterone-mediated oocyte maturation",8,113,0.856169453028111,1,FALSE
-"gonad","one00600","Sphingolipid metabolism",4,63,0.863300149731414,1,FALSE
-"gonad","one01232","Nucleotide metabolism",6,89,0.863462367271531,1,FALSE
-"gonad","one00785","Lipoic acid metabolism",1,20,0.865397325458233,1,FALSE
-"gonad","one03273","Virion - Lassa virus and SFTS virus",1,20,0.865397325458233,1,FALSE
-"gonad","one04340","Hedgehog signaling pathway",5,77,0.869792826120253,1,FALSE
-"gonad","one01240","Biosynthesis of cofactors",11,153,0.874735825495253,1,FALSE
-"gonad","one01200","Carbon metabolism",10,141,0.875985658431294,1,FALSE
-"gonad","one00533","Glycosaminoglycan biosynthesis - keratan sulfate",1,21,0.878258042918575,1,FALSE
-"gonad","one04020","Calcium signaling pathway",16,214,0.878727161860299,1,FALSE
-"gonad","one00520","Amino sugar and nucleotide sugar metabolism",2,37,0.880168559261338,1,FALSE
-"gonad","one01210","2-Oxocarboxylic acid metabolism",2,37,0.880168559261338,1,FALSE
-"gonad","one04920","Adipocytokine signaling pathway",6,92,0.883295847957269,1,FALSE
-"gonad","one03083","Polycomb repressive complex",9,131,0.888437589602144,1,FALSE
-"gonad","one00601","Glycosphingolipid biosynthesis - lacto and neolacto series",1,23,0.900414861372904,1,FALSE
-"gonad","one04912","GnRH signaling pathway",9,135,0.907318999271832,1,FALSE
-"gonad","one04519","Cadherin signaling",30,387,0.908251498289765,1,FALSE
-"gonad","one04382","Cornified envelope formation",10,152,0.924248176215815,1,FALSE
-"gonad","one00030","Pentose phosphate pathway",1,26,0.926332052599173,1,FALSE
-"gonad","one00534","Glycosaminoglycan biosynthesis - heparan sulfate / heparin",1,28,0.939748248317407,1,FALSE
-"gonad","one00830","Retinol metabolism",1,28,0.939748248317407,1,FALSE
-"gonad","one04114","Oocyte meiosis",10,161,0.950830184431447,1,FALSE
-"gonad","one03082","ATP-dependent chromatin remodeling",10,162,0.953205892740227,1,FALSE
-"gonad","one00010","Glycolysis / Gluconeogenesis",3,65,0.954593031437277,1,FALSE
-"gonad","one02010","ABC transporters",1,32,0.959702692583,1,FALSE
-"gonad","one00564","Glycerophospholipid metabolism",7,125,0.96053437212259,1,FALSE
-"gonad","one04530","Tight junction",18,269,0.962729039729032,1,FALSE
-"gonad","one00514","Other types of O-glycan biosynthesis",2,54,0.970428449318795,1,FALSE
-"gonad","one00230","Purine metabolism",7,130,0.97047632201938,1,FALSE
-"gonad","one00270","Cysteine and methionine metabolism",2,55,0.972842083197055,1,FALSE
-"gonad","one01250","Biosynthesis of nucleotide sugars",1,36,0.973054817619394,1,FALSE
-"gonad","one04146","Peroxisome",4,88,0.97369726528351,1,FALSE
-"gonad","one04012","ErbB signaling pathway",7,136,0.979363764628585,1,FALSE
-"gonad","one04330","Notch signaling pathway",3,76,0.980329551671045,1,FALSE
-"gonad","one03015","mRNA surveillance pathway",7,137,0.980578883698817,1,FALSE
-"gonad","one04068","FoxO signaling pathway",12,206,0.980650258430048,1,FALSE
-"gonad","one04520","Adherens junction",9,166,0.981480200604187,1,FALSE
-"gonad","one04070","Phosphatidylinositol signaling system",7,139,0.982812871218037,1,FALSE
-"gonad","one04110","Cell cycle",11,195,0.982987909794619,1,FALSE
-"gonad","one00562","Inositol phosphate metabolism",5,110,0.983455611174203,1,FALSE
-"gonad","one03410","Base excision repair",1,42,0.985273529501987,1,FALSE
-"gonad","one04137","Mitophagy - animal",11,199,0.986270931717589,1,FALSE
-"gonad","one04148","Efferocytosis",11,200,0.98699499307265,1,FALSE
-"gonad","one04810","Regulation of actin cytoskeleton",20,320,0.987621336252398,1,FALSE
-"gonad","one04518","Integrin signaling",10,189,0.988900851033503,1,FALSE
-"gonad","one04910","Insulin signaling pathway",11,203,0.988961033390422,1,FALSE
-"gonad","one04510","Focal adhesion",17,284,0.989185485270902,1,FALSE
-"gonad","one00310","Lysine degradation",3,87,0.991764820931908,1,FALSE
-"gonad","one04512","ECM-receptor interaction",3,87,0.991764820931908,1,FALSE
-"gonad","one04218","Cellular senescence",13,236,0.991807775294128,1,FALSE
-"gonad","one04310","Wnt signaling pathway",11,217,0.994993301351666,1,FALSE
-"gonad","one00240","Pyrimidine metabolism",1,58,0.997067121764171,1,FALSE
-"gonad","one04820","Cytoskeleton in muscle cells",12,247,0.998002981571164,1,FALSE
-"gonad","one04140","Autophagy - animal",15,299,0.998823613416347,1,FALSE
-"gonad","one00970","Aminoacyl-tRNA biosynthesis",0,46,1,1,FALSE
+"gonad","one00190","Oxidative phosphorylation",59,186,1.0207908499199e-17,1.9905421573438e-15,TRUE
+"gonad","one03010","Ribosome",66,261,3.43559412178849e-14,3.34970426874377e-12,TRUE
+"gonad","one03060","Protein export",15,50,3.91446611365676e-05,0.0025444029738769,TRUE
+"gonad","one04260","Cardiac muscle contraction",22,97,8.65451544269614e-05,0.00421907627831437,TRUE
+"gonad","one03420","Nucleotide excision repair",16,64,0.000241081380181921,0.00940217382709493,TRUE
+"gonad","one03020","RNA polymerase",10,38,0.00231475641603568,0.0752295835211597,FALSE
+"gonad","one03040","Spliceosome",35,258,0.0197405358978943,0.549914928584198,FALSE
+"gonad","one04060","Cytokine-cytokine receptor interaction",20,136,0.0325098475868561,0.792427534929617,FALSE
+"gonad","one00980","Metabolism of xenobiotics by cytochrome P450",6,27,0.0381885317619231,0.806969789849065,FALSE
+"gonad","one03050","Proteasome",15,98,0.0435855595562542,0.806969789849065,FALSE
+"gonad","one04623","Cytosolic DNA-sensing pathway",10,58,0.0455213727607165,0.806969789849065,FALSE
+"gonad","one00740","Riboflavin metabolism",3,10,0.0621999605170782,1,FALSE
+"gonad","one04145","Phagocytosis",37,304,0.0700069190306151,1,FALSE
+"gonad","one05132","Salmonella infection",44,374,0.0805354598964855,1,FALSE
+"gonad","one04744","Phototransduction",4,18,0.0852327901612738,1,FALSE
+"gonad","one00250","Alanine, aspartate and glutamate metabolism",7,41,0.090102641512826,1,FALSE
+"gonad","one00590","Arachidonic acid metabolism",7,41,0.090102641512826,1,FALSE
+"gonad","one03250","Viral life cycle - HIV-1",12,86,0.114255387328263,1,FALSE
+"gonad","one00062","Fatty acid elongation",5,28,0.121942980946179,1,FALSE
+"gonad","one00790","Folate biosynthesis",5,28,0.121942980946179,1,FALSE
+"gonad","one03013","Nucleocytoplasmic transport",20,161,0.130989411155661,1,FALSE
+"gonad","one00510","N-Glycan biosynthesis",11,81,0.145311965291036,1,FALSE
+"gonad","one04142","Lysosome biogenesis",35,311,0.167920377389159,1,FALSE
+"gonad","one00982","Drug metabolism - cytochrome P450",4,23,0.170434305456151,1,FALSE
+"gonad","one01100","Metabolic pathways",159,1561,0.171560047755122,1,FALSE
+"gonad","one04814","Motor proteins",21,180,0.192274977601682,1,FALSE
+"gonad","one00563","Glycosylphosphatidylinositol (GPI)-anchor biosynthesis",4,25,0.210542311727222,1,FALSE
+"gonad","one03440","Homologous recombination",5,35,0.237096662903462,1,FALSE
+"gonad","one00330","Arginine and proline metabolism",7,54,0.25219926139711,1,FALSE
+"gonad","one00670","One carbon pool by folate",5,36,0.25557836161615,1,FALSE
+"gonad","one03260","Virion - Human immunodeficiency virus",1,3,0.259543635360408,1,FALSE
+"gonad","one03272","Virion - Hepatitis viruses",8,65,0.276592585431603,1,FALSE
+"gonad","one00730","Thiamine metabolism",2,12,0.319319063066115,1,FALSE
+"gonad","one04672","Intestinal immune network for IgA production",3,21,0.323409913277119,1,FALSE
+"gonad","one04156","Integrated stress response (ISR) signaling pathway",9,78,0.324264223560963,1,FALSE
+"gonad","one03008","Ribosome biogenesis in eukaryotes",10,88,0.3275312564912,1,FALSE
+"gonad","one00260","Glycine, serine and threonine metabolism",5,40,0.332255537415377,1,FALSE
+"gonad","one04514","Cell adhesion molecule (CAM) interaction",15,138,0.334799194445772,1,FALSE
+"gonad","one00061","Fatty acid biosynthesis",3,22,0.350555383550853,1,FALSE
+"gonad","one00591","Linoleic acid metabolism",2,13,0.355568857257351,1,FALSE
+"gonad","one04082","Neuroactive ligand signaling",11,102,0.379765144585657,1,FALSE
+"gonad","one00340","Histidine metabolism",2,14,0.391101207605219,1,FALSE
+"gonad","one01212","Fatty acid metabolism",7,64,0.410280201672253,1,FALSE
+"gonad","one00480","Glutathione metabolism",6,54,0.410849659433912,1,FALSE
+"gonad","one04540","Gap junction",11,105,0.417580163895824,1,FALSE
+"gonad","one04010","MAPK signaling pathway",37,373,0.423096811130185,1,FALSE
+"gonad","one04141","Protein processing in endoplasmic reticulum",28,283,0.446287814944448,1,FALSE
+"gonad","one00470","D-Amino acid metabolism",1,6,0.451795689055125,1,FALSE
+"gonad","one00640","Propanoate metabolism",4,36,0.453176740598781,1,FALSE
+"gonad","one01230","Biosynthesis of amino acids",9,88,0.464074110476122,1,FALSE
+"gonad","one00565","Ether lipid metabolism",6,58,0.480541238670332,1,FALSE
+"gonad","one00220","Arginine biosynthesis",3,27,0.482243133992615,1,FALSE
+"gonad","one03022","Basal transcription factors",4,38,0.496184457230331,1,FALSE
+"gonad","one04350","TGF-beta signaling pathway",15,155,0.515539519491016,1,FALSE
+"gonad","one04625","C-type lectin receptor signaling pathway",15,155,0.515539519491016,1,FALSE
+"gonad","one00592","alpha-Linolenic acid metabolism",2,18,0.522816727891255,1,FALSE
+"gonad","one04621","NOD-like receptor signaling pathway",18,188,0.528855528913291,1,FALSE
+"gonad","one05100","Bacterial invasion of epithelial cells",13,136,0.538817044003675,1,FALSE
+"gonad","one00983","Drug metabolism - other enzymes",5,51,0.54293302510062,1,FALSE
+"gonad","one04120","Ubiquitin mediated proteolysis",21,222,0.549006063755235,1,FALSE
+"gonad","one04916","Melanogenesis",10,105,0.550055289945121,1,FALSE
+"gonad","one04122","Sulfur relay system",1,8,0.551385795765611,1,FALSE
+"gonad","one00561","Glycerolipid metabolism",7,74,0.566603112749144,1,FALSE
+"gonad","one03018","RNA degradation",9,96,0.572199702001357,1,FALSE
+"gonad","one00071","Fatty acid degradation",4,42,0.577393594816557,1,FALSE
+"gonad","one00630","Glyoxylate and dicarboxylate metabolism",4,42,0.577393594816557,1,FALSE
+"gonad","one00410","beta-Alanine metabolism",3,31,0.57780829851496,1,FALSE
+"gonad","one04980","Cobalamin transport and metabolism",2,20,0.581132399141292,1,FALSE
+"gonad","one04981","Folate transport and metabolism",2,20,0.581132399141292,1,FALSE
+"gonad","one04080","Neuroactive ligand-receptor interaction",12,130,0.59112738816842,1,FALSE
+"gonad","one04261","Adrenergic signaling in cardiomyocytes",17,184,0.591792307733944,1,FALSE
+"gonad","one00513","Various types of N-glycan biosynthesis",6,65,0.595140559122801,1,FALSE
+"gonad","one00760","Nicotinate and nicotinamide metabolism",3,32,0.599903881819588,1,FALSE
+"gonad","one00040","Pentose and glucuronate interconversions",2,21,0.608261081863837,1,FALSE
+"gonad","one00052","Galactose metabolism",2,21,0.608261081863837,1,FALSE
+"gonad","one00053","Ascorbate and aldarate metabolism",2,21,0.608261081863837,1,FALSE
+"gonad","one00140","Steroid hormone biosynthesis",2,21,0.608261081863837,1,FALSE
+"gonad","one04517","IgSF CAM signaling",37,402,0.616779292876725,1,FALSE
+"gonad","one04217","Necroptosis",19,209,0.622180039557008,1,FALSE
+"gonad","one00860","Porphyrin metabolism",5,56,0.628221551399165,1,FALSE
+"gonad","one03430","Mismatch repair",2,22,0.634031651695136,1,FALSE
+"gonad","one04130","SNARE interactions in vesicular transport",4,46,0.650620132410542,1,FALSE
+"gonad","one04977","Vitamin digestion and absorption",2,23,0.658456233259905,1,FALSE
+"gonad","one04622","RIG-I-like receptor signaling pathway",5,60,0.689044705136053,1,FALSE
+"gonad","one04081","Hormone signaling",15,173,0.689794044214726,1,FALSE
+"gonad","one00450","Selenocompound metabolism",1,12,0.699628503277048,1,FALSE
+"gonad","one00511","Other glycan degradation",1,12,0.699628503277048,1,FALSE
+"gonad","one04620","Toll-like receptor signaling pathway",9,107,0.702589577510445,1,FALSE
+"gonad","one04371","Apelin signaling pathway",16,186,0.705459676549952,1,FALSE
+"gonad","one00360","Phenylalanine metabolism",1,13,0.728300140445357,1,FALSE
+"gonad","one03265","Virion - Ebolavirus, Lyssavirus and Morbillivirus",1,13,0.728300140445357,1,FALSE
+"gonad","one04115","p53 signaling pathway",8,98,0.728685429997211,1,FALSE
+"gonad","one01040","Biosynthesis of unsaturated fatty acids",2,27,0.743247344034187,1,FALSE
+"gonad","one00910","Nitrogen metabolism",1,14,0.754238519894598,1,FALSE
+"gonad","one04216","Ferroptosis",6,77,0.755238215466365,1,FALSE
+"gonad","one04150","mTOR signaling pathway",17,204,0.756705547734086,1,FALSE
+"gonad","one04270","Vascular smooth muscle contraction",13,161,0.775594245216488,1,FALSE
+"gonad","one00051","Fructose and mannose metabolism",3,42,0.777628073478297,1,FALSE
+"gonad","one00130","Ubiquinone and other terpenoid-quinone biosynthesis",1,15,0.777703862479191,1,FALSE
+"gonad","one00531","Glycosaminoglycan degradation",1,15,0.777703862479191,1,FALSE
+"gonad","one04144","Endocytosis",34,399,0.783916186462913,1,FALSE
+"gonad","one00350","Tyrosine metabolism",1,16,0.798931646977262,1,FALSE
+"gonad","one00650","Butanoate metabolism",1,16,0.798931646977262,1,FALSE
+"gonad","one03266","Virion - Herpesvirus",1,16,0.798931646977262,1,FALSE
+"gonad","one00280","Valine, leucine and isoleucine degradation",3,44,0.804099633211924,1,FALSE
+"gonad","one00380","Tryptophan metabolism",2,31,0.809349605813963,1,FALSE
+"gonad","one00512","Mucin type O-glycan biosynthesis",2,31,0.809349605813963,1,FALSE
+"gonad","one03460","Fanconi anemia pathway",3,45,0.816311676221282,1,FALSE
+"gonad","one03030","DNA replication",2,32,0.823312654080255,1,FALSE
+"gonad","one04210","Apoptosis",16,203,0.823566593572852,1,FALSE
+"gonad","one00020","Citrate cycle (TCA cycle)",3,46,0.827871551370868,1,FALSE
+"gonad","one00620","Pyruvate metabolism",3,46,0.827871551370868,1,FALSE
+"gonad","one04136","Autophagy - other",3,46,0.827871551370868,1,FALSE
+"gonad","one03320","PPAR signaling pathway",6,85,0.832867347451554,1,FALSE
+"gonad","one00770","Pantothenate and CoA biosynthesis",1,18,0.835506620200741,1,FALSE
+"gonad","one04370","VEGF signaling pathway",6,86,0.841016749866035,1,FALSE
+"gonad","one05168","Herpes simplex virus 1 infection",18,230,0.843745936895133,1,FALSE
+"gonad","one00900","Terpenoid backbone biosynthesis",1,19,0.851221108030361,1,FALSE
+"gonad","one04914","Progesterone-mediated oocyte maturation",8,113,0.856272930354405,1,FALSE
+"gonad","one00600","Sphingolipid metabolism",4,63,0.863373296077718,1,FALSE
+"gonad","one01232","Nucleotide metabolism",6,89,0.863550215662514,1,FALSE
+"gonad","one00785","Lipoic acid metabolism",1,20,0.865436303235049,1,FALSE
+"gonad","one03273","Virion - Lassa virus and SFTS virus",1,20,0.865436303235049,1,FALSE
+"gonad","one04340","Hedgehog signaling pathway",5,77,0.869871406591273,1,FALSE
+"gonad","one01240","Biosynthesis of cofactors",11,153,0.874845943513484,1,FALSE
+"gonad","one01200","Carbon metabolism",10,141,0.876090330012251,1,FALSE
+"gonad","one00533","Glycosaminoglycan biosynthesis - keratan sulfate",1,21,0.878295064303609,1,FALSE
+"gonad","one04020","Calcium signaling pathway",16,214,0.878855790842489,1,FALSE
+"gonad","one00520","Amino sugar and nucleotide sugar metabolism",2,37,0.880218364773691,1,FALSE
+"gonad","one01210","2-Oxocarboxylic acid metabolism",2,37,0.880218364773691,1,FALSE
+"gonad","one04920","Adipocytokine signaling pathway",6,92,0.883375576145291,1,FALSE
+"gonad","one03083","Polycomb repressive complex",9,131,0.888530716445529,1,FALSE
+"gonad","one00601","Glycosphingolipid biosynthesis - lacto and neolacto series",1,23,0.900448038203853,1,FALSE
+"gonad","one04912","GnRH signaling pathway",9,135,0.907401296120709,1,FALSE
+"gonad","one04519","Cadherin signaling",30,387,0.90839551364049,1,FALSE
+"gonad","one04382","Cornified envelope formation",10,152,0.924323206297222,1,FALSE
+"gonad","one00030","Pentose phosphate pathway",1,26,0.926359807755316,1,FALSE
+"gonad","one00534","Glycosaminoglycan biosynthesis - heparan sulfate / heparin",1,28,0.939772701702748,1,FALSE
+"gonad","one00830","Retinol metabolism",1,28,0.939772701702748,1,FALSE
+"gonad","one04114","Oocyte meiosis",10,161,0.950884906004857,1,FALSE
+"gonad","one03082","ATP-dependent chromatin remodeling",10,162,0.953258612853958,1,FALSE
+"gonad","one00010","Glycolysis / Gluconeogenesis",3,65,0.954624116129402,1,FALSE
+"gonad","one02010","ABC transporters",1,32,0.959721394082863,1,FALSE
+"gonad","one00564","Glycerophospholipid metabolism",7,125,0.960574089782252,1,FALSE
+"gonad","one04530","Tight junction",18,269,0.962786653395067,1,FALSE
+"gonad","one00514","Other types of O-glycan biosynthesis",2,54,0.970447834467385,1,FALSE
+"gonad","one00230","Purine metabolism",7,130,0.970508086599448,1,FALSE
+"gonad","one00270","Cysteine and methionine metabolism",2,55,0.972860274063215,1,FALSE
+"gonad","one01250","Biosynthesis of nucleotide sugars",1,36,0.973068893427601,1,FALSE
+"gonad","one04146","Peroxisome",4,88,0.973720402748866,1,FALSE
+"gonad","one04012","ErbB signaling pathway",7,136,0.979387702419028,1,FALSE
+"gonad","one04330","Notch signaling pathway",3,76,0.980346075166349,1,FALSE
+"gonad","one03015","mRNA surveillance pathway",7,137,0.980601685408378,1,FALSE
+"gonad","one04068","FoxO signaling pathway",12,206,0.980678769758306,1,FALSE
+"gonad","one04520","Adherens junction",9,166,0.98150455018285,1,FALSE
+"gonad","one04070","Phosphatidylinositol signaling system",7,139,0.982833534960072,1,FALSE
+"gonad","one04110","Cell cycle",11,195,0.983012642403494,1,FALSE
+"gonad","one00562","Inositol phosphate metabolism",5,110,0.983473130786515,1,FALSE
+"gonad","one03410","Base excision repair",1,42,0.985282511994066,1,FALSE
+"gonad","one04137","Mitophagy - animal",11,199,0.986291669343912,1,FALSE
+"gonad","one04810","Regulation of actin cytoskeleton",20,320,0.987646006664801,1,FALSE
+"gonad","one04148","Efferocytosis",11,202,0.988356636636391,1,FALSE
+"gonad","one04518","Integrin signaling",10,189,0.988917555369647,1,FALSE
+"gonad","one04910","Insulin signaling pathway",11,203,0.988978335962848,1,FALSE
+"gonad","one04510","Focal adhesion",17,284,0.989205980601291,1,FALSE
+"gonad","one00310","Lysine degradation",3,87,0.991773034701714,1,FALSE
+"gonad","one04512","ECM-receptor interaction",3,87,0.991773034701714,1,FALSE
+"gonad","one04218","Cellular senescence",13,236,0.991822219936491,1,FALSE
+"gonad","one04310","Wnt signaling pathway",11,217,0.9950021553556,1,FALSE
+"gonad","one00240","Pyrimidine metabolism",1,58,0.997069597647322,1,FALSE
+"gonad","one04820","Cytoskeleton in muscle cells",12,247,0.998007103061725,1,FALSE
+"gonad","one04140","Autophagy - animal",15,299,0.998826435614563,1,FALSE
 "gonad","one00100","Steroid biosynthesis",0,21,1,1,FALSE
 "gonad","one00120","Primary bile acid biosynthesis",0,14,1,1,FALSE
 "gonad","one00290","Valine, leucine and isoleucine biosynthesis",0,1,1,1,FALSE
@@ -377,6 +376,7 @@
 "gonad","one00750","Vitamin B6 metabolism",0,3,1,1,FALSE
 "gonad","one00780","Biotin metabolism",0,3,1,1,FALSE
 "gonad","one00920","Sulfur metabolism",0,10,1,1,FALSE
+"gonad","one00970","Aminoacyl-tRNA biosynthesis",0,46,1,1,FALSE
 "gonad","one01320","Sulfur cycle",0,2,1,1,FALSE
 "gonad","one03264","Virion - Flavivirus and Alphavirus",0,7,1,1,FALSE
 "gonad","one03267","Virion - Adenovirus",0,4,1,1,FALSE

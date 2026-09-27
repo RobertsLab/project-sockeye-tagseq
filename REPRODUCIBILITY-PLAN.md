@@ -1270,6 +1270,38 @@ decision (submission checklist A4).
 
 ---
 
+## KEGG downloaded at render time (2026-09-27, checklist A4)
+
+KEGG states it is not a public database, provides its REST API for academic
+use by academic users, and requires a licence for other use; Bioconductor's
+KEGG.db manual says the package "is no longer allowed to be current" for the
+same reason. The two vendored KEGG responses are therefore removed from the
+repository (and so from any Zenodo archive; they remain in git history, which
+was not rewritten).
+
+- `ensure_kegg()` in `_common.R` downloads them into `tag-seq/genome/` on first
+  use (git ignores them), records the date and KEGG release in
+  `kegg_one_RETRIEVED.txt`, and reuses them after that; `KEGG_REFRESH=1`
+  forces a new download. Notebook 04 and the manuscript call it, and 04
+  reports whether the responses match those recorded for the committed results.
+- `kegg_one_SOURCE.txt` records the release (2026/09/25) and the sha256 of the
+  two responses the committed results were computed from. They left
+  `CHECKSUMS.sha256`, where a new KEGG release would have looked like a
+  corrupted input.
+- `check-reproduction.R` accepts numeric drift in KEGG-derived tables, listed in
+  their own section, only when the set of pathways enriched at FDR < 0.05 is
+  unchanged.
+
+Rebaseline: the live KEGG links differed from the 2026-08-30 copy by one
+removed and five added gene-pathway links, none involving a significant gene.
+Rendering against them left all five enriched gonad pathways and their gene
+counts unchanged, moved p-values in the third significant figure, and changed
+one tested pathway's gene count by 2. The manuscript's KEGG counts in the
+methods are now computed from the downloaded data (12,284 genes in 196
+pathways; the hand-typed figure was 12,285).
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no

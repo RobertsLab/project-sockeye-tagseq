@@ -75,13 +75,20 @@ one composite figure and four tables. The manuscript is *not* rendered by CI.
 - [x] Decide on the 33 MB of provenance-only files listed as an open decision
       in `tag-seq/data/README.md`, and on `Onerka_LOCID_gene_table.txt`
       (`tag-seq/genome/README.md`), before the archive is cut. *(Done in D3.)*
-- [ ] Decide whether the vendored KEGG files
+- [x] Decide whether the vendored KEGG files
       (`tag-seq/genome/kegg_one_*.tsv`) may be redistributed. KEGG states it
       is not a public database, provides its API for academic use by academic
       users, and requires a licence for other use; the LICENSE therefore
       excludes them from every open licence. If redistribution is not
       acceptable, remove them from the repository and the archive and have
       notebook 04 fetch them at render time, recording the retrieval date.
+      *(Decided 2026-09-27: not redistributed. `ensure_kegg()` downloads them
+      at render time; `kegg_one_SOURCE.txt` records the KEGG release
+      (2026/09/25) and sha256 behind the committed results; the checker
+      accepts KEGG drift only if the enriched pathways are unchanged. The
+      rebaseline on the current release moved no enriched pathway's gene
+      counts and no quoted number. The old copies remain in git history,
+      which was not rewritten.)*
 - [ ] Tag a release and mint a Zenodo DOI. GitHub alone is not an acceptable
       archive for *Molecular Ecology*.
 

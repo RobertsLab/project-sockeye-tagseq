@@ -240,6 +240,62 @@ DIVERGING <- c(low = "#0f6b45", mid = "#f0efec", high = "#762a83")
 
 phenotype_side_colours <- function(coldata) unname(PHENOTYPE_COLOURS[as.character(coldata$phenotype)])
 
+# ---- KEGG ---------------------------------------------------------------------
+
+## KEGG pathway membership is downloaded from the KEGG REST API at render time
+## rather than kept in the repository. KEGG is not a public database: its API is
+## provided for academic use by academic users, and it grants no right to
+## redistribute its data (https://www.kegg.jp/kegg/legal.html). This is also why
+## Bioconductor stopped updating its KEGG.db package.
+##
+## The two responses are saved under tag-seq/genome/, which git ignores for
+## these files, and reused while they exist, so repeated local renders use the
+## same copy. Set KEGG_REFRESH=1 to download afresh. A fresh checkout, including
+## every CI run, downloads the current release, which may differ slightly from
+## the one the committed results were computed from; kegg_one_SOURCE.txt records
+## that release and the sha256 of its two responses, and check-reproduction.R
+## accepts KEGG-derived tables that drift numerically as long as the set of
+## enriched pathways is unchanged.
+KEGG_FILES <- c(links = "kegg_one_gene2pathway.tsv", names = "kegg_one_pathways.tsv")
+KEGG_URLS  <- c(links = "https://rest.kegg.jp/link/pathway/one",
+                names = "https://rest.kegg.jp/list/pathway/one")
+
+ensure_kegg <- function(refresh = identical(Sys.getenv("KEGG_REFRESH"), "1")) {
+  paths <- setNames(file.path(PATHS$genome, KEGG_FILES), names(KEGG_FILES))
+  record_path <- file.path(PATHS$genome, "kegg_one_RETRIEVED.txt")
+
+  if (refresh || !all(file.exists(paths))) {
+    for (k in names(paths)) {
+      tmp <- tempfile()
+      ok  <- tryCatch({
+        utils::download.file(KEGG_URLS[[k]], tmp, quiet = TRUE, mode = "wb")
+        file.size(tmp) > 0
+      }, error = function(e) FALSE)
+      if (!ok) stop("could not download ", KEGG_URLS[[k]], ". KEGG pathway data are ",
+                    "fetched at render time and are not in the repository; check the ",
+                    "network connection, or place the file at ", paths[[k]], ".")
+      file.copy(tmp, paths[[k]], overwrite = TRUE)
+    }
+    info <- tryCatch(readLines("https://rest.kegg.jp/info/kegg", warn = FALSE),
+                     error = function(e) character(0))
+    release <- trimws(sub("^\\s*pathway\\s+[0-9]+\\s+", "",
+                          grep("^\\s*pathway\\s", info, value = TRUE)[1]))
+    writeLines(c(paste("retrieved:", format(Sys.time(), "%Y-%m-%d", tz = "UTC")),
+                 paste("KEGG pathway release:", release)), record_path)
+  }
+
+  ## Compare with the copy the committed results were computed from.
+  src <- readLines(file.path(PATHS$genome, "kegg_one_SOURCE.txt"), warn = FALSE)
+  src <- grep("^[0-9a-f]{64}[[:space:]]+kegg_", src, value = TRUE)
+  committed <- setNames(sub("[[:space:]].*$", "", src), sub("^[0-9a-f]{64}[[:space:]]+", "", src))
+  current   <- vapply(paths, function(p) digest::digest(p, algo = "sha256", file = TRUE), "")
+  matches   <- identical(unname(current), unname(committed[KEGG_FILES]))
+
+  retrieved <- if (file.exists(record_path)) readLines(record_path, warn = FALSE) else "retrieval record missing"
+  invisible(list(paths = paths, matches = matches, retrieved = retrieved,
+                 current = current, committed = committed))
+}
+
 # ---- input integrity ---------------------------------------------------------
 
 ## Check the input files against CHECKSUMS.sha256, so that an input which

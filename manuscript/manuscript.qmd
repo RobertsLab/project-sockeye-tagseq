@@ -123,8 +123,11 @@ depth_txt <- function(t) sprintf("%.1f &plusmn; %.1f million", mean(depth[[t]]) 
 ## Direction of DE genes within the enriched KEGG pathways.
 ann <- load_gene_annotation()
 g2g <- setNames(ann$gene, as.character(ann$GeneID))
+kegg <- ensure_kegg()   # downloaded at render time; KEGG data are not redistributed
 kl <- read.delim(file.path(PATHS$genome, "kegg_one_gene2pathway.tsv"), header = FALSE, col.names = c("gene", "pathway"))
 kl$gene <- unname(g2g[sub("^one:", "", kl$gene)]); kl$pathway <- sub("^path:", "", kl$pathway)
+kl <- unique(kl[!is.na(kl$gene), ])
+kegg_release <- sub("^KEGG pathway release: *", "", grep("^KEGG pathway release:", readLines(file.path(PATHS$genome, "kegg_one_SOURCE.txt")), value = TRUE))
 pw_dir <- function(pw) { g <- G$sig[G$sig$gene %in% kl$gene[kl$pathway == pw], ]; c(n = nrow(g), up = sum(g$log2FoldChange > 0)) }
 ox_dir <- pw_dir("one00190"); ribo_dir <- pw_dir("one03010")
 
@@ -266,8 +269,11 @@ regularised-log counts.
 Gene Ontology (GO) annotations were taken from the NCBI annotation release for this
 assembly (GAF 2.2, 139,236 distinct gene–term pairs after removing NOT-qualified
 annotations, covering 32,629 genes and 6,937 terms), and KEGG pathway membership from
-the KEGG REST service for organism `one` (12,285 genes in 196 pathways); both were
-vendored into the repository with their retrieval dates. For each tissue the test
+the KEGG REST service for organism `one` (release of `r kegg_release`;
+`r fmt(length(unique(kl$gene)))` genes in `r fmt(length(unique(kl$pathway)))` pathways).
+The GO annotation is kept in the repository; KEGG data may not be redistributed,
+so the analysis downloads them and records the release and checksums of the
+responses used. For each tissue the test
 universe was every gene that received an adjusted p-value, and the differentially
 expressed set was those with adjusted p below 0.05, the same rule used for the
 results tables. Over-representation was tested with the hypergeometric test as

@@ -35,6 +35,13 @@ manuscript/*_files/
 # estimates reach it through Tables S2 and S3, which are tracked and checked.
 tag-seq/DESEQ_output/*/alternatives/
 
+# ---- KEGG ---------------------------------------------------------------------
+# Downloaded at render time by ensure_kegg() and not redistributed; KEGG's terms
+# do not allow it. See tag-seq/genome/kegg_one_SOURCE.txt.
+tag-seq/genome/kegg_one_gene2pathway.tsv
+tag-seq/genome/kegg_one_pathways.tsv
+tag-seq/genome/kegg_one_RETRIEVED.txt
+
 # ---- renv -------------------------------------------------------------------
 # renv.lock IS tracked; the library it installs is not.
 renv/library/

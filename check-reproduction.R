@@ -165,9 +165,24 @@ compare_tables <- function(old, new, tol = TOL) {
   problems
 }
 
-images   <- character(0)
+## KEGG-derived tables. KEGG data are downloaded at render time (they may not
+## be redistributed; see tag-seq/genome/kegg_one_SOURCE.txt), so a render can
+## use a newer KEGG release than the committed results, and pathway gene counts
+## and p-values can move a little. Such a table is accepted, and reported in its
+## own section, when the set of pathways enriched at FDR < 0.05 is unchanged.
+## Any gained or lost enriched pathway is a failure.
+is_kegg_table <- function(path) grepl("KEGG", basename(path))
+
+kegg_enriched <- function(d) {
+  flag <- if ("enriched" %in% names(d)) d$enriched %in% c(TRUE, "TRUE") else !is.na(d$FDR) & d$FDR < 0.05
+  key  <- if ("tissue" %in% names(d)) paste(d$tissue, d$category) else d$category
+  sort(unique(key[flag]))
+}
+
+images    <- character(0)
 tolerated <- character(0)
-failures <- character(0)
+kegg_drift <- character(0)
+failures  <- character(0)
 
 for (path in changed) {
   ext <- tolower(tools::file_ext(path))
@@ -202,6 +217,16 @@ for (path in changed) {
   problems <- compare_tables(old, new)
   if (length(problems) == 0) {
     tolerated <- c(tolerated, path)
+  } else if (is_kegg_table(path) && all(c("category", "FDR") %in% names(old)) &&
+             all(c("category", "FDR") %in% names(new))) {
+    lost   <- setdiff(kegg_enriched(old), kegg_enriched(new))
+    gained <- setdiff(kegg_enriched(new), kegg_enriched(old))
+    if (length(lost) == 0 && length(gained) == 0) {
+      kegg_drift <- c(kegg_drift, sprintf("%s: %s", path, paste(problems, collapse = "; ")))
+    } else {
+      failures <- c(failures, sprintf("%s: enriched KEGG pathways changed (lost: %s; gained: %s)", path,
+                                      paste(lost, collapse = ", "), paste(gained, collapse = ", ")))
+    }
   } else {
     failures <- c(failures, sprintf("%s: %s", path, paste(problems, collapse = "; ")))
   }
@@ -220,6 +245,12 @@ if (length(tolerated) > 0) {
               length(tolerated)))
   cat(paste0("  ", tolerated, collapse = "\n"), "\n\n", sep = "")
 }
+if (length(kegg_drift) > 0) {
+  cat(sprintf("KEGG-derived tables that drifted, same enriched pathways (%d):\n", length(kegg_drift)))
+  cat(paste0("  ", kegg_drift, collapse = "\n"), "\n", sep = "")
+  cat("  This render used different KEGG responses from the committed results;\n",
+      "  see tag-seq/genome/kegg_one_SOURCE.txt to rebaseline on the new release.\n\n", sep = "")
+}
 if (length(failures) > 0) {
   cat(sprintf("FAILURES (%d):\n", length(failures)))
   cat(paste0("  ", failures, collapse = "\n"), "\n\n", sep = "")
@@ -232,5 +263,6 @@ if (length(failures) > 0) {
 cat("Reproduction check: PASS\n")
 cat(sprintf(paste0("Differences are confined to re-rendered images and numeric drift within\n",
                    "%g + %g * |value| (relative %g for p-value columns). No row, no column\n",
-                   "and no padj or FDR call at 0.05 changed.\n"), ABS_TOL, TOL, PVAL_TOL))
+                   "and no padj or FDR call at 0.05 changed%s.\n"), ABS_TOL, TOL, PVAL_TOL,
+            if (length(kegg_drift)) ", except in KEGG-derived tables, whose enriched pathways are unchanged" else ""))
 quit(status = 0)
