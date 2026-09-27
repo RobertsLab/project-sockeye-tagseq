@@ -1,4 +1,4 @@
-"count","trt","gene","sample"
+"count","phenotype","gene","sample"
 212.29326240245,"territorial","LOC115131673","B01"
 170.899398782813,"territorial","LOC115131673","B02"
 199.665835997596,"territorial","LOC115131673","B03"

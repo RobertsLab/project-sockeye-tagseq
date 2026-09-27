@@ -19,7 +19,7 @@ manuscript's HTML and Word renders embed. Both are sized for a 170 mm
 double-column width with 7 pt text.
 
 Colours are validated for colour-vision deficiency rather than chosen by eye;
-the values and the validation results are recorded next to `TRT_COLOURS` and
+the values and the validation results are recorded next to `PHENOTYPE_COLOURS` and
 `DIVERGING` in `tag-seq/code/_common.R`. Treatment is always shown by shape as
 well as colour.
 

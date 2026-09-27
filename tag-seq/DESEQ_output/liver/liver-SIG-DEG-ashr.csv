@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","tissue"
 "LOC115131673",100.828268389963,0.29183192861941,0.120162577733125,8.22039500797565e-06,0.0230517281281126,"NADH dehydrogenase [ubiquinone] iron-sulfur protein 5-like","liver"
 "LOC115128702",153.550384216592,0.280644724427389,0.100751919444173,1.93122531444919e-05,0.0230517281281126,"26S proteasome complex subunit SEM1","liver"
 "LOC115139187",143.999694322358,0.267593657748312,0.0969875037982731,3.7691344526152e-05,0.0230517281281126,"splicing factor 3B subunit 6","liver"

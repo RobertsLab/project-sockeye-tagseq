@@ -74,9 +74,9 @@ dat     <- load_counts(cfg)
 cts     <- dat$cts
 coldata <- dat$coldata
 
-print(dplyr::count(coldata, trt))
+print(dplyr::count(coldata, phenotype))
 cat("samples:", ncol(cts), " genes:", nrow(cts), "\n")
-cat("reference level:", levels(coldata$trt)[1], "\n")
+cat("reference level:", levels(coldata$phenotype)[1], "\n")
 ```
 
 ::: {.callout-important}
@@ -106,8 +106,8 @@ The model is fitted by `fit_deseq()` in `_common.R`, which notebook 05 also
 calls to draw the manuscript figures, so the tables and the figures come from
 one definition of the model. It does three things:
 
-1. Fits `~ trt` with DESeq2.
-2. Asserts that coefficient 2 is `trt_territorial_vs_social`. `social` is set
+1. Fits `~ phenotype` with DESeq2.
+2. Asserts that coefficient 2 is `phenotype_territorial_vs_social`. `social` is set
    as the reference level explicitly in `load_counts()`, so this holds by
    construction rather than by alphabetical accident (finding R3).
 3. Keeps genes with 10 or more counts in at least a third of samples. This
@@ -136,9 +136,9 @@ p <- pca(assay(vst(dds)), metadata = coldata)
 screeplot(p, axisLabSize = 18, titleLabSize = 22)
 
 bp1 <- biplot(p, x = "PC1", y = "PC2",
-              colby    = "trt",
-              colkey   = TRT_COLOURS,
-              shape    = "trt",
+              colby    = "phenotype",
+              colkey   = PHENOTYPE_COLOURS,
+              shape    = "phenotype",
               shapekey = c(territorial = 19, social = 17),
               pointSize = 4,
               showLoadings = FALSE,
@@ -162,7 +162,7 @@ bp2 <- pairsplot(p,
                  hline = 0, vline = 0,
                  pointSize = 1,
                  gridlines.major = FALSE, gridlines.minor = FALSE,
-                 colby = "trt",
+                 colby = "phenotype",
                  title = "Pairs plot", plotaxes = FALSE,
                  margingaps = unit(c(-0.01, -0.01, -0.01, -0.01), "cm"))
 bp2
@@ -206,7 +206,7 @@ different numbers of genes significant at the same 0.05 threshold.
 
 ```{r}
 #| label: contrasts
-res_table        <- results(dds, contrast = c("trt", "territorial", "social"), alpha = 0.05)
+res_table        <- results(dds, contrast = c("phenotype", "territorial", "social"), alpha = 0.05)
 res_table_normal <- lfcShrink(dds, coef = 2, res = res_table, type = "normal")
 res_table_apeglm <- lfcShrink(dds, coef = 2, res = res_table, type = "apeglm")
 res_table_ashr   <- lfcShrink(dds, coef = 2, res = res_table, type = "ashr")
@@ -275,7 +275,7 @@ annotate_genes <- function(tbl) {
   tbl %>%
     left_join(feature_table, by = "gene") %>%
     arrange(-log2FoldChange) %>%
-    mutate(treatment = cfg$tissue)
+    mutate(tissue = cfg$tissue)
 }
 
 all_genes        <- annotate_genes(res_table)
@@ -295,7 +295,7 @@ sig_genes_ashr   <- annotate_genes(filter(res_table_ashr,   padj < padj.cutoff))
 single_gene_counts <- function(sig) {
   if (nrow(sig) == 0) return(data.frame())
   do.call(rbind, lapply(sig$gene, function(locid) {
-    d <- plotCounts(dds, gene = locid, intgroup = "trt", returnData = TRUE)
+    d <- plotCounts(dds, gene = locid, intgroup = "phenotype", returnData = TRUE)
     d$gene   <- locid
     d$sample <- rownames(d)
     rownames(d) <- NULL
@@ -314,6 +314,12 @@ write.table(counts_apeglm,   out_path(cfg, cfg$prefix, "-apeglm-single-gene-coun
 write.table(counts_ashr,     out_path(cfg, cfg$prefix, "-ashr-single-gene-counts.csv"),     row.names = FALSE, sep = ",")
 ```
 
+The summary table `<tissue>-gene-counts.csv` records, per estimator, how many
+genes received an adjusted p-value (`genes_tested_*`) and how many of those
+have `padj < 0.05` (`significant_*`). Until 2026-09-27 the first set was
+labelled `DEGs_all-genes*`, which read as a count of differentially expressed
+genes; it never was (submission checklist D1).
+
 ```{r}
 #| label: write_tables
 gene_counts <- data.frame(count = c(
@@ -322,8 +328,8 @@ gene_counts <- data.frame(count = c(
   nrow(sig_genes), nrow(sig_genes_normal), nrow(sig_genes_apeglm), nrow(sig_genes_ashr)
 ), row.names = c(
   "genes_before_filtering", "genes_after_filtering", "genes_dropped",
-  "DEGs_all-genes", "DEGs_all-genes-normal", "DEGs_all-genes-apeglm", "DEGs_all-genes-ashr",
-  "DEG_unshrunken-p0.05", "DEG_normal-p0.05", "DEG_apeglm-p0.05", "DEG_ashr-p0.05"
+  "genes_tested_unshrunken", "genes_tested_normal", "genes_tested_apeglm", "genes_tested_ashr",
+  "significant_unshrunken", "significant_normal", "significant_apeglm", "significant_ashr"
 ))
 gene_counts
 
@@ -392,10 +398,10 @@ colnames(mat_sigs) <- rownames(coldata)
 mat_scaled_sigs <- t(apply(mat_sigs, 1, scale))
 colnames(mat_scaled_sigs) <- colnames(mat_sigs)
 
-side_colours <- trt_side_colours(coldata)
+side_colours <- phenotype_side_colours(coldata)
 stopifnot(length(side_colours) == ncol(mat_scaled_sigs))
 
-png(filename = out_path(cfg, cfg$heatmap_prefix, "_heatmap_pval_genes_apeglm.png"),
+png(filename = out_path(cfg, cfg$prefix, "_heatmap_pval_genes_apeglm.png"),
     res = 1200, width = 6000, height = 6000, units = "px", pointsize = 6)
 heatmap(mat_scaled_sigs, scale = "none",
         col = colorRampPalette(brewer.pal(11, "RdYlBu"))(256),

@@ -1,0 +1,12 @@
+"count"
+"genes_before_filtering",37942
+"genes_after_filtering",20105
+"genes_dropped",17837
+"genes_tested_unshrunken",18156
+"genes_tested_normal",18156
+"genes_tested_apeglm",18156
+"genes_tested_ashr",18156
+"significant_unshrunken",1653
+"significant_normal",1653
+"significant_apeglm",1653
+"significant_ashr",1653

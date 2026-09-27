@@ -15,21 +15,19 @@ PATHS <- list(
 # ---- per-tissue configuration -----------------------------------------------
 
 ## Everything that differed between the two near-identical DESeq2 notebooks
-## (finding E5) is collected here. The output file prefixes differ in case for
-## historical reasons -- liver files are "liver-*", gonad files are "GONAD-*" --
-## and are kept as they are so the committed results stay at the same paths.
+## (finding E5) is collected here. Every output file is prefixed with the
+## tissue name in lower case (liver-PCA.png, gonad-SIG-DEG-apeglm.csv, ...).
+## Gonad files were "GONAD-*" until 2026-09-27, a historical accident of the two
+## original notebooks; they were renamed so one rule covers both tissues
+## (submission checklist D1).
 tissue_config <- function(tissue) {
   cfg <- switch(
     tissue,
     liver = list(
-      prefix         = "liver",   # liver-PCA.png, liver-SIG-DEG-apeglm.csv, ...
-      heatmap_prefix = "liver",   # liver_heatmap_pval_genes_apeglm.png
       exclude        = character(0),
       pca_xlim       = c(-100, 100)
     ),
     gonad = list(
-      prefix         = "GONAD",
-      heatmap_prefix = "gonad",
       ## C05 and C17 were dropped on the basis of the MultiQC sample-correlation
       ## heatmap. In the .Rmd this was an uncommented pair of lines in gonad and
       ## the same pair commented out in liver, with no recorded criterion
@@ -40,6 +38,7 @@ tissue_config <- function(tissue) {
     stop("unknown tissue: ", tissue, " (expected 'liver' or 'gonad')")
   )
   cfg$tissue <- tissue
+  cfg$prefix <- tissue
   cfg$dir    <- file.path(PATHS$output, tissue)
   cfg
 }
@@ -137,10 +136,12 @@ load_counts <- function(cfg) {
     cts     <- cts[, keep, drop = FALSE]
   }
 
-  ## territorial is the treatment, social is the reference. Made explicit so the
-  ## sign of every log2FoldChange no longer depends on "social" happening to
-  ## sort before "territorial" alphabetically (finding R3).
-  coldata$trt    <- relevel(factor(coldata$trt), ref = "social")
+  ## Behavioural phenotype, observed at capture: territorial is compared with
+  ## social, the reference. Made explicit so the sign of every log2FoldChange no
+  ## longer depends on "social" happening to sort before "territorial"
+  ## alphabetically (finding R3). The column was called "trt" until 2026-09-27;
+  ## it is not a treatment, since phenotype was observed, not assigned.
+  coldata$phenotype <- relevel(factor(coldata$phenotype), ref = "social")
   coldata$tissue <- factor(coldata$tissue)
 
   list(cts = cts, coldata = coldata)
@@ -196,9 +197,9 @@ load_gene_annotation <- function() {
 fit_deseq <- function(dat) {
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = dat$cts,
                                         colData   = dat$coldata,
-                                        design    = ~ trt)
+                                        design    = ~ phenotype)
   dds <- DESeq2::DESeq(dds)
-  stopifnot(identical(DESeq2::resultsNames(dds)[2], "trt_territorial_vs_social"))
+  stopifnot(identical(DESeq2::resultsNames(dds)[2], "phenotype_territorial_vs_social"))
 
   n_before <- nrow(dds)
   dds <- dds[rowSums(DESeq2::counts(dds) >= 10) >= ncol(dds) / 3, ]
@@ -229,7 +230,7 @@ my_theme <- ggplot2::theme(
   legend.key       = ggplot2::element_blank()
 )
 
-## Treatment colours, derived from coldata rather than hardcoded run lengths.
+## Phenotype colours, derived from coldata rather than hardcoded run lengths.
 ## The .Rmd wrote rep("royalblue1", 15) / rep("red3", 15) for liver and 14 / 14
 ## for gonad, assuming both the group sizes and the column order (finding R4).
 ##
@@ -237,17 +238,17 @@ my_theme <- ggplot2::theme(
 ## blue and orange separate by OKLab delta E 24.7 under protanopia and 33.6 for
 ## normal vision, and both hold at least 3:1 contrast on a white page. Plots
 ## pair them with a second encoding (circle vs triangle) as well.
-TRT_COLOURS <- c(territorial = "#2a78d6", social = "#eb6834")
-TRT_SHAPES  <- c(territorial = 16, social = 17)
+PHENOTYPE_COLOURS <- c(territorial = "#2a78d6", social = "#eb6834")
+PHENOTYPE_SHAPES  <- c(territorial = 16, social = 17)
 
 ## Diverging ramp for z-scored expression heatmaps: green (low) through a
 ## neutral grey to purple (high). The poles were picked to stay distinct from
-## both treatment colours, since the heatmaps carry a treatment bar beside
+## both phenotype colours, since the heatmaps carry a phenotype bar beside
 ## them: every pair of the four clears delta E 10.9 under colour-vision
 ## deficiency and 22.3 for normal vision.
 DIVERGING <- c(low = "#0f6b45", mid = "#f0efec", high = "#762a83")
 
-trt_side_colours <- function(coldata) unname(TRT_COLOURS[as.character(coldata$trt)])
+phenotype_side_colours <- function(coldata) unname(PHENOTYPE_COLOURS[as.character(coldata$phenotype)])
 
 # ---- input integrity ---------------------------------------------------------
 

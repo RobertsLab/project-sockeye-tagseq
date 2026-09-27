@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","stat","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","stat","pvalue","padj","description","tissue"
 "LOC115131673",100.828268389963,0.512328788834676,0.114927281332966,4.4593620796394,8.22039500797565e-06,0.0230517281281126,"NADH dehydrogenase [ubiquinone] iron-sulfur protein 5-like","liver"
 "LOC115122299",289.917971707057,0.479676166477965,0.123329606524955,3.92227813441691,8.77156522328309e-05,0.0238352665667346,"mannose-binding protein C-like","liver"
 "wdr45",103.888393846575,0.467446129558833,0.114965331832425,4.06780267086817,4.74585435867113e-05,0.0230517281281126,"WD repeat domain 45","liver"
