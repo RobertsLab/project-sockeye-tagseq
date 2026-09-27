@@ -43,6 +43,11 @@ quarto render tag-seq/code/04-enrichment.qmd
 echo "=== 05 figures ==="
 quarto render tag-seq/code/05-figures.qmd
 
+# Supplementary tables. Reads the tables 02 and 04 wrote and the shared-gene
+# table 05 wrote. Writes manuscript/supplementary/.
+echo "=== 06 supplementary tables ==="
+quarto render tag-seq/code/06-supplementary-tables.qmd
+
 # Landing page. Rendered last so its links point at pages that now exist.
 echo "=== index (landing page) ==="
 quarto render index.qmd

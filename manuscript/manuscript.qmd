@@ -101,6 +101,12 @@ lk_top <- L$kegg[which.min(L$kegg$FDR), ]
 ## Variance explained by each principal component, written by notebook 05
 ## alongside the figure that shows it.
 pv  <- read.csv("figures/source-data/pca-variance.csv")
+
+## Sample table written by notebook 06 (Table S1).
+s1 <- read.csv("manuscript/supplementary/Table_S1_samples.csv")
+g_inc <- s1$library_size[s1$tissue == "gonad" & s1$included]
+g_exc <- s1[s1$tissue == "gonad" & !s1$included, ]
+mill  <- function(x) sprintf("%.2f", x / 1e6)
 pcv <- function(t, pc) sprintf("%.1f%%", pv$percent_variance[pv$tissue == t & pv$PC == pc])
 
 ## Library depth from the count matrices themselves.
@@ -223,6 +229,9 @@ and gene-level counts were extracted with prepDE.py. Mean overall alignment rate
 were 88.7% (SD 2.2) for gonad and 86.5% (SD 0.8) for liver libraries. Two gonad
 samples (C05 and C17) clustered apart from all others in the sample-correlation
 heatmap and were excluded before modelling, leaving 28 gonad and 30 liver libraries.
+They were also the two smallest gonad libraries, with `r mill(g_exc$library_size[1])` and
+`r mill(g_exc$library_size[2])` million gene-assigned counts against at least
+`r mill(min(g_inc))` million in every retained gonad library (Table S1).
 
 ## Differential expression
 
@@ -283,7 +292,7 @@ from the committed result tables at render time.
 ## Sequencing and sample quality
 
 Libraries yielded `r depth_txt("gonad")` gene-assigned counts per gonad sample and
-`r depth_txt("liver")` per liver sample (mean ± SD). Of the `r fmt(n_genes)`
+`r depth_txt("liver")` per liver sample (mean ± SD; Table S1). Of the `r fmt(n_genes)`
 annotated genes, `r fmt(g_kept)` (gonad) and `r fmt(l_kept)` (liver) passed the
 minimum-count filter, and `r fmt(g_tested)` and `r fmt(l_tested)` respectively
 received an adjusted p-value after independent filtering. Expression of sex-linked
@@ -313,7 +322,7 @@ majority, of transcriptome-wide variation in either tissue.
 ## Liver
 
 Only `r fmt(l_sig)` of `r fmt(l_tested)` tested liver genes differed between
-phenotypes at an adjusted p below 0.05 (@fig-overview B, C; @tbl-liver), and fold
+phenotypes at an adjusted p below 0.05 (@fig-overview B, C; Table S2), and fold
 changes were modest (median |log~2~ fold change| `r formatC(l_medlfc, format = "f", digits = 2)`;
 one gene beyond two-fold). `r fmt(l_up)` genes were more highly expressed in
 territorial fish and `r fmt(l_down)` in social fish. The territorial-high set was
@@ -328,12 +337,6 @@ lipoprotein receptor-related protein 1. No GO term or KEGG pathway was enriched
 (`r lgo_sig` and `r lk_sig` at FDR < 0.05); the closest was
 `r tolower(lk_top$name)` (`r lk_top$numDEInCat` of `r lk_top$numInCat` pathway genes,
 FDR `r formatC(lk_top$FDR, format = "f", digits = 2)`).
-
-```{r}
-#| label: tbl-liver
-#| tbl-cap: !expr sprintf("All %d liver genes differentially expressed between territorial and social sockeye (adjusted p < 0.05). Positive fold changes indicate higher expression in territorial fish. LOC identifiers are NCBI gene symbols for genes without an assigned name.", l_sig)
-kable(gene_tbl(L$sig, by = "lfc"), align = c("l", "l", "r", "r"))
-```
 
 ## Gonad
 
@@ -354,14 +357,14 @@ potassium channel.
 
 ```{r}
 #| label: tbl-gonad
-#| tbl-cap: "The 20 gonad genes with the largest absolute shrunken fold change between territorial and social sockeye (adjusted p < 0.05). Positive values indicate higher expression in territorial fish."
+#| tbl-cap: "The 20 gonad genes with the largest absolute shrunken fold change between territorial and social sockeye (adjusted p < 0.05). Positive values indicate higher expression in territorial fish. Every tested gene is in Table S3."
 kable(gene_tbl(G$sig, n = 20, by = "lfc"), align = c("l", "l", "r", "r"))
 ```
 
 ## Functional enrichment in the gonad
 
 Over-representation analysis recovered a coherent programme (@fig-enrichment;
-@tbl-kegg, @tbl-go).
+@tbl-kegg; Table S4).
 `r fmt(k_sig)` KEGG pathways were enriched at FDR < 0.05, led by oxidative
 phosphorylation (`r oxphos$numDEInCat` of `r oxphos$numInCat` pathway genes
 differentially expressed, FDR `r sci(oxphos$FDR)`) and ribosome
@@ -381,20 +384,11 @@ protein and generating more ATP than that of social fish.
 
 ```{r}
 #| label: tbl-kegg
-#| tbl-cap: "KEGG pathways over-represented among gonad genes differentially expressed between territorial and social sockeye (hypergeometric test, FDR < 0.05). Universe: all genes with an adjusted p-value that map to at least one pathway."
+#| tbl-cap: "KEGG pathways over-represented among gonad genes differentially expressed between territorial and social sockeye (hypergeometric test, FDR < 0.05). Universe: all genes with an adjusted p-value that map to at least one pathway. Every tested pathway, for both tissues, is in Table S5."
 G$kegg %>% filter(FDR < 0.05) %>%
   transmute(Pathway = category, Name = name, `DE genes` = numDEInCat, `Pathway genes` = numInCat,
             p = sapply(over_represented_pvalue, sci), FDR = sapply(FDR, sci)) %>%
   kable(align = c("l", "l", "r", "r", "r", "r"))
-```
-
-```{r}
-#| label: tbl-go
-#| tbl-cap: !expr sprintf("Gene Ontology terms over-represented among gonad genes differentially expressed between territorial and social sockeye (hypergeometric test, FDR < 0.05; %d terms). BP, biological process; CC, cellular component; MF, molecular function.", go_sig)
-G$go %>% filter(FDR < 0.05) %>%
-  transmute(Term = category, Description = term, Ontology = ontology, `DE genes` = numDEInCat, `Term genes` = numInCat,
-            FDR = sapply(FDR, sci)) %>%
-  kable(align = c("l", "l", "c", "r", "r", "r"))
 ```
 
 ![KEGG pathways and Gene Ontology terms over-represented among gonad genes differentially expressed between territorial and social sockeye (hypergeometric test, FDR < 0.05). The horizontal position is the share of each category's genes that are differentially expressed; the dashed line marks the same share across all tested genes. Point size gives the number of differentially expressed genes in the category and colour its FDR. Categories are ordered by that share within each panel.](../figures/fig2-enrichment.png){#fig-enrichment}
@@ -403,14 +397,14 @@ G$go %>% filter(FDR < 0.05) %>%
 
 `r length(shared)` genes were differentially expressed in both tissues
 (`r paste(shared, collapse = ", ")`), and `r shared_same_dir` of them changed in the
-same direction in both (@fig-genes B). They include NADH dehydrogenase subunits NDUFS5 and NDUFB5,
+same direction in both (@fig-genes B; Table S6). They include NADH dehydrogenase subunits NDUFS5 and NDUFB5,
 ATP5MPL, a cytochrome b-c1 complex subunit, the oligosaccharyltransferase subunit
 OSTC, proteasome subunit SEM1 and splicing factor 3B subunit 6, each higher in
 territorial fish in both tissues. This is a small set, but its composition mirrors at
 the level of individual genes the translation and energy-metabolism programme that
 dominates the gonad.
 
-![Named genes and genes shared between tissues. (A) Normalised counts in gonad for the genes discussed by name in the text, by phenotype (territorial, blue circles; social, orange triangles), on a log scale; boxes show the median and interquartile range. Fold changes and adjusted p-values for all six genes are in the full gonad results table (see Data and code availability). (B) Shrunken log~2~ fold changes in liver and gonad for every gene differentially expressed in both tissues; the dashed line marks equal change in the two tissues, and labelled genes are those named in the text.](../figures/fig3-genes.png){#fig-genes}
+![Named genes and genes shared between tissues. (A) Normalised counts in gonad for the genes discussed by name in the text, by phenotype (territorial, blue circles; social, orange triangles), on a log scale; boxes show the median and interquartile range. Fold changes and adjusted p-values for all six genes are in Table S3. (B) Shrunken log~2~ fold changes in liver and gonad for every gene differentially expressed in both tissues; the dashed line marks equal change in the two tissues, and labelled genes are those named in the text.](../figures/fig3-genes.png){#fig-genes}
 
 # Discussion
 
@@ -568,6 +562,37 @@ deposited in the NCBI Sequence Read Archive **[[BioProject accession to be added
 # Author contributions and funding
 
 **[[To be completed.]]**
+
+# Supporting information
+
+Tables S1–S6 are provided as comma-separated files, written by
+`tag-seq/code/06-supplementary-tables.qmd` from the result tables; column
+definitions are in `manuscript/supplementary/README.md`.
+
+**Table S1.** Libraries sequenced: sample, tissue, behavioural phenotype,
+whether the library was retained for analysis and, if not, why, total
+gene-assigned counts, and the number of genes with at least one and at least
+ten counts. Includes the two excluded gonad libraries.
+
+**Table S2.** Differential expression between territorial and social fish in
+liver, for every gene that received an adjusted p-value (`r fmt(l_tested)` genes).
+Gives mean normalised count, unshrunken log~2~ fold change and standard error,
+Wald statistic, p-value and Benjamini–Hochberg adjusted p-value, and the fold
+change and standard error from each of the apeglm, ashr and normal shrinkage
+estimators. Adjusted p-values do not depend on the estimator. Positive fold
+changes denote higher expression in territorial fish.
+
+**Table S3.** As Table S2, for gonad (`r fmt(g_tested)` genes).
+
+**Table S4.** Gene Ontology over-representation among differentially expressed
+genes, for every term tested in either tissue: number of differentially
+expressed genes in the term, number of tested genes in the term, hypergeometric
+p-value and Benjamini–Hochberg FDR.
+
+**Table S5.** As Table S4, for KEGG pathways.
+
+**Table S6.** The `r length(shared)` genes differentially expressed in both
+tissues, with their apeglm-shrunken fold changes and adjusted p-values in each.
 
 # References
 

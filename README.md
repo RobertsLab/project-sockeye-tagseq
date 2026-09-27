@@ -53,6 +53,7 @@ run on Raven with access to Gannet storage, not on a laptop.
 | `03-gene-tables.qmd` | `*-SIG-DEG-apeglm.csv` | `tag-seq/gene_tables/` |
 | `04-enrichment.qmd` | `*-ALL-DEG-apeglm.csv`, GAF, KEGG | `tag-seq/GO_output/<tissue>/` |
 | `05-figures.qmd` | count matrices, `*-apeglm.csv`, enrichment tables | `figures/` |
+| `06-supplementary-tables.qmd` | count matrices, all DE and enrichment tables | `manuscript/supplementary/` |
 
 Input integrity is recorded in `CHECKSUMS.sha256` and checked at the start of
 every render (a mismatch warns, it does not stop). Verify by hand with

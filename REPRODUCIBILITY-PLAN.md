@@ -707,6 +707,25 @@ instead of typing them.
 
 ---
 
+## Supplementary tables (2026-09-27, checklist C3)
+
+`tag-seq/code/06-supplementary-tables.qmd` writes Tables S1–S6 to
+`manuscript/supplementary/`. It computes no statistics; it joins the committed
+tables and asserts that the four shrinkage tables carry identical p-values and
+adjusted p-values, that the significant sets match the `SIG-DEG` tables, and
+that the shared-gene set matches Figure 3 B's source data.
+
+**Bearing on R5/E9 (the C05/C17 exclusion).** Table S1 lists every library,
+including the excluded ones. C05 and C17 are the two smallest gonad
+libraries: 1.97 and 2.14 million gene-assigned counts, against 3.39–5.77
+million for the 28 retained. This is the first evidence for the exclusion that
+can be computed from the repository. It is not the MultiQC correlation
+evidence the decision was originally based on, which is still absent, so R5/E9
+stays open; but a library-size criterion is now available if the authors
+choose to state the exclusion that way.
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no
