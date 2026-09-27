@@ -198,12 +198,31 @@ ggexport(filename = out_path(cfg, cfg$prefix, "-pheatmap.png"),
 
 ## Contrasts and shrinkage
 
+The results are computed once, with `alpha = 0.05`, and that object is passed
+to every shrinkage estimator through `res =`. Shrinkage changes only the fold
+change and its standard error; the p-values, the adjusted p-values and the set
+of genes that survive independent filtering all come from `res_table`, so every
+table below makes the same significance calls.
+
+`alpha` matters here because it is the target DESeq2's independent filtering
+optimises for. Called without `res =`, `lfcShrink()` computes its own results
+with the default `alpha = 0.1`, which filters a different set of low-count
+genes and so produces different adjusted p-values. Before this was fixed the
+unshrunken table (alpha 0.05) and the three shrunken tables (alpha 0.1) called
+different numbers of genes significant at the same 0.05 threshold.
+
 ```{r}
 #| label: contrasts
 res_table        <- results(dds, contrast = c("trt", "territorial", "social"), alpha = 0.05)
-res_table_normal <- lfcShrink(dds, coef = 2, type = "normal")
-res_table_apeglm <- lfcShrink(dds, coef = 2, type = "apeglm")
-res_table_ashr   <- lfcShrink(dds, coef = 2, type = "ashr")
+res_table_normal <- lfcShrink(dds, coef = 2, res = res_table, type = "normal")
+res_table_apeglm <- lfcShrink(dds, coef = 2, res = res_table, type = "apeglm")
+res_table_ashr   <- lfcShrink(dds, coef = 2, res = res_table, type = "ashr")
+
+## Every table must carry the same adjusted p-values as res_table.
+for (shrunk in list(res_table_normal, res_table_apeglm, res_table_ashr)) {
+  stopifnot(identical(rownames(shrunk), rownames(res_table)),
+            identical(shrunk$padj, res_table$padj))
+}
 ```
 
 ```{r}
