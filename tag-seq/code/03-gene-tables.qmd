@@ -4,20 +4,15 @@ subtitle: "Splitting the significant DEGs by annotation status"
 date: today
 ---
 
-Replaces `3_generate_gene_tables-salmon.Rmd`, which loaded `liver` and `gonad`
-and then operated on `control_ploidy`, `heat_ploidy`, `diploid_heat` and five
-other objects that never existed — leftovers from an oyster ploidy ×
-multistressor experiment. It also read the DESeq2 CSVs with `sep=" "` when they
-were written with `sep=","`, and its final chunk did not parse (finding B2).
+Splits each tissue's significant genes (apeglm, adjusted p < 0.05) by
+annotation status:
 
-Whatever produced the committed `gene_tables/` was therefore not in the
-repository. The rule has been reconstructed from those outputs and verified
-against both tissues:
-
-1. Drop genes with **no description** — no match in the LOCID table. These are
-   the rows the old oyster code called `LOCNA`.
+1. Genes with **no description** in the NCBI feature table are set aside.
 2. Of the rest, **uncharacterized** are those whose description begins with
    `uncharacterized`; everything else is **characterized**.
+
+It writes the two sets per tissue, the list of annotated gene identifiers, and
+a summary of the uncharacterized share.
 
 ```{r}
 #| label: setup
@@ -55,15 +50,8 @@ for (t in tables) {
 }
 ```
 
-::: {.callout-important}
-## Output format changed deliberately
-
-The committed tables were written with `quote = FALSE` and `sep = ","`, but
-descriptions contain commas — `uncharacterized LOC115129809, transcript variant X3`.
-In `gonad_characterized.txt` only 754 of 1,280 rows have the expected 8 fields;
-526 have 9, 10 or 11 and cannot be read back correctly. These are now written as
-properly quoted CSV. The rows and values are unchanged; only the quoting is.
-:::
+The tables are written as quoted CSV, because descriptions contain commas
+(`uncharacterized LOC115129809, transcript variant X3`).
 
 ```{r}
 #| label: write_tables

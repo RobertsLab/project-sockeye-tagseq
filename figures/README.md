@@ -20,18 +20,10 @@ double-column width with 7 pt text.
 
 Colours are validated for colour-vision deficiency rather than chosen by eye;
 the values and the validation results are recorded next to `PHENOTYPE_COLOURS` and
-`DIVERGING` in `tag-seq/code/_common.R`. Treatment is always shown by shape as
+`DIVERGING` in `tag-seq/code/_common.R`. Phenotype is always shown by shape as
 well as colour.
 
 These files are tracked so the manuscript renders without re-running the
 analysis. `check-reproduction.R` does not compare them: images differ in bytes
 on every render, and the source-data tables are derived from the result tables
 it already checks.
-
-## History
-
-This directory used to hold `figure_X.png`, exported from a hand-assembled
-PowerPoint file (`figure_X.pptx`) that no script produced (finding E11). After
-the independent-filtering fix of 2026-09-26 its heatmap panels showed gene sets
-that no longer matched the results. Both files were removed when notebook 05
-replaced them; they remain in the git history.

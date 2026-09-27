@@ -16,11 +16,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 This notebook runs the DESeq2 analysis for **one tissue**, chosen by the
-`tissue` parameter. It replaces `2_DESeq2_analysis-salmon-liver.Rmd` and
-`2_DESeq2_analysis-salmon-gonad.Rmd`, which were 571 and 582 lines differing in
-five places (finding E5).
+`tissue` parameter: territorial against social fish, with social as the
+reference, reporting genes at adjusted p < 0.05.
 
-Render both tissues with:
+`./render-all.sh` renders it for both tissues. To render one:
 
 ```bash
 quarto render tag-seq/code/02-differential-expression.qmd -P tissue:liver
@@ -54,16 +53,14 @@ cfg[c("tissue", "prefix", "dir", "exclude")]
 
 ## Load data
 
-Samples are matched between the count matrix and the treatment table **by name**,
-not by column position. `prepDE.py` names columns after the GTF files
-(`01B_S43_R1.gtf`); the treatment tables use `B01`. `load_counts()` derives one
+Samples are matched between the count matrix and the phenotype table **by
+name**, not by column position. `prepDE.py` names columns after the GTF files
+(`01B_S43_R1.gtf`); the phenotype tables use `B01`. `load_counts()` derives one
 from the other and asserts the two sets are identical before aligning them.
-
-The previous code assigned `colnames(cts) <- row.names(trt_list)` positionally
-and then "checked" it with `all(colnames(cts) %in% rownames(coldata))`, which is
-unconditionally `TRUE` after such a rename (finding R1). The assignment happened
-to be correct for the committed matrices — verified — but nothing would have
-caught a reordered re-run.
+Gene identifiers are the part of each StringTie row name after the pipe
+(`gene-arhgap8|arhgap8` gives `arhgap8`, `gene-LOC115144855|LOC115144855` gives
+`LOC115144855`), which is unique across all 37,942 genes, and descriptions come
+from the NCBI feature table for the assembly, which covers 37,929 of them.
 
 ```{r}
 #| label: load_data
@@ -79,27 +76,6 @@ cat("samples:", ncol(cts), " genes:", nrow(cts), "\n")
 cat("reference level:", levels(coldata$phenotype)[1], "\n")
 ```
 
-::: {.callout-important}
-## Gene identifiers were repaired
-
-StringTie row names are `gene-<id>|<id>`, and the identifier after the pipe is a
-`LOC` number for genes with no assigned symbol and a real symbol for the rest.
-The `.Rmd` split each name on the literal string `LOC` and kept the third piece,
-which works for `LOC115144855` and turns `gene-arhgap8|arhgap8` into the string
-`LOCNA` — for **4,731 genes, 12.5% of the annotation**, and disproportionately
-the well-characterised ones.
-
-Because `data.frame()` de-duplicates row names, those genes did not disappear:
-they reached the published tables as `LOCNA.1`, `LOCNA.2292` and so on —
-identifiers that correspond to nothing, join to nothing, and were therefore
-dropped from the gene tables as "no description". In the committed results that
-was 3 of 31 significant liver genes and **309 of 1,630 significant gonad genes**.
-
-Identifiers are now taken from after the pipe, which is unique across all 37,942
-genes, and descriptions come from the assembly feature table, which covers 37,929
-of them and agrees with the old LOCID table on all 33,210 they share.
-:::
-
 ## Fit the model
 
 The model is fitted by `fit_deseq()` in `_common.R`, which notebook 05 also
@@ -107,13 +83,11 @@ calls to draw the manuscript figures, so the tables and the figures come from
 one definition of the model. It does three things:
 
 1. Fits `~ phenotype` with DESeq2.
-2. Asserts that coefficient 2 is `phenotype_territorial_vs_social`. `social` is set
-   as the reference level explicitly in `load_counts()`, so this holds by
-   construction rather than by alphabetical accident (finding R3).
+2. Asserts that coefficient 2 is `phenotype_territorial_vs_social`, which
+   holds because `load_counts()` sets `social` as the reference level.
 3. Keeps genes with 10 or more counts in at least a third of samples. This
-   filtering happens *after* `DESeq()`, so dispersions were estimated on the
-   full matrix — preserved from the original, which the committed results
-   depend on.
+   filtering happens *after* `DESeq()`, so dispersions and size factors are
+   estimated on the full matrix.
 
 ```{r}
 #| label: deseq
@@ -173,9 +147,8 @@ bp3     <- pheatmap(rld_cor, annotation = coldata[, 1:2])
 bp3
 ```
 
-Exports are written to full paths. The original wrapped these in
-`setwd("DESEQ_output/<tissue>")` followed by two `setwd('..')` calls, which
-knitr resets at every chunk boundary (finding R7).
+The ordination and clustering figures are written to this tissue's results
+directory.
 
 ```{r}
 #| label: export_ordination
@@ -201,9 +174,8 @@ table below makes the same significance calls.
 `alpha` matters here because it is the target DESeq2's independent filtering
 optimises for. Called without `res =`, `lfcShrink()` computes its own results
 with the default `alpha = 0.1`, which filters a different set of low-count
-genes and so produces different adjusted p-values. Before this was fixed the
-unshrunken table (alpha 0.05) and the three shrunken tables (alpha 0.1) called
-different numbers of genes significant at the same 0.05 threshold.
+genes and so produces different adjusted p-values; the shrunken tables would
+then disagree with the unshrunken one about which genes are significant.
 
 ```{r}
 #| label: contrasts
@@ -241,8 +213,7 @@ draw_ma <- function() {
 }
 draw_ma()
 
-## PNG only. This was a PDF of 2-3 MB per tissue holding tens of thousands of
-## vector points; gonad also carried a 2022 MA_plots.png that no code wrote.
+## PNG: as a vector PDF, tens of thousands of points made 2-3 MB per tissue.
 png(filename = out_path(cfg, "MA_plots.png"), width = 10, height = 4, units = "in", res = 200)
 draw_ma()
 invisible(dev.off())
@@ -250,13 +221,8 @@ invisible(dev.off())
 
 ## Results tables
 
-Significance is `padj < 0.05`, and only that.
-
-The previous code also defined `lfc.cutoff <- 1.5` and `svalue.cutoff <- 0.005`,
-never used them, and then labelled its outputs
-`DEG_apeglm-s0.005_lfc1.5` — describing a filter that never ran (finding R2).
-The unused variables are gone and the labels now say what was actually done. The
-counts themselves are unchanged.
+Significance is `padj < 0.05`, and only that: no fold-change or s-value
+threshold is applied.
 
 ```{r}
 #| label: tidy_tables
@@ -303,8 +269,6 @@ sig_genes_ashr   <- annotate_genes(filter(res_table_ashr,   padj < padj.cutoff))
 The four estimators flag exactly the same genes, because they share one set of
 adjusted p-values. That is asserted here, and it is why one table of normalised
 counts serves all four: the counts depend on the gene, not on the estimator.
-Until 2026-09-27 there were four copies of that table, identical but for row
-order (submission checklist D2).
 
 ```{r}
 #| label: single_gene_counts
@@ -330,9 +294,8 @@ write.table(single_gene_counts(sig_genes_apeglm),
 
 The summary table `<tissue>-gene-counts.csv` records, per estimator, how many
 genes received an adjusted p-value (`genes_tested_*`) and how many of those
-have `padj < 0.05` (`significant_*`). Until 2026-09-27 the first set was
-labelled `DEGs_all-genes*`, which read as a count of differentially expressed
-genes; it never was (submission checklist D1).
+have `padj < 0.05` (`significant_*`), together with the gene counts before and
+after the reporting filter.
 
 ```{r}
 #| label: write_tables
@@ -374,9 +337,7 @@ volcano <- function(tbl) {
 }
 
 ## Unshrunken and apeglm, shown here; only apeglm, the estimate the manuscript
-## uses, is saved. Eight volcano PNGs per tissue were written until 2026-09-27,
-## one per estimator for all and for significant genes (submission checklist
-## D2); the manuscript's volcano plots are drawn by notebook 05.
+## uses, is saved. The manuscript's volcano plots are drawn by notebook 05.
 print(volcano(all_genes) + ggtitle("unshrunken"))
 
 p <- volcano(all_genes_apeglm) + ggtitle("apeglm")
@@ -387,9 +348,9 @@ ggsave(out_path(cfg, "Volcano_all_genes_apeglm.png"), plot = p,
 
 ## Expression heatmap
 
-Column annotation colours are derived from `coldata`. The previous code wrote
-`rep("royalblue1", 15)` / `rep("red3", 15)` for liver and `14` / `14` for gonad,
-hardcoding both the group sizes and the column order (finding R4).
+Z-scored regularised-log expression of every significant gene. The column
+colours are looked up per sample from `coldata`, so they follow the samples
+whatever the group sizes or column order.
 
 ```{r}
 #| label: heatmap

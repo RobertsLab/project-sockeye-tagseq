@@ -103,7 +103,7 @@ de_table <- function(tissue) {
     read.csv(path, stringsAsFactors = FALSE)
   }
   ## apeglm and unshrunken tables are tracked; normal and ashr are regenerated
-  ## into the untracked alternatives/ folder on every render (checklist D2).
+  ## into the untracked alternatives/ folder on every render.
   un <- rd(out_path(cfg, cfg$prefix, "-ALL-DEG.csv"))
   ap <- rd(out_path(cfg, cfg$prefix, "-ALL-DEG-apeglm.csv"))
   as <- rd(file.path(cfg$dir, "alternatives", paste0(cfg$prefix, "-ALL-DEG-ashr.csv")))

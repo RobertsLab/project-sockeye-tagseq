@@ -401,14 +401,26 @@ The notebooks, the directory READMEs and `_common.R` carry the audit narrative
 ("finding R5", "replaces the .Rmd which…", what the 2023 code did wrong). That
 record belongs in `REPRODUCIBILITY-PLAN.md`, which already holds it.
 
-- [ ] Rewrite the prose in notebooks 02–04 and `_common.R` to describe the
+- [x] Rewrite the prose in notebooks 02–04 and `_common.R` to describe the
       analysis as it is; move each "finding" reference and each comparison
       with the deleted code into the plan document, keyed by finding number.
-- [ ] Same for `tag-seq/data/README.md`, `tag-seq/genome/README.md`,
+- [x] Same for `tag-seq/data/README.md`, `tag-seq/genome/README.md`,
       `tag-seq/sequences/README.md` and `figures/README.md`.
 - [ ] Remove the callouts in `index.qmd` that mark the gonad counts as
       provisional and the raw data as undeposited — by resolving A3 and A5,
-      not by deleting the text.
+      not by deleting the text. *(Kept: A3 and A5 are still open. Both callouts
+      now state current facts, including the library-size evidence, and point
+      to A3 and A5 instead of to audit findings.)*
+
+Done 2026-09-27, except the callouts. Notebooks 02–06, `_common.R` and the
+four READMEs describe the analysis as it is; 39 passages of audit narrative
+(17,000 characters) moved verbatim into `REPRODUCIBILITY-PLAN.md`, "Notes moved
+from the notebooks and READMEs", each labelled with its finding. The
+executable code of every edited file was compared line by line with the
+previous commit and is unchanged. Two stale statements were corrected on the
+way: the exclusion comment said a later phase had committed the MultiQC
+evidence, which never happened, and the genome README said only notebook 04
+reads the feature table.
 
 ### D5. Empty directories and lab logistics
 
