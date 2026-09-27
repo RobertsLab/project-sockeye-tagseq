@@ -63,7 +63,7 @@ sample_table <- function(tissue) {
   data.frame(
     sample             = colnames(dat$cts),
     tissue             = tissue,
-    phenotype          = as.character(dat$coldata$trt),
+    phenotype          = as.character(dat$coldata$phenotype),
     included           = !colnames(dat$cts) %in% excluded,
     exclusion_reason   = ifelse(colnames(dat$cts) %in% excluded,
                                 "outlier in sample-correlation clustering", ""),

@@ -8,8 +8,8 @@ with nothing to say whether it was still needed.
 |---|---|---|---|
 | `onerka_gene_count_matrix-gonad.csv` | 4.0 MB | **input** — gene-level counts, 37,942 genes x 30 samples, from `prepDE.py` | `02` via `load_counts()` |
 | `onerka_gene_count_matrix-liver.csv` | 3.7 MB | **input** — same, liver | `02` via `load_counts()` |
-| `treatments-gonad.csv` | 599 B | **input** — sample to treatment map, 15 territorial / 15 social | `02` via `load_counts()` |
-| `treatments-liver.csv` | 599 B | **input** — same, liver | `02` via `load_counts()` |
+| `treatments-gonad.csv` | 605 B | **input** — sample to behavioural phenotype map (column `phenotype`), 15 territorial / 15 social | `02` via `load_counts()` |
+| `treatments-liver.csv` | 605 B | **input** — same, liver | `02` via `load_counts()` |
 | `transcript_count_matrix-gonad.csv` | 6.1 MB | provenance only — transcript-level counts from the same `prepDE.py` run | nothing |
 | `transcript_count_matrix-liver.csv` | 5.7 MB | provenance only — same, liver | nothing |
 | `onerka_merged-liver.gtf` | 21 MB | provenance only — StringTie merged annotation used to produce the liver matrices | nothing |

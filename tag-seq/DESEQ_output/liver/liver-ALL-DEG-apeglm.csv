@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","tissue"
 "LOC115112827",73.9283352640066,3.5595669441362,0.328616119254887,0.00107281920464408,0.0575369878701222,"serum amyloid A-5 protein-like","liver"
 "LOC115143107",70.0593520219347,2.91509774131568,0.559185401937977,0.188930122215003,0.484057717936395,"uncharacterized LOC115143107, transcript variant X1","liver"
 "LOC115138574",64.640341795556,1.57433936228586,0.236797044425314,0.0279722283494797,0.213911449817034,"sacsin-like, transcript variant X3","liver"

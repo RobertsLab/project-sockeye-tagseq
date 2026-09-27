@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","tissue"
 "LOC115129809",12.4538997634804,1.12221050513971,0.375360229583154,0.000114030648019803,0.00648615570193903,"uncharacterized LOC115129809, transcript variant X3","gonad"
 "LOC115105703",63.6306973269115,1.11313140623208,0.378281345639709,0.000128737544546295,0.00695642517494802,"uncharacterized LOC115105703, transcript variant X3","gonad"
 "LOC115112262",75.4604258055194,1.10994571003977,0.302949032661462,1.15397653935476e-05,0.00218255135740007,"uncharacterized LOC115112262, transcript variant X2","gonad"

@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","tissue"
 "LOC115137856",837.722347044338,3.44513189076828,1.14261420838838,3.30047561922545e-08,0.0001496092066979,"equistatin-like","gonad"
 "LOC115143451",21.0548421149284,1.83343470053743,0.912171103893368,2.73977639153068e-07,0.000336519162150198,"centromere protein S-like","gonad"
 "LOC115112426",197.66563369121,1.62598224724378,0.568725382189517,4.12010373149096e-08,0.0001496092066979,"serum amyloid A-5 protein-like","gonad"

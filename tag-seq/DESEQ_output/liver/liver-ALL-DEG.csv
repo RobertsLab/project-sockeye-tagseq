@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","stat","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","stat","pvalue","padj","description","tissue"
 "LOC115139445",109.218678611193,1.78400259512747,0.518638137804455,3.43978289502516,0.000582180994728829,0.0466002202576675,"protein broad-minded-like, transcript variant X5","liver"
 "LOC115107125",108.583073596139,1.24122923341734,0.433646289591738,2.86230797589876,0.00420568020434693,0.0963575161217609,"anoctamin-4-like, transcript variant X2","liver"
 "LOC115122299",289.917971707057,1.10372856196278,0.281399871232452,3.92227813441691,8.77156522328309e-05,0.0238352665667346,"mannose-binding protein C-like","liver"

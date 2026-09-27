@@ -1,4 +1,4 @@
-"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","treatment"
+"gene","baseMean","log2FoldChange","lfcSE","pvalue","padj","description","tissue"
 "LOC115122299",289.917971707057,0.93849092810142,0.309495742565503,8.77156522328309e-05,0.0238352665667346,"mannose-binding protein C-like","liver"
 "LOC115131673",100.828268389963,0.66253833728075,0.177224932847402,8.22039500797565e-06,0.0230517281281126,"NADH dehydrogenase [ubiquinone] iron-sulfur protein 5-like","liver"
 "LOC115103576",155.560057498132,0.662169354179396,0.271999041818688,0.000517085627288074,0.0466002202576675,"dispanin subfamily A member 2b-like","liver"

@@ -29,11 +29,11 @@ one composite figure and four tables. The manuscript is *not* rendered by CI.
       were ovarian, but no notebook computes the marker values it quotes
       (112–410 CPM for *foxl2*), and `amh` — a testis marker — is itself
       differentially expressed (log2FC −0.90, padj 0.032, baseMean 87) in
-      `tag-seq/DESEQ_output/gonad/GONAD-ALL-DEG-apeglm.csv`. Either put the
+      `tag-seq/DESEQ_output/gonad/gonad-ALL-DEG-apeglm.csv`. Either put the
       marker-gene check into notebook 02 (or a new notebook) so the numbers are
       computed, or remove the inference and rely on the records.
 - [ ] If sexes are mixed across phenotypes, re-fit the gonad model with sex as
-      a covariate (`~ sex + trt`) and re-derive every downstream table. This
+      a covariate (`~ sex + phenotype`) and re-derive every downstream table. This
       could change the central result.
 - [ ] If maturity stage or gonadosomatic index was recorded, test it as a
       covariate. The Discussion already concedes that territorial fish may
@@ -314,14 +314,24 @@ them in the same pass as B1 and rebaseline `check-reproduction.R` once.
 
 ### D1. Naming that will confuse supplementary-table readers
 
-- [ ] Use one case for the per-tissue output prefixes (`liver-*` and
+- [x] Use one case for the per-tissue output prefixes (`liver-*` and
       `GONAD-*` today; `tissue_config()` in `tag-seq/code/_common.R`).
-- [ ] Rename the `treatment` column in the DE tables, which holds the tissue
+- [x] Rename the `treatment` column in the DE tables, which holds the tissue
       name (`annotate_genes()` in notebook 02), to `tissue`.
-- [ ] Rename the `DEGs_all-genes*` rows of `*-gene-counts.csv` to say
+- [x] Rename the `DEGs_all-genes*` rows of `*-gene-counts.csv` to say
       "genes tested"; they are not DEG counts.
-- [ ] Rename `trt` to `phenotype` in `tag-seq/data/treatments-*.csv`, the
+- [x] Rename `trt` to `phenotype` in `tag-seq/data/treatments-*.csv`, the
       DESeq2 design and the plots, and re-record the input checksums.
+
+Done 2026-09-27. Gonad outputs are `gonad-*`, renamed with `git mv` so their
+history follows. The DE and gene tables have a `tissue` column. The summary
+rows are `genes_tested_*` and `significant_*`. `trt` is `phenotype`
+everywhere: the input tables (checksums re-recorded), the model design and
+term (`phenotype_territorial_vs_social`), the single-gene-count tables, the
+plots and the colour constants. A full render, compared table by table with
+the previous commit through the rename map, matched exactly on all 41 result
+tables, and the supplementary tables came out byte-identical, so only names
+changed. `treatments-*.csv` keeps its filename.
 
 ### D2. Track only the results the manuscript uses
 
