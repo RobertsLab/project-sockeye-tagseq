@@ -182,6 +182,29 @@ load_gene_annotation <- function() {
              stringsAsFactors = FALSE)
 }
 
+## Fit the DESeq2 model for one tissue and apply the reporting filter.
+##
+## Notebook 02 writes the result tables from this object and notebook 05 draws
+## the manuscript figures from it, so both work from one definition of the
+## model rather than two copies that could drift apart.
+##
+## social is the reference level (set in load_counts), so coefficient 2 is the
+## territorial-vs-social effect; that is asserted, not assumed (finding R3).
+## Genes are then kept if at least a third of samples have 10 or more counts.
+## The filter is applied *after* DESeq(), so dispersions and size factors were
+## estimated on the full matrix -- the order the committed results depend on.
+fit_deseq <- function(dat) {
+  dds <- DESeq2::DESeqDataSetFromMatrix(countData = dat$cts,
+                                        colData   = dat$coldata,
+                                        design    = ~ trt)
+  dds <- DESeq2::DESeq(dds)
+  stopifnot(identical(DESeq2::resultsNames(dds)[2], "trt_territorial_vs_social"))
+
+  n_before <- nrow(dds)
+  dds <- dds[rowSums(DESeq2::counts(dds) >= 10) >= ncol(dds) / 3, ]
+  list(dds = dds, n_before = n_before)
+}
+
 ## Kept for the notebooks that only need gene -> description.
 load_feature_table <- function() {
   load_gene_annotation()[, c("gene", "description")]
@@ -209,7 +232,20 @@ my_theme <- ggplot2::theme(
 ## Treatment colours, derived from coldata rather than hardcoded run lengths.
 ## The .Rmd wrote rep("royalblue1", 15) / rep("red3", 15) for liver and 14 / 14
 ## for gonad, assuming both the group sizes and the column order (finding R4).
-TRT_COLOURS <- c(territorial = "royalblue1", social = "red3")
+##
+## The hues are validated for colour-vision deficiency, not chosen by eye:
+## blue and orange separate by OKLab delta E 24.7 under protanopia and 33.6 for
+## normal vision, and both hold at least 3:1 contrast on a white page. Plots
+## pair them with a second encoding (circle vs triangle) as well.
+TRT_COLOURS <- c(territorial = "#2a78d6", social = "#eb6834")
+TRT_SHAPES  <- c(territorial = 16, social = 17)
+
+## Diverging ramp for z-scored expression heatmaps: green (low) through a
+## neutral grey to purple (high). The poles were picked to stay distinct from
+## both treatment colours, since the heatmaps carry a treatment bar beside
+## them: every pair of the four clears delta E 10.9 under colour-vision
+## deficiency and 22.3 for normal vision.
+DIVERGING <- c(low = "#0f6b45", mid = "#f0efec", high = "#762a83")
 
 trt_side_colours <- function(coldata) unname(TRT_COLOURS[as.character(coldata$trt)])
 

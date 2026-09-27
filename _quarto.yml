@@ -17,7 +17,7 @@ project:
   # (archive/1_process-tagseq-data-salmon.Rmd), whose ~40 bash chunks carried no
   # eval guard and would have run wget, rsync and hisat2 against absolute paths
   # on one particular machine (finding B5). The list also fixes the render
-  # order, so 03 and 04 always read results 02 has just written.
+  # order, so 03, 04 and 05 always read results 02 has just written.
   #
   # NOTE: 02 is parameterised by tissue and defaults to liver, so a bare
   # `quarto render` regenerates the liver results only (finding B6). Use
@@ -29,6 +29,7 @@ project:
     - tag-seq/code/02-differential-expression.qmd
     - tag-seq/code/03-gene-tables.qmd
     - tag-seq/code/04-enrichment.qmd
+    - tag-seq/code/05-figures.qmd
 
 execute:
   # Replaces knitr's cache = TRUE. Quarto's freeze invalidates on source

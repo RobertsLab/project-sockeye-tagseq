@@ -98,6 +98,11 @@ k_rest <- tolower(G$kegg$name[G$kegg$FDR < 0.05 & !G$kegg$category %in% c("one00
 ## Best liver pathway, to report how close the liver came.
 lk_top <- L$kegg[which.min(L$kegg$FDR), ]
 
+## Variance explained by each principal component, written by notebook 05
+## alongside the figure that shows it.
+pv  <- read.csv("figures/source-data/pca-variance.csv")
+pcv <- function(t, pc) sprintf("%.1f%%", pv$percent_variance[pv$tissue == t & pv$PC == pc])
+
 ## Library depth from the count matrices themselves.
 depth <- sapply(c("liver", "gonad"), function(t) colSums(load_counts(tissue_config(t))$cts))
 depth_txt <- function(t) sprintf("%.1f &plusmn; %.1f million", mean(depth[[t]]) / 1e6, sd(depth[[t]]) / 1e6)
@@ -293,14 +298,17 @@ dissection records]]**. Zona pellucida transcript abundance varied more than
 
 Neither tissue separated cleanly by phenotype in unsupervised ordination
 (@fig-overview A, D). In the liver the first two principal components explained
-13.8% and 10.9% of variance and the phenotype groups overlapped almost completely. In
-the gonad the first component explained 21.4% of variance and territorial samples
+`r pcv("liver", "PC1")` and `r pcv("liver", "PC2")` of variance and the phenotype groups
+overlapped almost completely. In the gonad the first component explained
+`r pcv("gonad", "PC1")` of variance and territorial samples
 were spread along it, with roughly half forming a cluster at negative PC1 scores
 that contained no social fish, while the remainder overlapped the social group. The
 gonad sample-correlation matrix showed the same structure: a block of six
 territorial fish (C01, C06, C07, C08, C10, C11) correlated more strongly with one
 another than with any social sample. Phenotype thus accounts for part, but not the
 majority, of transcriptome-wide variation in either tissue.
+
+![Transcriptome-wide comparison of territorial (blue circles) and social (orange triangles) sockeye salmon in liver (A–C) and gonad (D–F). (A, D) Principal component analysis of variance-stabilised counts, with 95% confidence ellipses for each phenotype; axis labels give the variance explained. (B, E) Volcano plots of all tested genes. Genes differentially expressed at adjusted p < 0.05 are coloured by the phenotype in which expression is higher, and the counts in the upper corners give the number in each direction; other genes are grey. Labelled genes are discussed in the text. (C, F) Z-scored regularised-log expression of every differentially expressed gene, with genes and samples ordered by hierarchical clustering; the bar above each heatmap gives the phenotype of each sample.](../figures/fig1-overview.png){#fig-overview}
 
 ## Liver
 
@@ -338,7 +346,7 @@ than two-fold. The largest effects were increases in territorial fish of genes o
 the acute-phase and innate immune response: two serum amyloid A-5 paralogues and an
 equistatin-like protease inhibitor were each about 60-fold higher (log~2~ fold change
 6.0–6.2), and ladderlectin-like, saxiphilin-like and neurofibromin-like genes were
-30–40-fold higher (@tbl-gonad). The most statistically robust changes were an
+30–40-fold higher (@tbl-gonad; @fig-genes A). The most statistically robust changes were an
 increase in the small heat shock protein *hspb11* and the centrosomal protein
 *cep170*. Genes higher in social fish included vasotocin-neurophysin VT1,
 a CD209 antigen-like lectin, dentin sialophosphoprotein-like and an inward-rectifier
@@ -352,7 +360,8 @@ kable(gene_tbl(G$sig, n = 20, by = "lfc"), align = c("l", "l", "r", "r"))
 
 ## Functional enrichment in the gonad
 
-Over-representation analysis recovered a coherent programme (@tbl-kegg, @tbl-go).
+Over-representation analysis recovered a coherent programme (@fig-enrichment;
+@tbl-kegg, @tbl-go).
 `r fmt(k_sig)` KEGG pathways were enriched at FDR < 0.05, led by oxidative
 phosphorylation (`r oxphos$numDEInCat` of `r oxphos$numInCat` pathway genes
 differentially expressed, FDR `r sci(oxphos$FDR)`) and ribosome
@@ -388,18 +397,20 @@ G$go %>% filter(FDR < 0.05) %>%
   kable(align = c("l", "l", "c", "r", "r", "r"))
 ```
 
+![KEGG pathways and Gene Ontology terms over-represented among gonad genes differentially expressed between territorial and social sockeye (hypergeometric test, FDR < 0.05). The horizontal position is the share of each category's genes that are differentially expressed; the dashed line marks the same share across all tested genes. Point size gives the number of differentially expressed genes in the category and colour its FDR. Categories are ordered by that share within each panel.](../figures/fig2-enrichment.png){#fig-enrichment}
+
 ## Overlap between tissues
 
 `r length(shared)` genes were differentially expressed in both tissues
 (`r paste(shared, collapse = ", ")`), and `r shared_same_dir` of them changed in the
-same direction in both. They include NADH dehydrogenase subunits NDUFS5 and NDUFB5,
+same direction in both (@fig-genes B). They include NADH dehydrogenase subunits NDUFS5 and NDUFB5,
 ATP5MPL, a cytochrome b-c1 complex subunit, the oligosaccharyltransferase subunit
 OSTC, proteasome subunit SEM1 and splicing factor 3B subunit 6, each higher in
 territorial fish in both tissues. This is a small set, but its composition mirrors at
 the level of individual genes the translation and energy-metabolism programme that
 dominates the gonad.
 
-![Transcriptome-wide comparison of territorial (blue circles) and social (red triangles) sockeye salmon in liver (A–C) and gonad (D–F). (A, D) Principal component analysis of variance-stabilised counts with 95% confidence ellipses. (B, E) Volcano plots of all tested genes; colour indicates the sign of the shrunken fold change. (C, F) Row-scaled expression of the differentially expressed genes (adjusted p < 0.05) across samples, with hierarchical clustering; n gives the number of genes. **[[Figure to be regenerated: panels C and F still show the gene counts from before the independent-filtering correction (31 and 1,630); the current counts are 66 and 1,653. See figures/README.md.]]**](../figures/figure_X.png){#fig-overview}
+![Named genes and genes shared between tissues. (A) Normalised counts in gonad for the genes discussed by name in the text, by phenotype (territorial, blue circles; social, orange triangles), on a log scale; boxes show the median and interquartile range. Fold changes and adjusted p-values for all six genes are in the full gonad results table (see Data and code availability). (B) Shrunken log~2~ fold changes in liver and gonad for every gene differentially expressed in both tissues; the dashed line marks equal change in the two tissues, and labelled genes are those named in the text.](../figures/fig3-genes.png){#fig-genes}
 
 # Discussion
 

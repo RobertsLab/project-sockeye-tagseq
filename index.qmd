@@ -53,6 +53,7 @@ notebook 02.
 | [02 — Differential expression (gonad)](tag-seq/code/02-differential-expression-gonad.html) | `tag-seq/data/` | `tag-seq/DESEQ_output/gonad/` |
 | [03 — Gene tables](tag-seq/code/03-gene-tables.html) | significant DEGs | `tag-seq/gene_tables/` |
 | [04 — GO and KEGG enrichment](tag-seq/code/04-enrichment.html) | all DEGs, GAF, KEGG | `tag-seq/GO_output/` |
+| [05 — Manuscript figures](tag-seq/code/05-figures.html) | counts, result tables | `figures/` |
 
 Notebook 01 documents the FASTQ-to-count-matrix pipeline as it was run on Raven
 (HISAT2, StringTie, `prepDE.py`). Every chunk in it is `eval: false` — it is a

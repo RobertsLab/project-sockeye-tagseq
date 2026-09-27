@@ -102,32 +102,25 @@ of them and agrees with the old LOCID table on all 33,210 they share.
 
 ## Fit the model
 
+The model is fitted by `fit_deseq()` in `_common.R`, which notebook 05 also
+calls to draw the manuscript figures, so the tables and the figures come from
+one definition of the model. It does three things:
+
+1. Fits `~ trt` with DESeq2.
+2. Asserts that coefficient 2 is `trt_territorial_vs_social`. `social` is set
+   as the reference level explicitly in `load_counts()`, so this holds by
+   construction rather than by alphabetical accident (finding R3).
+3. Keeps genes with 10 or more counts in at least a third of samples. This
+   filtering happens *after* `DESeq()`, so dispersions were estimated on the
+   full matrix — preserved from the original, which the committed results
+   depend on.
+
 ```{r}
 #| label: deseq
-dds <- DESeqDataSetFromMatrix(countData = cts,
-                              colData   = coldata,
-                              design    = ~ trt)
-dds <- DESeq(dds)
+fit      <- fit_deseq(dat)
+dds      <- fit$dds
+n_before <- fit$n_before
 resultsNames(dds)
-```
-
-`social` is set as the reference level explicitly in `load_counts()`, so
-`coef = 2` below is `trt_territorial_vs_social` by construction rather than by
-alphabetical accident (finding R3). Asserted rather than assumed:
-
-```{r}
-#| label: check_contrast
-stopifnot(identical(resultsNames(dds)[2], "trt_territorial_vs_social"))
-```
-
-Genes are kept if at least a third of samples have 10 or more counts. Note this
-filtering happens *after* `DESeq()`, so dispersions were estimated on the full
-matrix — preserved from the original, which the committed results depend on.
-
-```{r}
-#| label: filter
-n_before <- nrow(dds)
-dds <- dds[rowSums(DESeq2::counts(dds) >= 10) >= ncol(cts) / 3, ]
 cat("genes before filtering:", n_before, "\n")
 cat("genes after filtering: ", nrow(dds), "\n")
 ```
@@ -144,7 +137,7 @@ screeplot(p, axisLabSize = 18, titleLabSize = 22)
 
 bp1 <- biplot(p, x = "PC1", y = "PC2",
               colby    = "trt",
-              colkey   = c(territorial = "royalblue1", social = "red3"),
+              colkey   = TRT_COLOURS,
               shape    = "trt",
               shapekey = c(territorial = 19, social = 17),
               pointSize = 4,

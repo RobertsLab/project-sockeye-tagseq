@@ -1,0 +1,474 @@
+---
+title: "Manuscript figures"
+subtitle: "Figures 1–3, drawn from the fitted models and the committed result tables"
+date: today
+execute:
+  warning: true
+  message: false
+---
+
+This notebook draws the three manuscript figures. It replaces
+`figures/figure_X`, which was assembled by hand in PowerPoint and so could not
+follow the data when the results changed.
+
+Every element comes from one of two places:
+
+- **The fitted DESeq2 model**, refitted here with `fit_deseq()` from
+  `_common.R` — the same function notebook 02 uses — for the ordination and the
+  expression values in the heatmaps and count plots.
+- **The committed result tables** written by notebooks 02 and 04, for
+  significance, fold changes and enrichment. A gene is significant here exactly
+  when it is significant in the tables.
+
+Figures are written to `figures/` as vector PDF, for submission, and as PNG at
+300 dpi, for the manuscript's HTML and Word renders. The numbers the manuscript
+quotes from the ordination are written to `figures/source-data/`.
+
+Sizes follow the journal's double-column width of 170 mm, with text at 7 pt.
+
+```{r}
+#| label: setup
+library(DESeq2)
+library(ggplot2)
+library(ggrepel)
+library(cowplot)
+library(dplyr)
+source("tag-seq/code/_common.R")
+
+FIG_DIR <- "figures"
+SRC_DIR <- file.path(FIG_DIR, "source-data")
+dir.create(SRC_DIR, recursive = TRUE, showWarnings = FALSE)
+
+WIDTH_MM <- 170
+BASE_PT  <- 7
+PT_MM    <- BASE_PT / ggplot2::.pt          # geom_text sizes are in mm
+GREY_NS  <- "#c4c3be"                       # non-significant points
+
+theme_fig <- theme_classic(base_size = BASE_PT) +
+  theme(axis.text        = element_text(colour = "black"),
+        axis.line        = element_line(linewidth = 0.3),
+        axis.ticks       = element_line(linewidth = 0.3),
+        legend.key.size  = unit(3, "mm"),
+        legend.title     = element_text(size = BASE_PT),
+        legend.text      = element_text(size = BASE_PT - 0.5),
+        strip.background = element_blank(),
+        strip.text       = element_text(face = "bold", size = BASE_PT),
+        plot.margin      = margin(4, 4, 4, 4))
+
+## PDF with embedded fonts where cairo is available.
+pdf_device <- if (capabilities("cairo")) grDevices::cairo_pdf else grDevices::pdf
+
+save_fig <- function(plot, name, height_mm) {
+  for (ext in c("pdf", "png")) {
+    ggsave(file.path(FIG_DIR, paste0(name, ".", ext)), plot,
+           width = WIDTH_MM, height = height_mm, units = "mm",
+           device = if (ext == "pdf") pdf_device else "png",
+           dpi = 300, bg = "white")
+  }
+  invisible(file.path(FIG_DIR, paste0(name, c(".pdf", ".png"))))
+}
+
+TRT_LABELS <- c(territorial = "Territorial", social = "Social")
+```
+
+## Short labels for named genes
+
+Most significant genes carry an NCBI `LOC` identifier. These are the readable
+labels used in the figures; any gene not listed falls back to its identifier.
+Each label is checked against the NCBI description below, so a label cannot
+silently attach to the wrong gene.
+
+```{r}
+#| label: labels
+SHORT <- c(
+  ## gonad headline genes
+  LOC115112426 = "saa5 (a)",        LOC115112427 = "saa5 (b)",
+  LOC115137856 = "equistatin-like", hspb11       = "hspb11",
+  cep170       = "cep170",          LOC115101206 = "vasotocin VT1",
+  amh          = "amh",
+  ## liver genes labelled on the volcano plot
+  LOC115122299 = "MBL-like",        LOC115116544 = "ATAT1-like",
+  LOC115112270 = "ADAM10-like",
+  ## genes significant in both tissues
+  LOC115101900 = "PEN-2",           LOC115104196 = "UBC9-B",
+  LOC115104729 = "UQCR9-like",      LOC115105069 = "eIF1b",
+  LOC115113712 = "ferritin H",      LOC115125161 = "RPL32-like",
+  LOC115128702 = "SEM1",            LOC115131673 = "NDUFS5-like",
+  LOC115133295 = "OSTC",            LOC115133349 = "EMC4",
+  LOC115138705 = "PSMA3",           LOC115138930 = "ATPIF1B-like",
+  LOC115139187 = "SF3B6",           LOC115140186 = "DYNLL1-like",
+  LOC115142640 = "DPY30",           atp5mpl      = "ATP5MPL",
+  ndufb5       = "NDUFB5",          znhit2       = "ZNHIT2"
+)
+
+## The word each label must be able to find in the gene's NCBI description.
+EXPECT <- c(
+  LOC115112426 = "serum amyloid A", LOC115112427 = "serum amyloid A",
+  LOC115137856 = "equistatin",      LOC115101206 = "vasotocin",
+  amh          = "anti-Mullerian",  LOC115122299 = "mannose-binding",
+  LOC115116544 = "alpha-tubulin N-acetyltransferase",
+  LOC115112270 = "disintegrin",     LOC115101900 = "PEN-2",
+  LOC115104196 = "UBC9",            LOC115104729 = "b-c1 complex subunit 9",
+  LOC115105069 = "initiation factor 1b", LOC115113712 = "ferritin, heavy",
+  LOC115125161 = "L32",             LOC115128702 = "SEM1",
+  LOC115131673 = "iron-sulfur protein 5", LOC115133295 = "ostc",
+  LOC115133349 = "complex subunit 4", LOC115138705 = "alpha type-3",
+  LOC115138930 = "ATPase inhibitor", LOC115139187 = "3B subunit 6",
+  LOC115140186 = "dynein light chain 1", LOC115142640 = "dpy-30"
+)
+
+annotation <- load_gene_annotation()
+desc <- setNames(annotation$description, annotation$gene)
+ok <- mapply(function(g, w) grepl(w, desc[[g]], ignore.case = TRUE, fixed = FALSE),
+             names(EXPECT), EXPECT)
+if (!all(ok)) stop("label does not match NCBI description: ",
+                   paste(names(EXPECT)[!ok], collapse = ", "))
+
+short_label <- function(g) ifelse(g %in% names(SHORT), SHORT[g], g)
+```
+
+## Data
+
+```{r}
+#| label: data
+read_tissue <- function(tissue) {
+  cfg <- tissue_config(tissue)
+  dat <- load_counts(cfg)
+  fit <- fit_deseq(dat)
+  list(
+    tissue  = tissue,
+    cfg     = cfg,
+    coldata = dat$coldata,
+    dds     = fit$dds,
+    all     = read.csv(out_path(cfg, cfg$prefix, "-ALL-DEG-apeglm.csv"), stringsAsFactors = FALSE),
+    sig     = read.csv(out_path(cfg, cfg$prefix, "-SIG-DEG-apeglm.csv"), stringsAsFactors = FALSE)
+  )
+}
+L <- read_tissue("liver")
+G <- read_tissue("gonad")
+
+## The refitted model must describe the same genes as the committed tables.
+for (x in list(L, G)) {
+  stopifnot(all(x$all$gene %in% rownames(x$dds)),
+            all(x$sig$padj < 0.05))
+}
+sapply(list(liver = L, gonad = G), function(x) c(samples = ncol(x$dds),
+                                                  genes = nrow(x$dds),
+                                                  tested = nrow(x$all),
+                                                  significant = nrow(x$sig)))
+```
+
+## Figure 1 — overview
+
+Principal component analysis of variance-stabilised counts (as in notebook
+02), volcano plots of every tested gene, and heatmaps of the significant genes.
+
+```{r}
+#| label: pca
+pca_data <- function(x) {
+  mat <- assay(vst(x$dds))
+  pc  <- prcomp(t(mat), center = TRUE, scale. = FALSE)
+  pct <- 100 * pc$sdev^2 / sum(pc$sdev^2)
+  scores <- data.frame(sample = rownames(pc$x), pc$x[, 1:5],
+                       trt = x$coldata[rownames(pc$x), "trt"])
+  list(scores = scores, pct = pct)
+}
+PCA <- list(liver = pca_data(L), gonad = pca_data(G))
+
+pca_variance <- do.call(rbind, lapply(names(PCA), function(t)
+  data.frame(tissue = t, PC = paste0("PC", 1:5), percent_variance = round(PCA[[t]]$pct[1:5], 2))))
+write.csv(pca_variance, file.path(SRC_DIR, "pca-variance.csv"), row.names = FALSE)
+pca_variance
+
+pca_scores <- do.call(rbind, lapply(names(PCA), function(t)
+  cbind(tissue = t, PCA[[t]]$scores)))
+write.csv(pca_scores, file.path(SRC_DIR, "pca-scores.csv"), row.names = FALSE)
+
+plot_pca <- function(p) {
+  ggplot(p$scores, aes(PC1, PC2, colour = trt, shape = trt)) +
+    stat_ellipse(level = 0.95, linewidth = 0.4, show.legend = FALSE) +
+    geom_point(size = 1.6) +
+    scale_colour_manual(values = TRT_COLOURS, labels = TRT_LABELS, name = NULL,
+                        breaks = c("territorial", "social")) +
+    scale_shape_manual(values = TRT_SHAPES, labels = TRT_LABELS, name = NULL,
+                       breaks = c("territorial", "social")) +
+    labs(x = sprintf("PC1 (%.1f%%)", p$pct[1]), y = sprintf("PC2 (%.1f%%)", p$pct[2])) +
+    theme_fig + theme(legend.position = "none")
+}
+```
+
+The volcano plots colour a gene by the direction of its effect only when it is
+significant, using the treatment colour of the group in which it is higher.
+
+```{r}
+#| label: volcano
+VOLCANO_LABELS <- list(
+  liver = c("LOC115122299", "LOC115131673", "LOC115116544", "LOC115112270"),
+  gonad = c("LOC115137856", "hspb11", "cep170", "LOC115101206", "amh")
+)
+## The two serum amyloid A copies and the equistatin-like gene lie almost on
+## one point, so they share one label, attached to the equistatin-like gene.
+## Figure 3A shows the three separately.
+VOLCANO_TEXT <- c(LOC115137856 = "equistatin-like,\nsaa5 (a, b)")
+stopifnot(all(abs(G$sig$log2FoldChange[match(c("LOC115112426", "LOC115112427"), G$sig$gene)] -
+                  G$sig$log2FoldChange[G$sig$gene == "LOC115137856"]) < 0.3))
+
+plot_volcano <- function(x) {
+  d <- x$all %>%
+    mutate(class = case_when(padj >= 0.05         ~ "ns",
+                             log2FoldChange > 0   ~ "territorial",
+                             TRUE                 ~ "social"),
+           class = factor(class, levels = c("ns", "social", "territorial"))) %>%
+    arrange(class)                               # significant points drawn on top
+  lab <- d %>% filter(gene %in% VOLCANO_LABELS[[x$tissue]]) %>%
+    mutate(label = ifelse(gene %in% names(VOLCANO_TEXT), VOLCANO_TEXT[gene], short_label(gene)))
+  stopifnot(nrow(lab) == length(VOLCANO_LABELS[[x$tissue]]))
+  n_up <- sum(d$class == "territorial"); n_dn <- sum(d$class == "social")
+  ## Push labels outward, into the empty space beside the point cloud. Labels
+  ## on the social side also rise, and are kept left of zero, because the
+  ## much larger territorial cloud fills the space to their right.
+  lab$nudge   <- sign(lab$log2FoldChange) * 0.08 * diff(range(d$log2FoldChange))
+  lab$nudge_y <- ifelse(lab$log2FoldChange < 0, 0.06 * diff(range(-log10(d$pvalue))), 0)
+  lab_r <- filter(lab, log2FoldChange > 0); lab_l <- filter(lab, log2FoldChange < 0)
+  ## Keep labels below the direction counts in the top corners, which ggrepel
+  ## does not treat as obstacles.
+  y_cap <- 1.03 * max(-log10(d$pvalue))
+
+  ggplot(d, aes(log2FoldChange, -log10(pvalue), colour = class)) +
+    geom_point(size = 0.5, stroke = 0) +
+    geom_text_repel(data = lab_r, aes(label = label), colour = "black",
+                    nudge_x = lab_r$nudge, xlim = c(0, NA), ylim = c(NA, y_cap), bg.colour = "white", bg.r = 0.15,
+                    size = PT_MM - 0.4, min.segment.length = 0, segment.size = 0.25,
+                    box.padding = 0.3, max.overlaps = Inf, seed = 1) +
+    geom_text_repel(data = lab_l, aes(label = label), colour = "black",
+                    nudge_x = lab_l$nudge, nudge_y = lab_l$nudge_y, xlim = c(NA, 0), ylim = c(NA, y_cap),   # NA = panel edge
+                    bg.colour = "white", bg.r = 0.15,
+                    size = PT_MM - 0.4, min.segment.length = 0, segment.size = 0.25,
+                    box.padding = 0.3, max.overlaps = Inf, seed = 1) +
+    annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.4, size = PT_MM - 0.3,
+             label = sprintf("%s higher in\nterritorial", format(n_up, big.mark = ",")),
+             colour = "black", lineheight = 0.9) +
+    annotate("text", x = -Inf, y = Inf, hjust = -0.05, vjust = 1.4, size = PT_MM - 0.3,
+             label = sprintf("%s higher\nin social", format(n_dn, big.mark = ",")),
+             colour = "black", lineheight = 0.9) +
+    scale_colour_manual(values = c(ns = GREY_NS, TRT_COLOURS), guide = "none") +
+    scale_x_continuous(expand = expansion(mult = c(0.12, 0.05))) +   # room for left-side labels
+    scale_y_continuous(expand = expansion(mult = c(0.02, 0.18))) +
+    labs(x = expression(log[2]~"fold change (shrunken)"), y = expression(-log[10]~italic(P))) +
+    theme_fig
+}
+```
+
+The heatmaps show z-scored regularised-log expression of every significant
+gene, as in notebook 02. Genes and samples are ordered by hierarchical
+clustering; the bar above each heatmap gives the treatment.
+
+```{r}
+#| label: heatmap
+heatmap_data <- function(x) {
+  rl  <- assay(rlog(x$dds, blind = FALSE))[x$sig$gene, rownames(x$coldata), drop = FALSE]
+  z   <- t(scale(t(rl)))
+  row_order <- rownames(z)[hclust(dist(z))$order]
+  col_order <- colnames(z)[hclust(dist(t(z)))$order]
+  long <- data.frame(gene   = rep(rownames(z), times = ncol(z)),
+                     sample = rep(colnames(z), each = nrow(z)),
+                     z      = as.vector(z))
+  long$gene   <- factor(long$gene, levels = row_order)
+  long$sample <- factor(long$sample, levels = col_order)
+  bar <- data.frame(sample = factor(col_order, levels = col_order),
+                    trt = x$coldata[col_order, "trt"])
+  list(long = long, bar = bar, n = nrow(z))
+}
+HM <- list(liver = heatmap_data(L), gonad = heatmap_data(G))
+
+## One colour scale for both tissues, capped at |z| = 2.5 so a few extreme
+## values do not wash out the rest.
+Z_LIM <- 2.5
+
+plot_heatmap <- function(h) {
+  tiles <- ggplot(h$long, aes(sample, gene, fill = pmax(pmin(z, Z_LIM), -Z_LIM))) +
+    geom_raster() +
+    scale_fill_gradient2(low = DIVERGING[["low"]], mid = DIVERGING[["mid"]],
+                         high = DIVERGING[["high"]], midpoint = 0,
+                         limits = c(-Z_LIM, Z_LIM), name = "z-score",
+                         breaks = c(-2, 0, 2)) +
+    scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) +
+    labs(x = "Samples", y = sprintf("%s genes", format(h$n, big.mark = ","))) +
+    theme_fig +
+    theme(axis.text = element_blank(), axis.ticks = element_blank(),
+          axis.line = element_blank(), legend.position = "right",
+          legend.key.height = unit(5, "mm"), legend.key.width = unit(2, "mm"))
+  bar <- ggplot(h$bar, aes(sample, 1, fill = trt)) +
+    geom_tile() +
+    scale_fill_manual(values = TRT_COLOURS, guide = "none") +
+    scale_x_discrete(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
+    theme_void()
+  ## Align the bar with the tiles, not with the legend.
+  aligned <- align_plots(bar, tiles + theme(legend.position = "none"), align = "v", axis = "lr")
+  legend  <- get_legend(tiles)
+  plot_grid(plot_grid(aligned[[1]], aligned[[2]], ncol = 1, rel_heights = c(0.06, 1)),
+            legend, nrow = 1, rel_widths = c(1, 0.28))
+}
+```
+
+```{r}
+#| label: fig1
+#| fig-width: 6.7
+#| fig-height: 4.9
+row_label <- function(txt) ggdraw() + draw_label(txt, angle = 90, size = BASE_PT + 1, fontface = "bold")
+
+## Built as a right-hand legend laid out horizontally: cowplot 1.1.3's
+## get_legend() finds ggplot2 3.5's right-hand guide box but returned an empty
+## grob for a top-positioned one, which left the first render without a key.
+trt_legend <- get_legend(
+  plot_pca(PCA$liver) +
+    theme(legend.position = "right", legend.direction = "horizontal",
+          legend.text = element_text(size = BASE_PT)) +
+    guides(colour = guide_legend(override.aes = list(size = 2)))
+)
+
+panels <- plot_grid(
+  row_label("Liver"),
+  plot_pca(PCA$liver), plot_volcano(L), plot_heatmap(HM$liver),
+  row_label("Gonad"),
+  plot_pca(PCA$gonad), plot_volcano(G), plot_heatmap(HM$gonad),
+  nrow = 2, rel_widths = c(0.06, 1, 1, 1.05),
+  labels = c("", "A", "B", "C", "", "D", "E", "F"), label_size = BASE_PT + 2
+)
+fig1 <- plot_grid(trt_legend, panels, ncol = 1, rel_heights = c(0.06, 1))
+fig1
+save_fig(fig1, "fig1-overview", height_mm = 125)
+```
+
+## Figure 2 — enrichment in the gonad
+
+Every KEGG pathway and GO term over-represented among gonad genes at
+FDR < 0.05. The horizontal position is the share of the category's genes that
+are differentially expressed; the dashed line is the same share across all
+tested genes, so distance to the right of it is enrichment.
+
+```{r}
+#| label: fig2
+#| fig-width: 6.7
+#| fig-height: 6.3
+go   <- read.csv("tag-seq/GO_output/gonad/gonad-GO-enriched-FDR05.csv", stringsAsFactors = FALSE)
+kegg <- read.csv("tag-seq/GO_output/gonad/gonad-KEGG-enriched-FDR05.csv", stringsAsFactors = FALSE)
+
+ONTOLOGY <- c(BP = "GO biological process", CC = "GO cellular component",
+              MF = "GO molecular function")
+enr <- bind_rows(
+  kegg %>% transmute(source = "KEGG pathway", term = name, numDEInCat, numInCat, FDR),
+  go   %>% transmute(source = ONTOLOGY[ontology], term, numDEInCat, numInCat, FDR)
+) %>%
+  mutate(ratio  = numDEInCat / numInCat,
+         source = factor(source, levels = c("KEGG pathway", ONTOLOGY)),
+         term   = ifelse(nchar(term) > 58, paste0(substr(term, 1, 56), "…"), term)) %>%
+  group_by(source) %>% arrange(ratio, .by_group = TRUE) %>% ungroup() %>%
+  mutate(term = factor(term, levels = unique(term)))
+stopifnot(!anyDuplicated(paste(enr$source, enr$term)))
+
+background <- nrow(G$sig) / nrow(G$all)
+
+## The baseline is labelled on the top row of the biological-process panel,
+## whose point sits far to the right, so the text cannot cover a point.
+bp_top <- enr %>% filter(source == ONTOLOGY[["BP"]]) %>% slice_max(ratio, n = 1, with_ties = FALSE)
+stopifnot(bp_top$ratio > 0.6)
+## Same factor levels as the points, so the label cannot reorder the axis.
+baseline_label <- data.frame(source = bp_top$source, x = background,
+                             term = factor(as.character(bp_top$term), levels = levels(enr$term)))
+fig2 <- ggplot(enr, aes(ratio, term)) +
+  geom_vline(xintercept = background, linetype = "dashed", linewidth = 0.3, colour = "grey40") +
+  geom_point(aes(size = numDEInCat, colour = -log10(FDR))) +
+  geom_text(data = baseline_label, aes(x = x, y = term),
+            label = sprintf(" all tested genes (%.0f%%)", 100 * background),
+            hjust = 0, vjust = 0.5, size = PT_MM - 0.6, colour = "grey30") +
+  facet_grid(source ~ ., scales = "free_y", space = "free_y") +
+  scale_colour_gradient(low = "#9ec1ee", high = "#0b3f86",
+                        name = expression(-log[10]~FDR)) +
+  scale_size_area(max_size = 3.5, name = "DE genes", breaks = c(5, 20, 40, 60)) +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1),
+                     limits = c(0, NA), expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Share of category genes differentially expressed", y = NULL) +
+  theme_fig +
+  theme(strip.text.y = element_text(angle = 0, hjust = 0),
+        panel.grid.major.y = element_line(colour = "grey92", linewidth = 0.25),
+        legend.position = "right")
+fig2
+save_fig(fig2, "fig2-enrichment", height_mm = 160)
+```
+
+## Figure 3 — named genes, and the genes shared between tissues
+
+Panel A shows normalised counts, by treatment, for the gonad genes the
+manuscript discusses by name. Panel B compares liver and gonad fold changes for
+every gene significant in both tissues; points above the dashed line changed
+more in the gonad than in the liver.
+
+```{r}
+#| label: fig3
+#| fig-width: 6.7
+#| fig-height: 3.2
+HEADLINE <- c("LOC115112426", "LOC115112427", "LOC115137856", "hspb11",
+              "LOC115101206", "amh")
+stopifnot(all(HEADLINE %in% G$sig$gene))
+
+norm <- counts(G$dds, normalized = TRUE)[HEADLINE, rownames(G$coldata)]
+counts_long <- data.frame(gene   = rep(HEADLINE, times = ncol(norm)),
+                          sample = rep(colnames(norm), each = length(HEADLINE)),
+                          count  = as.vector(norm)) %>%
+  mutate(trt = G$coldata[sample, "trt"])
+
+## Facet titles carry the gene name only; the fold changes and adjusted
+## p-values are in the manuscript's gene table, and a second line of numbers
+## did not fit the panel width.
+stats <- G$sig %>% filter(gene %in% HEADLINE) %>% mutate(strip = short_label(gene))
+counts_long$strip <- factor(stats$strip[match(counts_long$gene, stats$gene)],
+                            levels = stats$strip[match(HEADLINE, stats$gene)])
+counts_long$trt <- factor(counts_long$trt, levels = c("territorial", "social"))
+
+fig3a <- ggplot(counts_long, aes(trt, count + 1, colour = trt, shape = trt)) +
+  geom_boxplot(outlier.shape = NA, width = 0.55, linewidth = 0.3, colour = "grey35") +
+  geom_point(position = position_jitter(width = 0.15, seed = 1), size = 0.9) +
+  facet_wrap(~ strip, nrow = 2, scales = "free_y") +
+  scale_y_log10(labels = scales::label_number(big.mark = ",")) +
+  scale_colour_manual(values = TRT_COLOURS, guide = "none") +
+  scale_shape_manual(values = TRT_SHAPES, guide = "none") +
+  scale_x_discrete(labels = TRT_LABELS) +
+  labs(x = NULL, y = "Normalised count + 1") +
+  theme_fig + theme(strip.text = element_text(face = "plain", size = BASE_PT - 0.5))
+
+shared <- inner_join(L$sig %>% select(gene, liver = log2FoldChange),
+                     G$sig %>% select(gene, gonad = log2FoldChange), by = "gene") %>%
+  mutate(label = short_label(gene))
+write.csv(shared, file.path(SRC_DIR, "shared-genes.csv"), row.names = FALSE)
+
+## Label only the genes the manuscript names, plus the one gene lower in
+## territorial fish. Eighteen points sit in a small region, and labelling all
+## of them made the panel unreadable; every gene is in the source-data file.
+B_LABELS <- c("LOC115131673", "ndufb5", "atp5mpl", "LOC115104729", "LOC115133295",
+              "LOC115128702", "LOC115139187", "LOC115116544")
+stopifnot(all(B_LABELS %in% shared$gene))
+
+fig3b <- ggplot(shared, aes(liver, gonad)) +
+  geom_hline(yintercept = 0, linewidth = 0.25, colour = "grey60") +
+  geom_vline(xintercept = 0, linewidth = 0.25, colour = "grey60") +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", linewidth = 0.25, colour = "grey60") +
+  geom_point(size = 1.1, colour = "black") +
+  geom_text_repel(data = filter(shared, gene %in% B_LABELS), aes(label = label),
+                  size = PT_MM - 0.6, segment.size = 0.2, bg.colour = "white", bg.r = 0.15,
+                  min.segment.length = 0, box.padding = 0.35, max.overlaps = Inf, seed = 1) +
+  labs(x = expression("Liver"~log[2]~"fold change"), y = expression("Gonad"~log[2]~"fold change")) +
+  theme_fig
+
+fig3 <- plot_grid(fig3a, fig3b, nrow = 1, rel_widths = c(1.45, 1),
+                  labels = c("A", "B"), label_size = BASE_PT + 2)
+fig3
+save_fig(fig3, "fig3-genes", height_mm = 80)
+```
+
+## Session
+
+```{r}
+#| label: session
+sessionInfo()
+```
