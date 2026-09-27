@@ -164,9 +164,14 @@ Posit Package Manager snapshot, but `renv.lock` records many packages from a
 from the pinned snapshot alone fails; CI passes only because its runner adds
 "latest" Package Manager as a fallback.
 
-- [ ] Either move the `.Rprofile` pin to 2025-05-18 or re-snapshot the
+- [x] Either move the `.Rprofile` pin to 2025-05-18 or re-snapshot the
       lockfile against 2024-04-24, then confirm `renv::restore()` succeeds
       with no other repository configured.
+
+Done 2026-09-27: pin moved to 2025-05-18 in both `.Rprofile` and `renv.lock`
+(no version changed), CI's fallback repository removed, and a clean restore
+with an empty cache installed all 184 locked versions. Detail in
+`REPRODUCIBILITY-PLAN.md`, "The pinned snapshot now restores the lockfile".
 
 ---
 

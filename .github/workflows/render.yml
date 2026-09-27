@@ -59,7 +59,13 @@ jobs:
         with:
           # Must match the R version recorded in renv.lock.
           r-version: '4.3.2'
-          use-public-rspm: true
+          # false, so that the only CRAN the restore can see is the dated
+          # snapshot named in renv.lock and .Rprofile. With true, the runner
+          # added "latest" Package Manager as a second repository, which hid
+          # the fact that the pinned snapshot could not restore the lockfile
+          # (submission checklist B4). renv still installs Linux binaries,
+          # because it rewrites Package Manager URLs to their binary form.
+          use-public-rspm: false
 
       # Pinned to the version the analysis was developed and verified with
       # (REPRODUCIBILITY-PLAN.md records Quarto 1.6.40). Unpinned, the action
@@ -70,12 +76,17 @@ jobs:
         with:
           version: 1.6.40
 
+      # A cached library is restored from the cache, not from the repositories,
+      # so a warm cache cannot tell you whether the lockfile is still
+      # obtainable. Bump the version prefix ("v2") whenever the repository
+      # configuration changes, to force one clean restore from the snapshot.
+      # v2: CRAN snapshot moved to 2025-05-18 and the RSPM fallback removed (B4).
       - name: Cache renv library
         uses: actions/cache@v4
         with:
           path: ${{ env.RENV_PATHS_ROOT }}
-          key: renv-${{ runner.os }}-R4.3.2-${{ hashFiles('renv.lock') }}
-          restore-keys: renv-${{ runner.os }}-R4.3.2-
+          key: renv-v2-${{ runner.os }}-R4.3.2-${{ hashFiles('renv.lock') }}
+          restore-keys: renv-v2-${{ runner.os }}-R4.3.2-
 
       # The lockfile is the environment. If this step fails, the pin is broken,
       # which is itself the finding.

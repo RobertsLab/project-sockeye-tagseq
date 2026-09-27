@@ -222,7 +222,10 @@ Pinning was not the formality it looked like:
   `ggpubr -> rstatix -> car -> pbkrtest -> doBy` — fails to compile on R 4.3.2,
   because its sources now target R >= 4.5. A lockfile that cannot restore is not
   a pin. Fixed with a dated snapshot, `cran/2024-04-24`, contemporary with
-  Bioconductor 3.18.
+  Bioconductor 3.18. *(Superseded 2026-09-27: the lockfile was later
+  snapshotted with packages that snapshot does not hold, and the pin is now
+  `cran/2025-05-18`. See "The pinned snapshot now restores the lockfile"
+  below.)*
 - The pin must be applied **after** `renv/activate.R`, which restores the
   lockfile's repositories and would otherwise overwrite it; and it must **amend**
   the `CRAN` entry rather than replace the vector, which silently drops all five
@@ -649,9 +652,44 @@ records many packages from a 2025-05-18 snapshot, and some (`nlme` 3.1-166)
 exist only in the later one. A restore limited to the pinned snapshot fails on
 `nlme` and `mgcv`. CI succeeds only because its runner also configures "latest"
 Package Manager as a fallback. The re-render above passed both snapshots to
-`renv::restore(repos = ...)`. Open: either move the `.Rprofile` pin to
-2025-05-18, or re-snapshot the lockfile against 2024-04-24, so that the pinned
-snapshot alone restores the environment.
+`renv::restore(repos = ...)`. Closed the next day; see below.
+
+## The pinned snapshot now restores the lockfile (2026-09-27, checklist B4)
+
+Two ways to make the pinned snapshot and the lockfile agree were considered.
+Re-resolving the lockfile against 2024-04-24 would have downgraded 77 of the
+146 locked CRAN packages, since that many were newer than anything the
+snapshot held, and forced another result rebaseline. Moving the pin to
+2025-05-18 changes no package version: 137 locked versions are current in
+that snapshot and the other 9 (MASS, Matrix, XML, lattice, mgcv, nlme, nnet,
+renv, survival) are in its Archive, each confirmed by URL.
+
+**Changes.**
+
+- `renv.lock`: the CRAN repository URL moves to `cran/2025-05-18`. The 49
+  packages recorded against that snapshot's URL, and `renv` recorded as
+  `RSPM`, are relabelled `CRAN`, which now names the same repository. No
+  version changed; the diff is those 51 lines.
+- `.Rprofile`: the pin moves to the same date, and the comment explains why
+  it must match the lockfile.
+- `.github/workflows/render.yml`: `use-public-rspm: false`, so CI no longer
+  adds "latest" Package Manager as a second repository, which is what hid the
+  mismatch. The renv cache key gains a `v2` prefix: a warm cache installs from
+  the cache and never contacts a repository, so without the bump CI would not
+  have exercised the change.
+
+**Verification.** A copy of the project containing only `renv.lock`,
+`.Rprofile` and `renv/`, with an empty renv cache and no library, ran a bare
+`renv::restore(prompt = FALSE)` in the same `bioconductor_docker:3.18-R-4.3.2`
+container whose restore had failed on `nlme` before. The only repositories
+the session saw were the six Bioconductor 3.18 repositories and
+`cran/2025-05-18`. It completed in 16 minutes, and all 184 locked packages
+installed at exactly their locked versions. Because no version changed, the
+committed results stand without a re-render.
+
+**Caveat, unchanged.** The date now governs anything newly installed, and 130
+packages current in that snapshot require R >= 4.4. A future
+`renv::install()` may need an explicit older version; `.Rprofile` says so.
 
 ---
 
