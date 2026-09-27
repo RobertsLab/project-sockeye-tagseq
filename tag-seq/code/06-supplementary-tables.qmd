@@ -97,9 +97,17 @@ tables, and that is asserted here.
 #| label: s2-s3
 de_table <- function(tissue) {
   cfg <- tissue_config(tissue)
-  rd  <- function(suffix) read.csv(out_path(cfg, cfg$prefix, "-ALL-DEG", suffix, ".csv"),
-                                   stringsAsFactors = FALSE)
-  un <- rd(""); ap <- rd("-apeglm"); as <- rd("-ashr"); no <- rd("-normal")
+  rd  <- function(path) {
+    if (!file.exists(path)) stop(path, " not found: it is written by notebook 02, ",
+                                 "so render with ./render-all.sh, or render 02 first")
+    read.csv(path, stringsAsFactors = FALSE)
+  }
+  ## apeglm and unshrunken tables are tracked; normal and ashr are regenerated
+  ## into the untracked alternatives/ folder on every render (checklist D2).
+  un <- rd(out_path(cfg, cfg$prefix, "-ALL-DEG.csv"))
+  ap <- rd(out_path(cfg, cfg$prefix, "-ALL-DEG-apeglm.csv"))
+  as <- rd(file.path(cfg$dir, "alternatives", paste0(cfg$prefix, "-ALL-DEG-ashr.csv")))
+  no <- rd(file.path(cfg$dir, "alternatives", paste0(cfg$prefix, "-ALL-DEG-normal.csv")))
 
   for (x in list(ap, as, no)) {
     stopifnot(setequal(x$gene, un$gene))

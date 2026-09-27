@@ -182,7 +182,8 @@ knitr resets at every chunk boundary (finding R7).
 ggexport(filename = out_path(cfg, cfg$prefix, "-PCA.png"),
          plot = bp1, res = 600, width = 4000, height = 5000)
 
-ggexport(filename = out_path(cfg, cfg$prefix, "-PAIRS.png"),
+## The pairs plot of PCs 1-5 is a diagnostic, kept out of git (alternatives/).
+ggexport(filename = alt_path(cfg, cfg$prefix, "-PAIRS.png"),
          plot = bp2, res = 600, width = 6000, height = 6000)
 
 ggexport(filename = out_path(cfg, cfg$prefix, "-pheatmap.png"),
@@ -218,6 +219,14 @@ for (shrunk in list(res_table_normal, res_table_apeglm, res_table_ashr)) {
 }
 ```
 
+Three shrinkage estimators are compared. They move fold changes by different
+amounts (the MA plots below), but because they share the unshrunken test's
+adjusted p-values they flag exactly the same genes, so the choice affects
+effect sizes, never which genes are called. The manuscript reports apeglm. Its
+tables are tracked in git; the normal and ashr tables are regenerated on every
+render into `alternatives/`, which git ignores, and their fold changes are
+published in Tables S2 and S3.
+
 ```{r}
 #| label: ma_plots
 #| fig-width: 10
@@ -232,7 +241,9 @@ draw_ma <- function() {
 }
 draw_ma()
 
-pdf(file = out_path(cfg, "MA_plots.pdf"))
+## PNG only. This was a PDF of 2-3 MB per tissue holding tens of thousands of
+## vector points; gonad also carried a 2022 MA_plots.png that no code wrote.
+png(filename = out_path(cfg, "MA_plots.png"), width = 10, height = 4, units = "in", res = 200)
 draw_ma()
 invisible(dev.off())
 ```
@@ -289,9 +300,19 @@ sig_genes_apeglm <- annotate_genes(filter(res_table_apeglm, padj < padj.cutoff))
 sig_genes_ashr   <- annotate_genes(filter(res_table_ashr,   padj < padj.cutoff))
 ```
 
+The four estimators flag exactly the same genes, because they share one set of
+adjusted p-values. That is asserted here, and it is why one table of normalised
+counts serves all four: the counts depend on the gene, not on the estimator.
+Until 2026-09-27 there were four copies of that table, identical but for row
+order (submission checklist D2).
+
 ```{r}
 #| label: single_gene_counts
-## Normalised counts for every significant gene, per shrinkage estimator.
+stopifnot(setequal(sig_genes$gene, sig_genes_normal$gene),
+          setequal(sig_genes$gene, sig_genes_apeglm$gene),
+          setequal(sig_genes$gene, sig_genes_ashr$gene))
+
+## Normalised counts for every significant gene.
 single_gene_counts <- function(sig) {
   if (nrow(sig) == 0) return(data.frame())
   do.call(rbind, lapply(sig$gene, function(locid) {
@@ -303,15 +324,8 @@ single_gene_counts <- function(sig) {
   }))
 }
 
-counts_unshrunk <- single_gene_counts(sig_genes)
-counts_normal   <- single_gene_counts(sig_genes_normal)
-counts_apeglm   <- single_gene_counts(sig_genes_apeglm)
-counts_ashr     <- single_gene_counts(sig_genes_ashr)
-
-write.table(counts_unshrunk, out_path(cfg, cfg$prefix, "-unshrunk-single-gene-counts.csv"), row.names = FALSE, sep = ",")
-write.table(counts_normal,   out_path(cfg, cfg$prefix, "-normal-single-gene-counts.csv"),   row.names = FALSE, sep = ",")
-write.table(counts_apeglm,   out_path(cfg, cfg$prefix, "-apeglm-single-gene-counts.csv"),   row.names = FALSE, sep = ",")
-write.table(counts_ashr,     out_path(cfg, cfg$prefix, "-ashr-single-gene-counts.csv"),     row.names = FALSE, sep = ",")
+write.table(single_gene_counts(sig_genes_apeglm),
+            alt_path(cfg, cfg$prefix, "-single-gene-counts.csv"), row.names = FALSE, sep = ",")
 ```
 
 The summary table `<tissue>-gene-counts.csv` records, per estimator, how many
@@ -333,15 +347,19 @@ gene_counts <- data.frame(count = c(
 ))
 gene_counts
 
+## Tracked: the unshrunken test and the apeglm estimates the manuscript uses.
 write.table(all_genes,        out_path(cfg, cfg$prefix, "-ALL-DEG.csv"),            row.names = FALSE, sep = ",")
-write.table(all_genes_normal, out_path(cfg, cfg$prefix, "-ALL-DEG-normal.csv"),     row.names = FALSE, sep = ",")
 write.table(all_genes_apeglm, out_path(cfg, cfg$prefix, "-ALL-DEG-apeglm.csv"),     row.names = FALSE, sep = ",")
-write.table(all_genes_ashr,   out_path(cfg, cfg$prefix, "-ALL-DEG-ashr.csv"),       row.names = FALSE, sep = ",")
 write.table(sig_genes,        out_path(cfg, cfg$prefix, "-SIG-DEG-unshrunken.csv"), row.names = FALSE, sep = ",")
-write.table(sig_genes_normal, out_path(cfg, cfg$prefix, "-SIG-DEG-normal.csv"),     row.names = FALSE, sep = ",")
 write.table(sig_genes_apeglm, out_path(cfg, cfg$prefix, "-SIG-DEG-apeglm.csv"),     row.names = FALSE, sep = ",")
-write.table(sig_genes_ashr,   out_path(cfg, cfg$prefix, "-SIG-DEG-ashr.csv"),       row.names = FALSE, sep = ",")
 write.table(gene_counts,      out_path(cfg, cfg$prefix, "-gene-counts.csv"),        row.names = TRUE, sep = ",")
+
+## Regenerated but untracked (alternatives/): the normal and ashr estimates.
+## Their fold changes reach the paper through Tables S2 and S3 (notebook 06).
+write.table(all_genes_normal, alt_path(cfg, cfg$prefix, "-ALL-DEG-normal.csv"),     row.names = FALSE, sep = ",")
+write.table(all_genes_ashr,   alt_path(cfg, cfg$prefix, "-ALL-DEG-ashr.csv"),       row.names = FALSE, sep = ",")
+write.table(sig_genes_normal, alt_path(cfg, cfg$prefix, "-SIG-DEG-normal.csv"),     row.names = FALSE, sep = ",")
+write.table(sig_genes_ashr,   alt_path(cfg, cfg$prefix, "-SIG-DEG-ashr.csv"),       row.names = FALSE, sep = ",")
 ```
 
 ## Volcano plots
@@ -355,23 +373,16 @@ volcano <- function(tbl) {
     geom_point(aes(color = log2FoldChange > 0))
 }
 
-volcano_specs <- list(
-  list(file = "Volcano_all_genes.png",        data = all_genes),
-  list(file = "Volcano_all_genes_normal.png", data = all_genes_normal),
-  list(file = "Volcano_all_genes_ashr.png",   data = all_genes_ashr),
-  list(file = "Volcano_all_genes_apeglm.png", data = all_genes_apeglm),
-  list(file = "Volcano_sig_genes.png",        data = sig_genes),
-  list(file = "Volcano_sig_genes_normal.png", data = sig_genes_normal),
-  list(file = "Volcano_sig_genes_ashr.png",   data = sig_genes_ashr),
-  list(file = "Volcano_sig_genes_apeglm.png", data = sig_genes_apeglm)
-)
+## Unshrunken and apeglm, shown here; only apeglm, the estimate the manuscript
+## uses, is saved. Eight volcano PNGs per tissue were written until 2026-09-27,
+## one per estimator for all and for significant genes (submission checklist
+## D2); the manuscript's volcano plots are drawn by notebook 05.
+print(volcano(all_genes) + ggtitle("unshrunken"))
 
-for (spec in volcano_specs) {
-  p <- volcano(spec$data)
-  print(p)
-  ggsave(out_path(cfg, spec$file), plot = p,
-         dpi = 600, device = "png", width = 6, height = 4, units = "in")
-}
+p <- volcano(all_genes_apeglm) + ggtitle("apeglm")
+print(p)
+ggsave(out_path(cfg, "Volcano_all_genes_apeglm.png"), plot = p,
+       dpi = 600, device = "png", width = 6, height = 4, units = "in")
 ```
 
 ## Expression heatmap
