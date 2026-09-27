@@ -749,6 +749,28 @@ verification.
 
 ---
 
+## Unread inputs out of the tree (2026-09-27, checklist D3; closes E11)
+
+The last open decisions of finding E11 are closed. The two transcript-level
+count matrices, the liver merged GTF (33 MB together) and the superseded
+`Onerka_LOCID_gene_table.txt` (3.8 MB) are removed from the working tree.
+None was read by any notebook; a full render without them reproduced every
+tracked result byte for byte. Each is recorded in `tag-seq/data/README.md` or
+`tag-seq/genome/README.md` with its sha256 and a commit-pinned GitHub address,
+downloaded and checked before removal; the LOC table is also on Gannet (CRLF
+line endings, otherwise identical). Its replacement's superset claim was
+re-verified: all 33,211 of its genes are in the feature table with matching
+descriptions (the earlier note said 33,210).
+
+Tracked content is now 67 MB, from 129 MB before D2 and D3.
+
+Also found: `index.qmd` gave the raw-data location as a Gannet
+`seashell/bu-github/` address that returns 404; it now gives the
+`panopea/berdahl-sockeye-salmon/` folder, which holds all 95 FASTQs
+(gonad 60, liver 30, brain 5) and which every other document already cited.
+
+---
+
 ## How you will know it worked
 
 1. **It renders.** `quarto render` completes from a clean checkout with no

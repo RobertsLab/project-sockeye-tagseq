@@ -95,11 +95,23 @@ observation. It does not replace the MultiQC evidence the original decision
 cited; either commit that, or adopt a library-size rule in notebook 02 and say
 so.
 
+Found 2026-09-27 on Gannet (`panopea/berdahl-sockeye-salmon/multiqc_report.html`
+and `multiqc_data/`, July 2022): a FastQC-only MultiQC report on the untrimmed
+gonad reads. It has no sample-correlation heatmap, so it is not the evidence
+the exclusion was based on. Its raw read totals (both lanes) also show that
+raw depth alone does not separate the excluded libraries: C17 is the lowest
+(4.12 M reads) but C05 (6.00 M) has more than the retained C01 (5.49 M; the
+other 28 range 5.49–12.09 M). C05 stands out only in gene-assigned counts,
+which points to a lower assignment rate rather than shallow sequencing; a
+library-size rule should say it is on gene-assigned counts.
+
 ### A6. Sequencing details
 
 - [ ] Instrument, read length and run type (single-end assumed) from the GSAF
       job documents (JA22192 gonad, JA22330 liver; Dropbox links in
-      `README.md`). Replace the placeholder in `manuscript.qmd`.
+      `README.md`). Replace the placeholder in `manuscript.qmd`. *Partly
+      known: the Gannet MultiQC report shows the gonad reads are 101 bp, R1
+      only, from two lanes; liver is still unconfirmed.*
 - [ ] Cutadapt, FastQC and MultiQC versions (notebook 01 lists the tools but
       not every version).
 
@@ -365,13 +377,23 @@ a 2022 `gonad/MA_plots.png` that no code wrote.
 Already recorded as open decisions in `tag-seq/data/README.md` and
 `tag-seq/genome/README.md`; close them.
 
-- [ ] Move `transcript_count_matrix-{gonad,liver}.csv` and
+- [x] Move `transcript_count_matrix-{gonad,liver}.csv` and
       `onerka_merged-liver.gtf` (33 MB) to the Gannet project folder or into
       the SRA/GEO deposit, and record the URL in `tag-seq/data/README.md`.
-- [ ] Drop `Onerka_LOCID_gene_table.txt` (3.8 MB, superseded) and record in
+- [x] Drop `Onerka_LOCID_gene_table.txt` (3.8 MB, superseded) and record in
       `tag-seq/genome/README.md` that the feature table is a strict superset.
-- [ ] Tracked content then falls from ~129 MB to ~55 MB. Git history keeps the
+- [x] Tracked content then falls from ~129 MB to ~55 MB. Git history keeps the
       old blobs; that is fine, Zenodo archives the tree.
+
+Done 2026-09-27, with one change of plan. The transcript matrices and merged
+GTF are not on Gannet, and writing to the lab server is not something to do
+from an analysis session, so instead of a Gannet URL each file's record in
+`tag-seq/data/README.md` is a commit-pinned GitHub address plus its sha256,
+downloaded and checked before removal. They should still go into the GEO
+deposit (A3). `Onerka_LOCID_gene_table.txt` is also on Gannet (with CRLF line
+endings, otherwise identical), and the superset claim was re-verified: all
+33,211 of its genes are in the feature table with matching descriptions.
+Also fixed: `index.qmd` linked a Gannet address that returns 404.
 
 ### D4. Write the notebooks for a reader, not an auditor
 

@@ -115,8 +115,12 @@ Tracked in git, so a re-render either reproduces them or shows a diff:
 
 ## Data availability
 
-Raw FASTQ files are on Gannet:
-<https://gannet.fish.washington.edu/seashell/bu-github/project-sockeye-tagseq/>.
+Raw FASTQ files are on Gannet, at
+<https://gannet.fish.washington.edu/panopea/berdahl-sockeye-salmon/>: gonad in
+`20220714-tagseq-gonad/` (30 libraries, two lanes each), liver in
+`20220917-tagseq-liver/` (30 libraries), with FastQC and MultiQC reports
+alongside. This page previously linked a `seashell/bu-github/` address, which
+no longer resolves.
 
 They have **no archival accession yet** — no BioProject, no SRA (audit finding
 E10). Until they are deposited, the raw data has neither a persistence guarantee
