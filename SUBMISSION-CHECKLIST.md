@@ -454,10 +454,22 @@ description of the render and the checker is corrected.
 - [x] Replace `figures/figure_X.pptx` and its PNG export with the output of
       the figures notebook (C2). Delete the pptx once the scripted figure
       matches.
-- [ ] Have the same notebook write `manuscript/supplementary/` (tables S1–Sn
+- [x] Have the same notebook write `manuscript/supplementary/` (tables S1–Sn
       from A5, B3, C3) so the supplement is regenerated with the results.
-- [ ] Add `manuscript/manuscript.qmd` to `render-all.sh` and to the render
+      *(Done in C3 by a separate notebook, `06-supplementary-tables.qmd`,
+      rendered after the figures, rather than in notebook 05.)*
+- [x] Add `manuscript/manuscript.qmd` to `render-all.sh` and to the render
       workflow (C4) so the docx and the supplement are built in CI.
+      *(Done in C4.)*
+
+Also 2026-09-27: the generated outputs are now deterministic, so a render
+leaves the working tree clean. Every render used to rewrite the three figure
+PDFs, whose only difference was the creation timestamp cairo writes (cairo
+1.16 ignores SOURCE_DATE_EPOCH), and the PCA scores, which varied in the 13th
+decimal. Notebook 05 now sets the PDF timestamp to the epoch in place, keeping
+the file length and cross-reference offsets unchanged, and rounds the scores
+to six decimals. Two consecutive renders gave byte-identical figure files, and
+the PDFs parse under a strict parser.
 
 ### D7. Standard files
 
