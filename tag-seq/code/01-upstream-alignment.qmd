@@ -450,12 +450,15 @@ python3 "$PREPDEPY" \
 
 ## Quality summary
 
-Alignment rates reported by HISAT2 (from `hisat2_alignment_{gonad,liver}.txt`):
+Alignment rates reported by HISAT2 (from `hisat2_alignment_{gonad,liver}.txt` in
+the project root on Raven; those logs are not in this repository, so the figures
+below are unverified; see `tag-seq/QC/README.md`):
 
 - **Gonad:** 88.7% +/- 2.21 overall alignment rate
 - **Liver:** 86.5% +/- 0.82 overall alignment rate
 
-MultiQC reports and detailed FastQC results are committed alongside this notebook for reference.
+The gonad MultiQC reports are in `tag-seq/QC/multiqc_gonad/`; the per-library
+FastQC pages are on Gannet. No liver read-QC output has been found.
 
 ## Notes
 

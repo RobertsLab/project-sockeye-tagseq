@@ -1,0 +1,26 @@
+# Project notes
+
+Lab logistics for the Berdahl sockeye salmon TagSeq project: sample shipping,
+the sequencing quote and manifests, related lab-notebook issues, and working
+documents. Moved here from `README.md` on 2026-09-27 so the README can describe
+the analysis. Several links point to Dropbox and Google Drive files that may not
+be public; consider whether this file belongs in a public archive of the
+repository.
+
+### Locations
+1. [Gannet folder](https://gannet.fish.washington.edu/panopea/berdahl-sockeye-salmon/)
+2. [Manuscript](https://docs.google.com/document/d/19xcEKJfSdz6b7KGZAEr76w9NrCF5RPQ99FFtRt-G-wI/edit?usp=sharing)
+
+### Github issues:
+1. [Sam's initial experiments w/ RNA extraction](https://github.com/RobertsLab/resources/issues/1307)
+2. [Matt & Sam - issues with RNA extractions](https://github.com/RobertsLab/resources/issues/1410)
+3. [GSAF sequencing results](https://github.com/RobertsLab/resources/issues/1501)
+
+### Sequencing:
+1. Salmon samples shipped to UT Austin GSAF on 5/24. Received 5/25. Assigned Job number JA22192.
+2. Sample list and plate map available [here](https://www.dropbox.com/s/snq453edfxeor6t/Berdahl_sockeye_salmon.xlsx?dl=0)
+3. Quote available [here](https://www.dropbox.com/s/znk1cikjtrj9v6n/GSAF_Quote_Job_JA22192_2022-05-09.pdf?dl=0)
+4. GSAF sample manifest available [here](https://www.dropbox.com/s/9yuso7jhkazikrt/GSAF%20Sample%20Manifest_Job%23JA22192_2022-05-12.pdf?dl=0)
+
+### Pertinent Documents
+1. Sample attributes [list](https://docs.google.com/spreadsheets/d/1HVCK9HVTzWEkBT5vnbK97zJvnE4Amco5NPkmf_W9yVw/edit?usp=sharing)

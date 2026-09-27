@@ -82,10 +82,16 @@ one composite figure and four tables. The manuscript is *not* rendered by CI.
       placeholders), **or** compute the outlier criterion inside notebook 02
       (e.g. sample-correlation or PCA distance with a stated threshold) so the
       exclusion is derived rather than hardcoded in `tag-seq/code/_common.R`.
+      *(Partly: the gonad MultiQC reports are now in `tag-seq/QC/multiqc_gonad/`,
+      but they are FastQC-only and are not the correlation evidence. No liver
+      QC has been found.)*
 - [ ] Fix `tag-seq/QC/ALIGNMENT_SUMMARY.md`: it reports n=15 per tissue for
       matrices with 30 columns, and cites logs that are not in the repository.
       Commit per-sample alignment rates and library sizes as a supplementary
-      table.
+      table. *(The summary is replaced by `tag-seq/QC/README.md`, which marks
+      the alignment rates unverified, and the manuscript now flags them with a
+      placeholder. Library sizes are in Table S1. Per-sample alignment rates
+      need the HISAT2 logs, `hisat2_alignment_{gonad,liver}.txt` on Raven.)*
 
 Evidence found 2026-09-27 while building Table S1: C05 and C17 are the two
 smallest gonad libraries, 1.97 and 2.14 million gene-assigned counts against
@@ -424,14 +430,24 @@ reads the feature table.
 
 ### D5. Empty directories and lab logistics
 
-- [ ] `tag-seq/QC/`: commit the MultiQC reports and a per-sample alignment
+- [x] `tag-seq/QC/`: commit the MultiQC reports and a per-sample alignment
       table (A5), or remove the placeholder directories. An empty tracked
       directory asserts content that is not there.
-- [ ] Move the sequencing logistics in `README.md` (shipping dates, GSAF
+- [x] Move the sequencing logistics in `README.md` (shipping dates, GSAF
       quote, sample manifest, Dropbox links, GitHub issue links) to a
       `NOTES.md` or drop them from the public archive. Keep the Gannet URL.
-- [ ] Add a directory map to `README.md`: one line per top-level directory
+- [x] Add a directory map to `README.md`: one line per top-level directory
       saying what it holds and which notebook reads or writes it.
+
+Done 2026-09-27. `tag-seq/QC/` holds the gonad MultiQC reports and data tables
+copied from Gannet with their checksums, and a README saying what QC evidence
+is missing: liver read QC, the HISAT2 logs, and the correlation evidence for
+the exclusion. The four empty placeholder directories are gone. The alignment
+rates the manuscript quotes are marked unverified there and in the manuscript
+(a new placeholder, so the check now lists seven). Logistics moved to
+`NOTES.md`, which may not belong in a public archive; its Dropbox and Google
+links are not all public. `README.md` has a directory map, and its stale
+description of the render and the checker is corrected.
 
 ### D6. Figures and supplement as outputs
 

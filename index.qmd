@@ -36,8 +36,8 @@ Counts are gene-level, quantified against NCBI assembly
 
 `C05` and `C17` are dropped by a hardcoded `exclude` in `tag-seq/code/_common.R`.
 The recorded reason is a sample-correlation inspection whose output is **not in
-this repository**; the MultiQC report on Gannet covers FastQC only and has no
-correlation heatmap. What the repository can show is that they are the two
+this repository**; the gonad MultiQC reports, now in `tag-seq/QC/`, cover
+FastQC only and have no correlation heatmap. What the repository can show is that they are the two
 smallest gonad libraries by gene-assigned counts (1.97 and 2.14 million, against
 3.39–5.77 million for the other 28; Supplementary Table S1). This is the one
 analytical choice with a discretionary effect on the gonad results. Treat the
